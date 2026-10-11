@@ -14,13 +14,15 @@ class Retoc:
                                + result.stderr.decode(errors="replace"))
         return result.stdout
 
-    def chunks(self, container):
-        """{game path (e.g. /Game/Game/UI/X): chunk id} for every package in a .utoc or directory."""
+    def chunks(self, container, suffix=None):
+        """{game path (e.g. /Game/Game/UI/X): chunk id} for every package in a .utoc or directory,
+        optionally only those whose file ends in `suffix` (".umap" for levels)."""
         found = {}
         for line in self.run("list", "--path", container).decode().splitlines():
             fields = line.split(maxsplit=3)
             if len(fields) == 4 and fields[2] == "ExportBundleData" and game_path(fields[3]):
-                found[game_path(fields[3])] = fields[1]
+                if suffix is None or fields[3].strip().endswith(suffix):
+                    found[game_path(fields[3])] = fields[1]
         return found
 
     def get(self, container, chunk):

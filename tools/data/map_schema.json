@@ -1,0 +1,3927 @@
+{
+ "roots": [
+  "BP_CombatPreparationArea_C",
+  "TacticalPoint",
+  "SphereComponent",
+  "BoxComponent"
+ ],
+ "schemas": {
+  "Actor": {
+   "super": "Object",
+   "flags": 818413988,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "PrimaryActorTick",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "ActorTickFunction"
+     }
+    },
+    {
+     "index": 1,
+     "name": "bNetTemporary",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 2,
+     "name": "bOnlyRelevantToOwner",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 3,
+     "name": "bAlwaysRelevant",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 4,
+     "name": "bReplicateMovement",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 5,
+     "name": "bCallPreReplication",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 6,
+     "name": "bCallPreReplicationForReplay",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 7,
+     "name": "bHidden",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 8,
+     "name": "bTearOff",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 9,
+     "name": "bForceNetAddressable",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 10,
+     "name": "bExchangedRoles",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 11,
+     "name": "bNetLoadOnClient",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 12,
+     "name": "bNetUseOwnerRelevancy",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 13,
+     "name": "bRelevantForNetworkReplays",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 14,
+     "name": "bRelevantForLevelBounds",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 15,
+     "name": "bReplayRewindable",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 16,
+     "name": "bAllowTickBeforeBeginPlay",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 17,
+     "name": "bAutoDestroyWhenFinished",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 18,
+     "name": "bCanBeDamaged",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 19,
+     "name": "bBlockInput",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 20,
+     "name": "bCollideWhenPlacing",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 21,
+     "name": "bFindCameraComponentWhenViewTarget",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 22,
+     "name": "bGenerateOverlapEventsDuringLevelStreaming",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 23,
+     "name": "bIgnoresOriginShifting",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 24,
+     "name": "bEnableAutoLODGeneration",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 25,
+     "name": "bIsEditorOnlyActor",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 26,
+     "name": "bReplicates",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 27,
+     "name": "bCanBeInCluster",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 28,
+     "name": "bAllowReceiveTickEventOnDedicatedServer",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 29,
+     "name": "bReplicateUsingRegisteredSubObjectList",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 30,
+     "name": "bActorEnableCollision",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 31,
+     "name": "bActorIsBeingDestroyed",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 32,
+     "name": "bAsyncPhysicsTickEnabled",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 33,
+     "name": "UpdateOverlapsMethodDuringLevelStreaming",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EActorUpdateOverlapsMethod"
+     }
+    },
+    {
+     "index": 34,
+     "name": "DefaultUpdateOverlapsMethodDuringLevelStreaming",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EActorUpdateOverlapsMethod"
+     }
+    },
+    {
+     "index": 35,
+     "name": "RemoteRole",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ENetRole"
+     }
+    },
+    {
+     "index": 36,
+     "name": "InitialLifeSpan",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 37,
+     "name": "CustomTimeDilation",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 38,
+     "name": "RayTracingGroupId",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 39,
+     "name": "AttachmentReplication",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "RepAttachment"
+     }
+    },
+    {
+     "index": 40,
+     "name": "ReplicatedMovement",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "RepMovement"
+     }
+    },
+    {
+     "index": 41,
+     "name": "Owner",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 42,
+     "name": "NetDriverName",
+     "array_dim": 1,
+     "type": {
+      "type": "NameProperty"
+     }
+    },
+    {
+     "index": 43,
+     "name": "Role",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ENetRole"
+     }
+    },
+    {
+     "index": 44,
+     "name": "NetDormancy",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ENetDormancy"
+     }
+    },
+    {
+     "index": 45,
+     "name": "SpawnCollisionHandlingMethod",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ESpawnActorCollisionHandlingMethod"
+     }
+    },
+    {
+     "index": 46,
+     "name": "AutoReceiveInput",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EAutoReceiveInput"
+     }
+    },
+    {
+     "index": 47,
+     "name": "InputPriority",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 48,
+     "name": "InputComponent",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 49,
+     "name": "NetTag",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 50,
+     "name": "NetCullDistanceSquared",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 51,
+     "name": "NetUpdateFrequency",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 52,
+     "name": "MinNetUpdateFrequency",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 53,
+     "name": "NetPriority",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 54,
+     "name": "PhysicsReplicationMode",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EPhysicsReplicationMode"
+     }
+    },
+    {
+     "index": 55,
+     "name": "Instigator",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 56,
+     "name": "Children",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 57,
+     "name": "RootComponent",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 58,
+     "name": "Layers",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "NameProperty"
+      }
+     }
+    },
+    {
+     "index": 59,
+     "name": "ParentComponent",
+     "array_dim": 1,
+     "type": {
+      "type": "WeakObjectProperty"
+     }
+    },
+    {
+     "index": 60,
+     "name": "Tags",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "NameProperty"
+      }
+     }
+    },
+    {
+     "index": 61,
+     "name": "OnTakeAnyDamage",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 62,
+     "name": "OnTakePointDamage",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 63,
+     "name": "OnTakeRadialDamage",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 64,
+     "name": "OnActorBeginOverlap",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 65,
+     "name": "OnActorEndOverlap",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 66,
+     "name": "OnBeginCursorOver",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 67,
+     "name": "OnEndCursorOver",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 68,
+     "name": "OnClicked",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 69,
+     "name": "OnReleased",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 70,
+     "name": "OnInputTouchBegin",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 71,
+     "name": "OnInputTouchEnd",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 72,
+     "name": "OnInputTouchEnter",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 73,
+     "name": "OnInputTouchLeave",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 74,
+     "name": "OnActorHit",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 75,
+     "name": "OnDestroyed",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 76,
+     "name": "OnEndPlay",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 77,
+     "name": "InstanceComponents",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 78,
+     "name": "BlueprintCreatedComponents",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    }
+   ]
+  },
+  "ActorComponent": {
+   "super": "Object",
+   "flags": 820510885,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "PrimaryComponentTick",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "ActorComponentTickFunction"
+     }
+    },
+    {
+     "index": 1,
+     "name": "ComponentTags",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "NameProperty"
+      }
+     }
+    },
+    {
+     "index": 2,
+     "name": "AssetUserData",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 3,
+     "name": "UCSSerializationIndex",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 4,
+     "name": "bNetAddressable",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 5,
+     "name": "bReplicateUsingRegisteredSubObjectList",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 6,
+     "name": "bReplicates",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 7,
+     "name": "bAutoActivate",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 8,
+     "name": "bIsActive",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 9,
+     "name": "bEditableWhenInherited",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 10,
+     "name": "bCanEverAffectNavigation",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 11,
+     "name": "bIsEditorOnly",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 12,
+     "name": "CreationMethod",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EComponentCreationMethod"
+     }
+    },
+    {
+     "index": 13,
+     "name": "OnComponentActivated",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 14,
+     "name": "OnComponentDeactivated",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    }
+   ]
+  },
+  "ActorComponentTickFunction": {
+   "super": "TickFunction",
+   "flags": 1,
+   "module": "/Script/Engine",
+   "properties": []
+  },
+  "ActorTickFunction": {
+   "super": "TickFunction",
+   "flags": 1,
+   "module": "/Script/Engine",
+   "properties": []
+  },
+  "BP_CombatPreparationArea_C": {
+   "super": "CombatPreparationArea",
+   "flags": 12845316,
+   "module": "/Game/Game/Core/Blueprints/BP_CombatPreparationArea",
+   "properties": [
+    {
+     "index": 0,
+     "name": "UberGraphFrame",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "PointerToUberGraphFrame"
+     }
+    },
+    {
+     "index": 1,
+     "name": "MoveTargets",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "StructProperty",
+       "struct": "BitReactorMoveTarget"
+      }
+     }
+    },
+    {
+     "index": 2,
+     "name": "Found Target Points",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "SoftObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 3,
+     "name": "TimesMoved",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 4,
+     "name": "Stage",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 5,
+     "name": "Suppress Tactical Camera Transition",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 6,
+     "name": "Objective Dummies",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 7,
+     "name": "bypass built in camera instructions",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    }
+   ]
+  },
+  "BitReactorMovePathPoint": {
+   "super": null,
+   "flags": 4097,
+   "module": "/Script/BitReactorGame",
+   "properties": [
+    {
+     "index": 0,
+     "name": "Location",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector"
+     }
+    }
+   ]
+  },
+  "BitReactorMoveTarget": {
+   "super": null,
+   "flags": 4097,
+   "module": "/Script/BitReactorGame",
+   "properties": [
+    {
+     "index": 0,
+     "name": "Location",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector"
+     }
+    },
+    {
+     "index": 1,
+     "name": "Heading",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 2,
+     "name": "Stance",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECharacterStance"
+     }
+    },
+    {
+     "index": 3,
+     "name": "MovementPath",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "StructProperty",
+       "struct": "BitReactorMovePathPoint"
+      }
+     }
+    },
+    {
+     "index": 4,
+     "name": "MovingActor",
+     "array_dim": 1,
+     "type": {
+      "type": "WeakObjectProperty"
+     }
+    },
+    {
+     "index": 5,
+     "name": "RequestedMoveStyle",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTag"
+     }
+    }
+   ]
+  },
+  "BodyInstance": {
+   "super": "BodyInstanceCore",
+   "flags": 1,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "PositionSolverIterationCount",
+     "array_dim": 1,
+     "type": {
+      "type": "ByteProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "VelocitySolverIterationCount",
+     "array_dim": 1,
+     "type": {
+      "type": "ByteProperty"
+     }
+    },
+    {
+     "index": 2,
+     "name": "ProjectionSolverIterationCount",
+     "array_dim": 1,
+     "type": {
+      "type": "ByteProperty"
+     }
+    },
+    {
+     "index": 3,
+     "name": "ObjectType",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionChannel"
+     }
+    },
+    {
+     "index": 4,
+     "name": "CollisionEnabled",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionEnabled"
+     }
+    },
+    {
+     "index": 5,
+     "name": "SleepFamily",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ESleepFamily"
+     }
+    },
+    {
+     "index": 6,
+     "name": "DOFMode",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EDOFMode"
+     }
+    },
+    {
+     "index": 7,
+     "name": "bUseCCD",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 8,
+     "name": "bUseMACD",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 9,
+     "name": "bIgnoreAnalyticCollisions",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 10,
+     "name": "bNotifyRigidBodyCollision",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 11,
+     "name": "bSmoothEdgeCollisions",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 12,
+     "name": "bLockTranslation",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 13,
+     "name": "bLockRotation",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 14,
+     "name": "bLockXTranslation",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 15,
+     "name": "bLockYTranslation",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 16,
+     "name": "bLockZTranslation",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 17,
+     "name": "bLockXRotation",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 18,
+     "name": "bLockYRotation",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 19,
+     "name": "bLockZRotation",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 20,
+     "name": "bOverrideMaxAngularVelocity",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 21,
+     "name": "bOverrideMaxDepenetrationVelocity",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 22,
+     "name": "bOverrideWalkableSlopeOnInstance",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 23,
+     "name": "bInterpolateWhenSubStepping",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 24,
+     "name": "bInertiaConditioning",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 25,
+     "name": "bOneWayInteraction",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 26,
+     "name": "bOverrideSolverAsyncDeltaTime",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 27,
+     "name": "SolverAsyncDeltaTime",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 28,
+     "name": "CollisionProfileName",
+     "array_dim": 1,
+     "type": {
+      "type": "NameProperty"
+     }
+    },
+    {
+     "index": 29,
+     "name": "CollisionResponses",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "CollisionResponse"
+     }
+    },
+    {
+     "index": 30,
+     "name": "MaxDepenetrationVelocity",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 31,
+     "name": "MassInKgOverride",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 32,
+     "name": "LinearDamping",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 33,
+     "name": "AngularDamping",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 34,
+     "name": "CustomDOFPlaneNormal",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector"
+     }
+    },
+    {
+     "index": 35,
+     "name": "COMNudge",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector"
+     }
+    },
+    {
+     "index": 36,
+     "name": "MassScale",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 37,
+     "name": "GravityGroupIndex",
+     "array_dim": 1,
+     "type": {
+      "type": "ByteProperty"
+     }
+    },
+    {
+     "index": 38,
+     "name": "InertiaTensorScale",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector"
+     }
+    },
+    {
+     "index": 39,
+     "name": "WalkableSlopeOverride",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "WalkableSlopeOverride"
+     }
+    },
+    {
+     "index": 40,
+     "name": "PhysMaterialOverride",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 41,
+     "name": "MaxAngularVelocity",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 42,
+     "name": "CustomSleepThresholdMultiplier",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 43,
+     "name": "StabilizationThresholdMultiplier",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 44,
+     "name": "PhysicsBlendWeight",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    }
+   ]
+  },
+  "BodyInstanceCore": {
+   "super": null,
+   "flags": 4097,
+   "module": "/Script/PhysicsCore",
+   "properties": [
+    {
+     "index": 0,
+     "name": "bSimulatePhysics",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "bOverrideMass",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 2,
+     "name": "bEnableGravity",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 3,
+     "name": "bUpdateKinematicFromSimulation",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 4,
+     "name": "bGyroscopicTorqueEnabled",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 5,
+     "name": "bAutoWeld",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 6,
+     "name": "bStartAwake",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 7,
+     "name": "bGenerateWakeEvents",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 8,
+     "name": "bUpdateMassWhenScaleChanges",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    }
+   ]
+  },
+  "BoxComponent": {
+   "super": "ShapeComponent",
+   "flags": 820514980,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "BoxExtent",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector"
+     }
+    }
+   ]
+  },
+  "CollisionResponse": {
+   "super": null,
+   "flags": 4099,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "ResponseToChannels",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "CollisionResponseContainer"
+     }
+    },
+    {
+     "index": 1,
+     "name": "ResponseArray",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "StructProperty",
+       "struct": "ResponseChannel"
+      }
+     }
+    }
+   ]
+  },
+  "CollisionResponseContainer": {
+   "super": null,
+   "flags": 4097,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "WorldStatic",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 1,
+     "name": "WorldDynamic",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 2,
+     "name": "Pawn",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 3,
+     "name": "Visibility",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 4,
+     "name": "Camera",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 5,
+     "name": "PhysicsBody",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 6,
+     "name": "Vehicle",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 7,
+     "name": "Destructible",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 8,
+     "name": "EngineTraceChannel1",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 9,
+     "name": "EngineTraceChannel2",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 10,
+     "name": "EngineTraceChannel3",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 11,
+     "name": "EngineTraceChannel4",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 12,
+     "name": "EngineTraceChannel5",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 13,
+     "name": "EngineTraceChannel6",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 14,
+     "name": "GameTraceChannel1",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 15,
+     "name": "GameTraceChannel2",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 16,
+     "name": "GameTraceChannel3",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 17,
+     "name": "GameTraceChannel4",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 18,
+     "name": "GameTraceChannel5",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 19,
+     "name": "GameTraceChannel6",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 20,
+     "name": "GameTraceChannel7",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 21,
+     "name": "GameTraceChannel8",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 22,
+     "name": "GameTraceChannel9",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 23,
+     "name": "GameTraceChannel10",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 24,
+     "name": "GameTraceChannel11",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 25,
+     "name": "GameTraceChannel12",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 26,
+     "name": "GameTraceChannel13",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 27,
+     "name": "GameTraceChannel14",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 28,
+     "name": "GameTraceChannel15",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 29,
+     "name": "GameTraceChannel16",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 30,
+     "name": "GameTraceChannel17",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    },
+    {
+     "index": 31,
+     "name": "GameTraceChannel18",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    }
+   ]
+  },
+  "Color": {
+   "super": null,
+   "flags": 59451,
+   "module": "/Script/CoreUObject",
+   "properties": [
+    {
+     "index": 0,
+     "name": "B",
+     "array_dim": 1,
+     "type": {
+      "type": "ByteProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "G",
+     "array_dim": 1,
+     "type": {
+      "type": "ByteProperty"
+     }
+    },
+    {
+     "index": 2,
+     "name": "R",
+     "array_dim": 1,
+     "type": {
+      "type": "ByteProperty"
+     }
+    },
+    {
+     "index": 3,
+     "name": "A",
+     "array_dim": 1,
+     "type": {
+      "type": "ByteProperty"
+     }
+    }
+   ]
+  },
+  "CombatPreparationArea": {
+   "super": "TriggerBox",
+   "flags": 818938277,
+   "module": "/Script/BitReactorGame",
+   "properties": [
+    {
+     "index": 0,
+     "name": "BlockingVolume",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "BlockingVolumeProfile",
+     "array_dim": 1,
+     "type": {
+      "type": "NameProperty"
+     }
+    },
+    {
+     "index": 2,
+     "name": "CombatTriggerVolume",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 3,
+     "name": "PlayerDestinations",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 4,
+     "name": "LinkedTacticalVolume",
+     "array_dim": 1,
+     "type": {
+      "type": "SoftObjectProperty"
+     }
+    },
+    {
+     "index": 5,
+     "name": "bActivateOnPlayerEntry",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 6,
+     "name": "bCancelOnPlayerExit",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 7,
+     "name": "ContainedUnits",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 8,
+     "name": "bActive",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 9,
+     "name": "bTriggered",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 10,
+     "name": "bActivated",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 11,
+     "name": "bLoadedFromSave",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    }
+   ]
+  },
+  "CustomPrimitiveData": {
+   "super": null,
+   "flags": 4097,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "Data",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "FloatProperty"
+      }
+     }
+    }
+   ]
+  },
+  "GameplayTag": {
+   "super": null,
+   "flags": 5116929,
+   "module": "/Script/GameplayTags",
+   "properties": [
+    {
+     "index": 0,
+     "name": "TagName",
+     "array_dim": 1,
+     "type": {
+      "type": "NameProperty"
+     }
+    }
+   ]
+  },
+  "GameplayTagContainer": {
+   "super": null,
+   "flags": 6429699,
+   "module": "/Script/GameplayTags",
+   "properties": [
+    {
+     "index": 0,
+     "name": "GameplayTags",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "StructProperty",
+       "struct": "GameplayTag"
+      }
+     }
+    },
+    {
+     "index": 1,
+     "name": "ParentTags",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "StructProperty",
+       "struct": "GameplayTag"
+      }
+     }
+    }
+   ]
+  },
+  "LightingChannels": {
+   "super": null,
+   "flags": 4097,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "bChannel0",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "bChannel1",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 2,
+     "name": "bChannel2",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    }
+   ]
+  },
+  "Object": {
+   "super": null,
+   "flags": 809500833,
+   "module": "/Script/CoreUObject",
+   "properties": []
+  },
+  "PointerToUberGraphFrame": {
+   "super": null,
+   "flags": 32769,
+   "module": "/Script/Engine",
+   "properties": []
+  },
+  "PrimitiveComponent": {
+   "super": "SceneComponent",
+   "flags": 820510885,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "MinDrawDistance",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "LDMaxDrawDistance",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 2,
+     "name": "CachedMaxDrawDistance",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 3,
+     "name": "DepthPriorityGroup",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ESceneDepthPriorityGroup"
+     }
+    },
+    {
+     "index": 4,
+     "name": "ViewOwnerDepthPriorityGroup",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ESceneDepthPriorityGroup"
+     }
+    },
+    {
+     "index": 5,
+     "name": "IndirectLightingCacheQuality",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EIndirectLightingCacheQuality"
+     }
+    },
+    {
+     "index": 6,
+     "name": "LightmapType",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ELightmapType"
+     }
+    },
+    {
+     "index": 7,
+     "name": "HLODBatchingPolicy",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EHLODBatchingPolicy"
+     }
+    },
+    {
+     "index": 8,
+     "name": "ShadowCacheInvalidationBehavior",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EShadowCacheInvalidationBehavior"
+     }
+    },
+    {
+     "index": 9,
+     "name": "bEnableAutoLODGeneration",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 10,
+     "name": "bIsActorTextureStreamingBuiltData",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 11,
+     "name": "bIsValidTextureStreamingBuiltData",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 12,
+     "name": "bNeverDistanceCull",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 13,
+     "name": "bAlwaysCreatePhysicsState",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 14,
+     "name": "bGenerateOverlapEvents",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 15,
+     "name": "bMultiBodyOverlap",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 16,
+     "name": "bTraceComplexOnMove",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 17,
+     "name": "bReturnMaterialOnMove",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 18,
+     "name": "bUseViewOwnerDepthPriorityGroup",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 19,
+     "name": "bAllowCullDistanceVolume",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 20,
+     "name": "bVisibleInReflectionCaptures",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 21,
+     "name": "bVisibleInRealTimeSkyCaptures",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 22,
+     "name": "bVisibleInRayTracing",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 23,
+     "name": "bRenderInMainPass",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 24,
+     "name": "bRenderInDepthPass",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 25,
+     "name": "bRenderInHologramCapturePass",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 26,
+     "name": "bIsHologramCaptureBackgroundComponent",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 27,
+     "name": "bReceivesDecals",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 28,
+     "name": "bHoldout",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 29,
+     "name": "bOwnerNoSee",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 30,
+     "name": "bOnlyOwnerSee",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 31,
+     "name": "bTreatAsBackgroundForOcclusion",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 32,
+     "name": "bUseAsOccluder",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 33,
+     "name": "bSelectable",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 34,
+     "name": "bWantsEditorEffects",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 35,
+     "name": "bForceMipStreaming",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 36,
+     "name": "bHasPerInstanceHitProxies",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 37,
+     "name": "CastShadow",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 38,
+     "name": "bEmissiveLightSource",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 39,
+     "name": "bAffectDynamicIndirectLighting",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 40,
+     "name": "bAffectIndirectLightingWhileHidden",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 41,
+     "name": "bAffectDistanceFieldLighting",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 42,
+     "name": "bCastDynamicShadow",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 43,
+     "name": "bCastStaticShadow",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 44,
+     "name": "bCastVolumetricTranslucentShadow",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 45,
+     "name": "bCastContactShadow",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 46,
+     "name": "bSelfShadowOnly",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 47,
+     "name": "bCastFarShadow",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 48,
+     "name": "bCastInsetShadow",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 49,
+     "name": "bCastCinematicShadow",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 50,
+     "name": "bCastHiddenShadow",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 51,
+     "name": "bCastShadowAsTwoSided",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 52,
+     "name": "bLightAsIfStatic",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 53,
+     "name": "bLightAttachmentsAsGroup",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 54,
+     "name": "bExcludeFromLightAttachmentGroup",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 55,
+     "name": "bReceiveMobileCSMShadows",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 56,
+     "name": "bSingleSampleShadowFromStationaryLights",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 57,
+     "name": "bIgnoreRadialImpulse",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 58,
+     "name": "bIgnoreRadialForce",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 59,
+     "name": "bApplyImpulseOnDamage",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 60,
+     "name": "bReplicatePhysicsToAutonomousProxy",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 61,
+     "name": "bFillCollisionUnderneathForNavmesh",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 62,
+     "name": "bRasterizeAsFilledConvexVolume",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 63,
+     "name": "AlwaysLoadOnClient",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 64,
+     "name": "AlwaysLoadOnServer",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 65,
+     "name": "bUseEditorCompositing",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 66,
+     "name": "bIsBeingMovedByEditor",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 67,
+     "name": "bRenderCustomDepth",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 68,
+     "name": "bVisibleInSceneCaptureOnly",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 69,
+     "name": "bHiddenInSceneCapture",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 70,
+     "name": "bRayTracingFarField",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 71,
+     "name": "FirstPersonPrimitiveType",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EFirstPersonPrimitiveType"
+     }
+    },
+    {
+     "index": 72,
+     "name": "bHasNoStreamableTextures",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 73,
+     "name": "bStaticWhenNotMoveable",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 74,
+     "name": "bHasCustomNavigableGeometry",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EHasCustomNavigableGeometry"
+     }
+    },
+    {
+     "index": 75,
+     "name": "CanCharacterStepUpOn",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECanBeCharacterBase"
+     }
+    },
+    {
+     "index": 76,
+     "name": "LightingChannels",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "LightingChannels"
+     }
+    },
+    {
+     "index": 77,
+     "name": "RayTracingGroupCullingPriority",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ERayTracingGroupCullingPriority"
+     }
+    },
+    {
+     "index": 78,
+     "name": "CustomDepthStencilWriteMask",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ERendererStencilMask"
+     }
+    },
+    {
+     "index": 79,
+     "name": "ExcludeFromHLODLevels",
+     "array_dim": 1,
+     "type": {
+      "type": "ByteProperty"
+     }
+    },
+    {
+     "index": 80,
+     "name": "RayTracingGroupId",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 81,
+     "name": "VisibilityId",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 82,
+     "name": "CustomDepthStencilValue",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 83,
+     "name": "CustomPrimitiveData",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "CustomPrimitiveData"
+     }
+    },
+    {
+     "index": 84,
+     "name": "CustomPrimitiveDataInternal",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "CustomPrimitiveData"
+     }
+    },
+    {
+     "index": 85,
+     "name": "TranslucencySortPriority",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 86,
+     "name": "TranslucencySortDistanceOffset",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 87,
+     "name": "RuntimeVirtualTextures",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 88,
+     "name": "VirtualTextureLodBias",
+     "array_dim": 1,
+     "type": {
+      "type": "Int8Property"
+     }
+    },
+    {
+     "index": 89,
+     "name": "VirtualTextureCullMips",
+     "array_dim": 1,
+     "type": {
+      "type": "Int8Property"
+     }
+    },
+    {
+     "index": 90,
+     "name": "VirtualTextureMinCoverage",
+     "array_dim": 1,
+     "type": {
+      "type": "Int8Property"
+     }
+    },
+    {
+     "index": 91,
+     "name": "VirtualTextureRenderPassType",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ERuntimeVirtualTextureMainPassType"
+     }
+    },
+    {
+     "index": 92,
+     "name": "BoundsScale",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 93,
+     "name": "MoveIgnoreActors",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 94,
+     "name": "MoveIgnoreComponents",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 95,
+     "name": "BodyInstance",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "BodyInstance"
+     }
+    },
+    {
+     "index": 96,
+     "name": "OnComponentHit",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 97,
+     "name": "OnComponentBeginOverlap",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 98,
+     "name": "OnComponentEndOverlap",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 99,
+     "name": "OnComponentWake",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 100,
+     "name": "OnComponentSleep",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 101,
+     "name": "OnComponentPhysicsStateChanged",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 102,
+     "name": "OnBeginCursorOver",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 103,
+     "name": "OnEndCursorOver",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 104,
+     "name": "OnClicked",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 105,
+     "name": "OnReleased",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 106,
+     "name": "OnInputTouchBegin",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 107,
+     "name": "OnInputTouchEnd",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 108,
+     "name": "OnInputTouchEnter",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 109,
+     "name": "OnInputTouchLeave",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    },
+    {
+     "index": 110,
+     "name": "LODParentPrimitive",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    }
+   ]
+  },
+  "RepAttachment": {
+   "super": null,
+   "flags": 4101,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "AttachParent",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "LocationOffset",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector_NetQuantize100"
+     }
+    },
+    {
+     "index": 2,
+     "name": "RelativeScale3D",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector_NetQuantize100"
+     }
+    },
+    {
+     "index": 3,
+     "name": "RotationOffset",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Rotator"
+     }
+    },
+    {
+     "index": 4,
+     "name": "AttachSocket",
+     "array_dim": 1,
+     "type": {
+      "type": "NameProperty"
+     }
+    },
+    {
+     "index": 5,
+     "name": "AttachComponent",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    }
+   ]
+  },
+  "RepMovement": {
+   "super": null,
+   "flags": 4199425,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "LinearVelocity",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector"
+     }
+    },
+    {
+     "index": 1,
+     "name": "AngularVelocity",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector"
+     }
+    },
+    {
+     "index": 2,
+     "name": "Location",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector"
+     }
+    },
+    {
+     "index": 3,
+     "name": "Rotation",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Rotator"
+     }
+    },
+    {
+     "index": 4,
+     "name": "Acceleration",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector"
+     }
+    },
+    {
+     "index": 5,
+     "name": "bSimulatedPhysicSleep",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 6,
+     "name": "bRepPhysics",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 7,
+     "name": "bRepAcceleration",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 8,
+     "name": "ServerFrame",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 9,
+     "name": "ServerPhysicsHandle",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 10,
+     "name": "LocationQuantizationLevel",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EVectorQuantization"
+     }
+    },
+    {
+     "index": 11,
+     "name": "VelocityQuantizationLevel",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EVectorQuantization"
+     }
+    },
+    {
+     "index": 12,
+     "name": "RotationQuantizationLevel",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ERotatorQuantization"
+     }
+    }
+   ]
+  },
+  "ResponseChannel": {
+   "super": null,
+   "flags": 4097,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "Channel",
+     "array_dim": 1,
+     "type": {
+      "type": "NameProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "Response",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ECollisionResponse"
+     }
+    }
+   ]
+  },
+  "Rotator": {
+   "super": null,
+   "flags": 4779067,
+   "module": "/Script/CoreUObject",
+   "properties": [
+    {
+     "index": 0,
+     "name": "Pitch",
+     "array_dim": 1,
+     "type": {
+      "type": "DoubleProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "Yaw",
+     "array_dim": 1,
+     "type": {
+      "type": "DoubleProperty"
+     }
+    },
+    {
+     "index": 2,
+     "name": "Roll",
+     "array_dim": 1,
+     "type": {
+      "type": "DoubleProperty"
+     }
+    }
+   ]
+  },
+  "SceneComponent": {
+   "super": "ActorComponent",
+   "flags": 820510884,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "PhysicsVolume",
+     "array_dim": 1,
+     "type": {
+      "type": "WeakObjectProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "AttachParent",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 2,
+     "name": "AttachSocketName",
+     "array_dim": 1,
+     "type": {
+      "type": "NameProperty"
+     }
+    },
+    {
+     "index": 3,
+     "name": "AttachChildren",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 4,
+     "name": "ClientAttachedChildren",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 5,
+     "name": "RelativeLocation",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector"
+     }
+    },
+    {
+     "index": 6,
+     "name": "RelativeRotation",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Rotator"
+     }
+    },
+    {
+     "index": 7,
+     "name": "RelativeScale3D",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector"
+     }
+    },
+    {
+     "index": 8,
+     "name": "ComponentVelocity",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Vector"
+     }
+    },
+    {
+     "index": 9,
+     "name": "bComponentToWorldUpdated",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 10,
+     "name": "bAbsoluteLocation",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 11,
+     "name": "bAbsoluteRotation",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 12,
+     "name": "bAbsoluteScale",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 13,
+     "name": "bVisible",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 14,
+     "name": "bShouldBeAttached",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 15,
+     "name": "bShouldSnapLocationWhenAttached",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 16,
+     "name": "bShouldSnapRotationWhenAttached",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 17,
+     "name": "bShouldSnapScaleWhenAttached",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 18,
+     "name": "bShouldUpdatePhysicsVolume",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 19,
+     "name": "bHiddenInGame",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 20,
+     "name": "bBoundsChangeTriggersStreamingDataRebuild",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 21,
+     "name": "bUseAttachParentBound",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 22,
+     "name": "bComputeFastLocalBounds",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 23,
+     "name": "bComputeBoundsOnceForGame",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 24,
+     "name": "bComputedBoundsOnceForGame",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 25,
+     "name": "bIsNotRenderAttachmentRoot",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 26,
+     "name": "Mobility",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EComponentMobility"
+     }
+    },
+    {
+     "index": 27,
+     "name": "DetailMode",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EDetailMode"
+     }
+    },
+    {
+     "index": 28,
+     "name": "PhysicsVolumeChangedDelegate",
+     "array_dim": 1,
+     "type": {
+      "type": "MulticastDelegateProperty"
+     }
+    }
+   ]
+  },
+  "SelectionTags": {
+   "super": null,
+   "flags": 4609,
+   "module": "/Script/BitReactorCore",
+   "properties": [
+    {
+     "index": 0,
+     "name": "PreferredTags",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagContainer"
+     }
+    },
+    {
+     "index": 1,
+     "name": "RequiredTags",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagContainer"
+     }
+    },
+    {
+     "index": 2,
+     "name": "BlockTags",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagContainer"
+     }
+    }
+   ]
+  },
+  "ShapeComponent": {
+   "super": "PrimitiveComponent",
+   "flags": 820514981,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "ShapeBodySetup",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "ShapeColor",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "Color"
+     }
+    },
+    {
+     "index": 2,
+     "name": "bDrawOnlyIfSelected",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 3,
+     "name": "bShouldCollideWhenPlacing",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 4,
+     "name": "bDynamicObstacle",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 5,
+     "name": "bUseSystemDefaultObstacleAreaClass",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 6,
+     "name": "AreaClassOverride",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 7,
+     "name": "LineThickness",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    }
+   ]
+  },
+  "SphereComponent": {
+   "super": "ShapeComponent",
+   "flags": 820514980,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "SphereRadius",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    }
+   ]
+  },
+  "TacticalPoint": {
+   "super": "Actor",
+   "flags": 818938276,
+   "module": "/Script/BitReactorGame",
+   "properties": [
+    {
+     "index": 0,
+     "name": "OwningTeam",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "OccupyingCharacterSelectionTags",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "SelectionTags"
+     }
+    }
+   ]
+  },
+  "TickFunction": {
+   "super": null,
+   "flags": 1,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "TickGroup",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ETickingGroup"
+     }
+    },
+    {
+     "index": 1,
+     "name": "EndTickGroup",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ETickingGroup"
+     }
+    },
+    {
+     "index": 2,
+     "name": "bTickEvenWhenPaused",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 3,
+     "name": "bCanEverTick",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 4,
+     "name": "bStartWithTickEnabled",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 5,
+     "name": "bAllowTickOnDedicatedServer",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 6,
+     "name": "TickInterval",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    }
+   ]
+  },
+  "TriggerBase": {
+   "super": "Actor",
+   "flags": 818413989,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "CollisionComponent",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    }
+   ]
+  },
+  "TriggerBox": {
+   "super": "TriggerBase",
+   "flags": 818413988,
+   "module": "/Script/Engine",
+   "properties": []
+  },
+  "Vector": {
+   "super": null,
+   "flags": 4779067,
+   "module": "/Script/CoreUObject",
+   "properties": [
+    {
+     "index": 0,
+     "name": "X",
+     "array_dim": 1,
+     "type": {
+      "type": "DoubleProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "Y",
+     "array_dim": 1,
+     "type": {
+      "type": "DoubleProperty"
+     }
+    },
+    {
+     "index": 2,
+     "name": "Z",
+     "array_dim": 1,
+     "type": {
+      "type": "DoubleProperty"
+     }
+    }
+   ]
+  },
+  "Vector_NetQuantize100": {
+   "super": "Vector",
+   "flags": 4252689,
+   "module": "/Script/Engine",
+   "properties": []
+  },
+  "WalkableSlopeOverride": {
+   "super": null,
+   "flags": 24577,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "WalkableSlopeBehavior",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EWalkableSlopeBehavior"
+     }
+    },
+    {
+     "index": 1,
+     "name": "WalkableSlopeAngle",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    }
+   ]
+  }
+ }
+}

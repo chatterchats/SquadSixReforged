@@ -74,11 +74,13 @@ class ZenPackage:
         self.exports = []
         position = self.header_size
         for index in range(count):
-            (serial_offset, serial_size, object_index, object_number, _outer, class_index,
+            (serial_offset, serial_size, object_index, object_number, outer, class_index,
              _super, _template, _hash, _flags, _filter) = self.EXPORT.unpack_from(
                 data, export_map + index * self.EXPORT.size)
             self.exports.append({
+                "index": index,
                 "name": self.mapped_name(object_index, object_number),
+                "outer": outer,
                 "class": class_index,
                 "cooked_offset": serial_offset,
                 "size": serial_size,
@@ -109,6 +111,12 @@ class ZenPackage:
     def mapped_name(self, index, number):
         name = self.names[index & 0x3FFFFFFF]
         return name if number == 0 else f"{name}_{number - 1}"
+
+    def export_at(self, package_object_index):
+        """The export an FPackageObjectIndex points at, or None if it is an import or null."""
+        if package_object_index >> 62 != 0:  # Export = 0; ScriptImport, PackageImport, Null
+            return None
+        return self.exports[package_object_index & ((1 << 62) - 1)]
 
     def export(self, name):
         for export in self.exports:
@@ -165,7 +173,28 @@ def read_gameplay_tag_container(reader, schema, package):
     return [package.mapped_name(*read_name(reader)) for _ in range(reader.i32())]
 
 
-NATIVE_STRUCTS = {"GameplayTagContainer": read_gameplay_tag_container}
+def read_vector(reader, schema, package):
+    # UE5 large world coordinates: doubles.
+    x, y, z = reader.unpack("<ddd")
+    return {"X": x, "Y": y, "Z": z}
+
+
+def read_rotator(reader, schema, package):
+    pitch, yaw, roll = reader.unpack("<ddd")
+    return {"Pitch": pitch, "Yaw": yaw, "Roll": roll}
+
+
+def read_color(reader, schema, package):
+    b, g, r, a = reader.unpack("<BBBB")
+    return {"R": r, "G": g, "B": b, "A": a}
+
+
+NATIVE_STRUCTS = {
+    "GameplayTagContainer": read_gameplay_tag_container,
+    "Vector": read_vector,
+    "Rotator": read_rotator,
+    "Color": read_color,
+}
 
 
 def read_value(reader, type_info, schema, package):
@@ -215,8 +244,13 @@ def read_value(reader, type_info, schema, package):
 
 
 def read_struct(reader, name, schema, package):
-    if name in NATIVE_STRUCTS:
-        return NATIVE_STRUCTS[name](reader, schema, package)
+    # A struct derived from a natively serialized one (Vector_NetQuantize100 from Vector)
+    # serializes as its parent does.
+    native = name
+    while native is not None and native not in NATIVE_STRUCTS:
+        native = schema.schemas.get(native, {}).get("super")
+    if native is not None:
+        return NATIVE_STRUCTS[native](reader, schema, package)
     if schema.is_native(name):
         raise FormatError(f"{name} serializes natively and has no reader")
     return {prop["name"]: value for prop, _, _, value in read_unversioned(reader, name, schema, package)}
@@ -266,12 +300,36 @@ def read_unversioned(reader, class_name, schema, package):
     return results
 
 
-def read_properties(package, export, class_name, schema):
-    """The export's top-level properties. Raises unless the stream ends at the UObject trailer."""
+def read_properties(package, export, class_name, schema, trailer="object"):
+    """The export's top-level properties. Raises unless the stream ends exactly at the trailer
+    its kind of object writes after the properties:
+      object     4 bytes: UObject's has-GUID flag, 0 in cooked data
+      component  8 zero bytes (scene components, as cooked in levels)
+    Actors use read_actor, whose trailer carries the actor's label.
+    """
     reader = Reader(package.data, export["offset"], export["offset"] + export["size"])
     results = read_unversioned(reader, class_name, schema, package)
-    trailer = reader.take(4)
-    if reader.offset != reader.end or trailer != b"\0\0\0\0":
-        raise FormatError(f"{package.name}: properties end {reader.end - reader.offset + 4} bytes "
-                          f"before the export does; a type was misread")
+    size = {"object": 4, "component": 8}[trailer]
+    rest = package.data[reader.offset:reader.end]
+    if rest != bytes(size):
+        raise FormatError(f"{package.name}: {export['name']} has {len(rest)} bytes after its properties, "
+                          f"expected {size} zero bytes; a type was misread")
     return results
+
+
+def read_actor(package, export, class_name, schema):
+    """An actor's properties and its label. After the properties a cooked level actor writes the
+    has-GUID flag (0), a label flag (0 or 1), the label as an FString when present, and two
+    16-byte GUIDs."""
+    reader = Reader(package.data, export["offset"], export["offset"] + export["size"])
+    results = read_unversioned(reader, class_name, schema, package)
+    try:
+        has_guid, has_label = reader.u32(), reader.u32()
+        label = reader.fstring() if has_label == 1 else None
+        reader.take(32)
+    except FormatError:
+        has_guid = has_label = None
+    if has_guid != 0 or has_label not in (0, 1) or reader.offset != reader.end:
+        raise FormatError(f"{package.name}: {export['name']} doesn't end in the actor trailer; "
+                          f"a type was misread")
+    return results, label

@@ -1,8 +1,10 @@
 """Extract the property schemas a mission definition needs from a parsed .usmap.
 
   python3 tools/schema.py <usmap dir with schemas.tsv and properties.tsv> [--root BrunoMissionData]
+  python3 tools/schema.py <usmap dir> --output tools/data/map_schema.json \
+      --root BP_CombatPreparationArea_C --root TacticalPoint --root SphereComponent
 
-Writes tools/data/schema.json: every class and struct reachable from the root class (through
+Writes tools/data/schema.json (or --output): every class and struct reachable from the roots (through
 supers and struct-typed properties), with its super, struct flags and properties in
 serialization order. Regenerate it from a fresh usmap after a game patch that changes these
 classes; zen.read_properties fails loudly when the schema no longer matches the data.
@@ -19,6 +21,7 @@ OUTPUT = ROOT / "tools" / "data" / "schema.json"
 parser = argparse.ArgumentParser()
 parser.add_argument("usmap", type=Path)
 parser.add_argument("--root", action="append", default=None)
+parser.add_argument("--output", type=Path, default=OUTPUT)
 args = parser.parse_args()
 roots = args.root or ["BrunoMissionData"]
 
@@ -77,6 +80,7 @@ while pending:
     for prop in entry["properties"]:
         pending.extend(referenced(prop["type"]))
 
-OUTPUT.parent.mkdir(exist_ok=True)
-OUTPUT.write_text(json.dumps({"roots": roots, "schemas": dict(sorted(wanted.items()))}, indent=1) + "\n")
-print(f"Wrote {len(wanted)} schemas reachable from {', '.join(roots)} to {OUTPUT.relative_to(ROOT)}")
+output = args.output.resolve()
+output.parent.mkdir(exist_ok=True)
+output.write_text(json.dumps({"roots": roots, "schemas": dict(sorted(wanted.items()))}, indent=1) + "\n")
+print(f"Wrote {len(wanted)} schemas reachable from {', '.join(roots)} to {output.relative_to(ROOT)}")

@@ -31,6 +31,7 @@ src/Runtime/    UE4SS mod ZCOMSquadSix + zcom-mod.json        -> ue4ss/Mods
     selfcheck.lua   logs whether every game name the other modules use still resolves
     common.lua      shared constants and reflection/vector helpers
 data/           missions.tsv: the squad limit for every mission (what the Core pak changes)
+                mapscan.json: every deployment area and its destination points (tools/map_scan.py)
 docs/           upstream notes, file hashes, pak analysis, runtime-notes.md (why each rule exists)
 tests/          runtime tests under a UE4SS stand-in (ue4ss_mock.lua): startup, self-check,
                 lineup, rescue
@@ -71,8 +72,10 @@ changed, and lists what to review. See [docs/core-pak-analysis.md](docs/core-pak
    `missing=` names each function, class or property that no longer exists (for example a
    Blueprint struct field whose GUID suffix changed). `unchecked=` means UE4SS couldn't inspect
    it, which says nothing either way.
-3. The three hard-coded map layouts in `placement.lua` can't be checked this way; they only match
-   their own maps and fall back to the generic placement when they don't.
+3. `python3 tools/map_scan.py --retoc ... --paks "$PAKS"` re-reads every deployment area and its
+   destination points into `data/mapscan.json`, and checks that each of `placement.lua`'s three
+   hard-coded map layouts still matches exactly one area. Diff `data/mapscan.json` to see what a
+   patch moved.
 
 ## Building a release
 

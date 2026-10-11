@@ -1,0 +1,2864 @@
+{
+ "areas": [
+  {
+   "package": "/Game/Game/Maps/HeroMissions/HM_Cly_010/HM_Cly_010_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_21",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-3150.0, -5950.0, 600.0]
+    },
+    {
+     "point": "TacticalPoint_22",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-3200.0, -4900.0, 400.0]
+    },
+    {
+     "point": "TacticalPoint_23",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [-3450.0, -5650.0, 400.0]
+    },
+    {
+     "point": "TacticalPoint_24",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-3650.0, -6200.0, 400.0]
+    }
+   ],
+   "location": [0.0, -2500.0, 1070.0],
+   "missions": [
+    "HM_Cly_010"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/HeroMissions/HM_Cly_020/HM_Cly_020_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [-3750.0, -4430.0, 50.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [-4250.0, -4285.488, 50.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [-2950.0, -4330.0, 100.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [-3450.0, -4430.0, 50.0]
+    }
+   ],
+   "location": [-3597.837, -3796.666, 110.0],
+   "missions": [
+    "HM_Cly_020"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/HeroMissions/HM_Jae_010/HM_Jae_010_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [-540.0, -2065.0, 2350.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [-255.0, -2065.0, 2350.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [-1000.0, -2335.0, 2350.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [-455.0, -2445.0, 2350.0]
+    }
+   ],
+   "location": [-24.538, -1112.268, 2446.5],
+   "missions": [
+    "HM_Jae_010"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/HeroMissions/HM_Jae_020/HM_Jae_020_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-900.0, -850.0, 750.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-450.0, -300.0, 750.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [-450.0, 350.0, 750.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-1050.0, 500.0, 750.0]
+    }
+   ],
+   "location": [-1750.0, 0.0, 1050.0],
+   "missions": [
+    "HM_Jae_020"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/HeroMissions/HM_Kabb_010/HM_Kabb_010_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [6040.0, -3310.0, -1780.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [6140.0, -2950.0, -1780.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [6030.0, -2560.0, -1790.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [6250.0, -3560.0, -1780.0]
+    }
+   ],
+   "location": [7230.0, -2760.0, -1600.0],
+   "missions": [
+    "HM_Kabb_010"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/HeroMissions/HM_Kabb_020/HM_Kabb_020_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [1045.0, 1005.0, 1130.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [750.0, 350.0, 1150.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [500.0, 0.0, 1185.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-200.0, -100.0, 1120.0]
+    }
+   ],
+   "location": [2165.0, 100.0, 1200.0],
+   "missions": [
+    "HM_Kabb_020"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/HeroMissions/HM_Luco_010/HM_Luco_010_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_21",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-1295.0, -750.0, 600.0]
+    },
+    {
+     "point": "TacticalPoint_22",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-1220.0, -335.0, 600.0]
+    },
+    {
+     "point": "TacticalPoint_23",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [-1645.0, -50.0, 600.0]
+    },
+    {
+     "point": "TacticalPoint_24",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-1105.0, 495.0, 600.0]
+    }
+   ],
+   "location": [-4812.522, 5.461, 700.0],
+   "missions": [
+    "HM_Luco_010"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/HeroMissions/HM_TelRea_010/HM_TelRea_010_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "CombatPrep_1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_23",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [1194.55, -2087.338, 129.996]
+    },
+    {
+     "point": "TacticalPoint_25",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [445.0, -2039.0, 129.996]
+    },
+    {
+     "point": "TacticalPoint_26",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [-183.543, -2641.507, 150.0]
+    },
+    {
+     "point": "TacticalPoint_27",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-541.213, -2057.0, 129.996]
+    }
+   ],
+   "location": [0.0, -2718.0, 250.0],
+   "missions": [
+    "HM_Telrea_010"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/HeroMissions/HM_TelRea_020/HM_TelRea_020_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep_1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [97.987, 18495.319, 1771.369]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [-402.013, 18845.319, 1771.369]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [-472.013, 18655.319, 1771.369]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [-902.013, 18445.319, 1771.369]
+    }
+   ],
+   "location": [-622.013, 17271.309, 1793.178],
+   "missions": [
+    "HM_Telrea_020"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/HeroMissions/HM_TrickLuco_020/HM_TrickLuco_020_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [-717.761, 3343.617, -80.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [-1389.486, 3890.728, -85.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [-1212.71, 3713.952, -90.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [-792.27, 3407.628, -90.0]
+    }
+   ],
+   "location": [-994.228, 3756.777, 10.0],
+   "missions": [
+    "HM_TrickLuco_020"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/HeroMissions/HM_Trick_010/HM_Trick_010_Gameplay_Real",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [3750.0, -25350.0, 3150.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [3276.49, -24481.494, 3150.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [3020.864, -24772.297, 3150.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [3350.0, -25047.936, 3150.0]
+    }
+   ],
+   "location": [2839.727, -25944.156, 3247.066],
+   "missions": [
+    "HM_Trick_010"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Anaxes_020/SK_Anaxes_020_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [2740.0, -4450.0, -1280.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [2775.0, -3420.0, -1280.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [2825.0, -4050.0, -1280.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [2846.303, -3735.491, -1282.633]
+    }
+   ],
+   "location": [2400.0, -3900.0, -1150.0],
+   "missions": [
+    "OM_Crisis_Enforcer_A",
+    "SK_Anaxes_020"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Anaxes_030/SK_Anaxes_030_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_0",
+     "label": "PlayerDestination_1",
+     "location": [600.0, -1650.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_2",
+     "location": [700.0, -1450.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_3",
+     "location": [950.0, -2150.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_4",
+     "location": [850.0, -2150.0, 0.0]
+    }
+   ],
+   "location": [0.0, -2750.0, 150.0],
+   "missions": [
+    "SK_Anaxes_030"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Anaxes_035/SK_Anaxes_035_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_0",
+     "label": "PlayerTacticalPoint1",
+     "location": [-400.0, 1950.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerTacticalPoint2",
+     "location": [-400.0, 1250.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerTacticalPoint3",
+     "location": [400.0, 1300.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerTacticalPoint4",
+     "location": [500.0, 1400.0, 0.0]
+    }
+   ],
+   "location": [-0.0, 2550.0, 250.0],
+   "missions": [
+    "SK_Anaxes_035"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Anaxes_040/SK_Anaxes_040_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [137.47, -1270.0, -20.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-850.0, -1600.0, 50.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [700.0, -850.0, 50.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-422.005, -1273.608, -20.0]
+    }
+   ],
+   "location": [205.461, -2087.478, 100.0],
+   "missions": [
+    "SK_Anaxes_040"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Anaxes_045/SK_Anaxes_045_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [1259.238, 772.155, 168.781]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [1550.0, 144.297, -50.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [1399.422, -290.833, -5.005]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [1244.555, 483.261, -1.221]
+    }
+   ],
+   "location": [1655.085, -14.586, 200.0],
+   "missions": [
+    "SK_Anaxes_045"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Brentaal_010/SK_Brentaal_010_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-650.0, -2650.0, 400.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-184.952, -2871.704, 400.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [947.381, -2781.165, 400.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [500.0, -3050.0, 400.0]
+    }
+   ],
+   "location": [0.0, -2050.0, 650.0],
+   "missions": [
+    "SK_Brentaal_010",
+    "SK_Brentaal_010_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Brentaal_015/SK_Brentaal_015_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-1179.48, -6860.961, 800.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-750.0, -5750.0, 800.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [-624.107, -6423.821, 800.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-1187.213, -6650.0, 800.0]
+    }
+   ],
+   "location": [-2591.906, -6330.459, 1100.0],
+   "missions": [
+    "OM_Crisis_Brute_A",
+    "SK_Brentaal_015",
+    "SK_Brentaal_015_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Brentaal_020/SK_Brentaal_020_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-480.0, -3130.0, 600.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [570.0, -3200.0, 600.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [-450.0, -3360.0, 420.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [150.0, -3200.0, 400.0]
+    }
+   ],
+   "location": [0.0, -2500.0, 1070.0],
+   "missions": [
+    "SK_Brentaal_020",
+    "SK_Brentaal_020_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Brentaal_030/SK_Brentaal_030_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TeamPoint1",
+     "location": [2275.0, -1115.0, 50.0]
+    },
+    {
+     "point": "TacticalPoint_5",
+     "label": "TeamPoint2",
+     "location": [2450.0, -945.0, 50.0]
+    },
+    {
+     "point": "TacticalPoint_6",
+     "label": "TeamPoint3",
+     "location": [2260.0, -1765.0, 50.0]
+    },
+    {
+     "point": "TacticalPoint_7",
+     "label": "TeamPoint4",
+     "location": [2360.0, -1565.0, 50.0]
+    }
+   ],
+   "location": [2600.0, -1290.0, 150.0],
+   "missions": [
+    "SK_Brentaal_030"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Brentaal_035/SK_Brentaal_035_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TeamPoint1",
+     "location": [-2195.687, 103.771, 148.895]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TeamPoint2",
+     "location": [-2270.711, 385.627, 50.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TeamPoint3",
+     "location": [-2363.016, 1094.552, 50.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "TeamPoint4",
+     "location": [-2269.289, 902.132, 50.0]
+    }
+   ],
+   "location": [-2372.487, 676.066, 140.0],
+   "missions": [
+    "SK_Brentaal_035",
+    "SK_Brentaal_035_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Courtsilius_010/SK_Courtsilius_010_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [12250.0, -23290.0, 1630.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [11950.0, -23110.0, 1650.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [11170.0, -23600.0, 1830.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [10850.0, -22750.0, 1650.0]
+    }
+   ],
+   "location": [11700.0, -23900.0, 1750.0],
+   "missions": [
+    "OM_Crisis_Captain_B",
+    "SK_Courtsilius_010"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Courtsilius_015/SK_Courtsilius_015_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [10750.0, -19960.0, 1900.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [10800.0, -19410.0, 2000.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [10750.0, -20360.0, 1900.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [10000.0, -20510.0, 2000.0]
+    }
+   ],
+   "location": [10150.0, -19450.0, 2150.0],
+   "missions": [
+    "SK_Courtsilius_015"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Courtsilius_020/SK_Courtsilius_020_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-100.0, -5750.0, 900.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-150.0, -4200.0, 500.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [650.0, -4550.0, 500.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [300.0, -4300.0, 500.0]
+    }
+   ],
+   "location": [-0.0, -3650.0, 650.0],
+   "missions": [
+    "OM_Crisis_Brute_B",
+    "SK_Courtsilius_020"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Courtsilius_025/SK_Courtsilius_025_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-750.0, -9900.0, 900.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-350.0, -9650.0, 700.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [350.0, -9650.0, 700.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [700.0, -9800.0, 950.0]
+    }
+   ],
+   "location": [50.0, -10300.0, 850.0],
+   "missions": [
+    "SK_Courtsilius_025"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Dantooine_010/SK_Dantooine_010_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [-2050.0, 2400.0, -80.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [-1850.0, 2300.0, -70.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [-1350.0, 2400.0, -100.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [-1150.0, 2300.0, -100.0]
+    }
+   ],
+   "location": [-1700.0, 2650.0, 0.0],
+   "missions": [
+    "OM_Crisis_Seer_A",
+    "SK_Dantooine_010"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Dantooine_015/SK_Dantooine_015_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TacticalPointPlayer1.1",
+     "location": [-1650.0, -1200.0, -50.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TacticalPointPlayer1.2",
+     "location": [-1850.0, -769.692, -50.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TacticalPointPlayer1.3",
+     "location": [-2250.0, -1450.0, -50.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "TacticalPointPlayer1.4",
+     "location": [-2400.0, -650.0, -50.0]
+    }
+   ],
+   "location": [-1800.0, -1700.0, 50.0],
+   "missions": [
+    "OM_Crisis_BXS_A",
+    "SK_Dantooine_015",
+    "SK_Dantooine_015_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Dantooine_020/SK_Dantooine_020_gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_0",
+     "label": "TeamPoint1",
+     "location": [1247.151, -2350.0, 107.746]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TeamPoint2",
+     "location": [770.0, -2350.0, 50.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TeamPoint3",
+     "location": [-150.0, -2400.0, 50.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "TeamPoint4",
+     "location": [298.198, -2551.802, 50.0]
+    }
+   ],
+   "location": [560.0, -2730.0, 110.0],
+   "missions": [
+    "OM_Crisis_B1_A",
+    "SK_Dantooine_020"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Dantooine_025/SK_Dantooine_025_gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TeamPoint1",
+     "location": [400.0, 1410.0, 140.0]
+    },
+    {
+     "point": "TacticalPoint_0",
+     "label": "TeamPoint2",
+     "location": [500.0, 1410.0, 140.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TeamPoint3",
+     "location": [600.0, 1410.0, 140.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TeamPoint4",
+     "location": [121.213, 1508.787, 140.0]
+    }
+   ],
+   "location": [964.645, 1859.497, 190.0],
+   "missions": [
+    "SK_Dantooine_025"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Florrum_010/SK_Florrum_010_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-250.0, -4460.0, 450.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [90.0, -4495.0, 450.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [-750.0, -4280.0, 450.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-995.609, -4280.907, 451.002]
+    }
+   ],
+   "location": [-445.0, -4900.0, 522.481],
+   "missions": [
+    "OM_Crisis_B2_A",
+    "SK_Florrum_010",
+    "SK_Florrum_010_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Florrum_015/SK_Florrum_015_Gameplayb",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-77.476, 530.438, 450.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-524.46, 655.747, 450.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [236.073, 356.544, 450.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [682.876, 170.432, 542.855]
+    }
+   ],
+   "location": [-11.784, 1151.424, 522.481],
+   "missions": [
+    "SK_Florrum_015",
+    "SK_Florrum_015_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Florrum_020/SK_Florrum_020_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [-1450.0, -6541.716, 2350.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [-1776.931, -6681.251, 2350.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [-2150.0, -6772.484, 2350.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [-2510.088, -6503.727, 2449.399]
+    }
+   ],
+   "location": [-1924.446, -6983.65, 2416.577],
+   "missions": [
+    "SK_Florrum_020",
+    "SK_Florrum_020_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Florrum_030/SK_Florrum_030_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TeamPoint2",
+     "location": [-1550.0, -450.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TeamPoint3",
+     "location": [-1649.863, 40.0, 10.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TeamPoint4",
+     "location": [-2009.899, -500.0, 10.0]
+    },
+    {
+     "point": "TacticalPoint_0",
+     "label": "TeamPoint",
+     "location": [-1550.0, -560.0, 0.0]
+    }
+   ],
+   "location": [-2519.899, -271.522, 110.0],
+   "missions": [
+    "SK_Florrum_030",
+    "SK_Florrum_030_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Florrum_035/SK_Florrum_035_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TeamPoint1",
+     "location": [1250.0, 300.0, -0.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TeamPoint2",
+     "location": [1250.0, 200.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TeamPoint3",
+     "location": [1168.959, 779.218, 152.719]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "TeamPoint4",
+     "location": [1313.084, -193.084, 10.0]
+    }
+   ],
+   "location": [1770.0, -40.0, 90.0],
+   "missions": [
+    "SK_Florrum_035",
+    "SK_Florrum_035_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Kaller_020/SK_Kaller_020_Gameplay_Alt",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_0",
+     "label": "PlayerTacticalPoint1",
+     "location": [700.0, -2500.0, 29.999]
+    },
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerTacticalPoint2",
+     "location": [950.0, -2150.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerTacticalPoint3",
+     "location": [950.0, -1650.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerTacticalPoint4",
+     "location": [650.0, -1350.0, 0.0]
+    }
+   ],
+   "location": [200.0, -1750.0, 200.0],
+   "missions": [
+    "OM_Crisis_Seer_B",
+    "SK_Kaller_020"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Kaller_025/SK_Kaller_025_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_3",
+     "label": "TacticalPoint_Player_1.1",
+     "location": [5000.0, -1140.0, 400.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "TacticalPoint_Player_1.2",
+     "location": [5460.0, -1200.0, 400.0]
+    },
+    {
+     "point": "TacticalPoint_5",
+     "label": "TacticalPoint_Player_1.3",
+     "location": [5000.0, -1500.0, 400.0]
+    },
+    {
+     "point": "TacticalPoint_6",
+     "label": "TacticalPoint_Player_1.4",
+     "location": [5450.0, -1700.0, 400.0]
+    }
+   ],
+   "location": [5750.0, -1450.0, 500.0],
+   "missions": [
+    "OM_Crisis_BXM_B",
+    "SK_Kaller_025",
+    "SK_Kaller_025_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Kaller_030/SK_Kaller_030_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TacticalPoint1.1",
+     "location": [-685.177, 5668.133, 632.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TacticalPoint1.2",
+     "location": [-508.92, 5675.289, 632.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "TacticalPoint1.3",
+     "location": [-963.726, 5972.269, 632.0]
+    },
+    {
+     "point": "TacticalPoint_5",
+     "label": "TacticalPoint1.4",
+     "location": [-256.734, 5968.784, 632.0]
+    }
+   ],
+   "location": [-451.091, 7342.52, 681.077],
+   "missions": [
+    "SK_Kaller_030",
+    "SK_Kaller_040",
+    "SK_Kaller_045"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Kaller_035/SK_Kaller_035_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_0",
+     "label": "TacticalPoint1.1",
+     "location": [-250.0, 5950.0, 650.0]
+    },
+    {
+     "point": "TacticalPoint_1",
+     "label": "TacticalPoint1.2",
+     "location": [-500.0, 5650.0, 650.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TacticalPoint1.3",
+     "location": [-700.0, 5650.0, 650.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TacticalPoint1.4",
+     "location": [-950.0, 5950.0, 650.0]
+    }
+   ],
+   "location": [-600.873, 6292.746, 680.0],
+   "missions": [
+    "SK_Kaller_035"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Lothal_030/SK_Lothal_030_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep_1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TacticalPoint_Player1.1",
+     "location": [-2949.007, -1813.64, 6.627]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TacticalPoint_Player1.2",
+     "location": [-3385.836, -1513.791, 6.626]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "TacticalPoint_Player1.4",
+     "location": [-3122.817, -1192.119, 51.723]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TacticalPoint_Player1.3",
+     "location": [-3429.348, -794.816, 6.626]
+    }
+   ],
+   "location": [-3880.911, -1213.912, 100.0],
+   "missions": [
+    "SK_Lothal_030"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Lothal_035/SK_Lothal_035_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep_1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TacticalPoint_Player1.1",
+     "location": [449.109, 935.385, 6.627]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TacticalPoint_Player1.2",
+     "location": [892.944, 635.358, 51.539]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "TacticalPoint_Player1.4",
+     "location": [431.615, 1165.213, 150.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TacticalPoint_Player1.3",
+     "location": [1367.602, 240.344, 6.626]
+    }
+   ],
+   "location": [1261.017, 1002.305, 100.0],
+   "missions": [
+    "SK_Lothal_035",
+    "SK_Lothal_035_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Lothal_050/SK_Lothal_050_GameplayNew",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_0",
+     "label": "TeamPoint1",
+     "location": [-460.0, -1350.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TeamPoint2",
+     "location": [10.0, -1330.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TeamPoint3",
+     "location": [466.863, -1526.447, 0.0]
+    },
+    {
+     "point": "TacticalPoint_1",
+     "label": "TeamPoint4",
+     "location": [403.223, -1165.822, 0.0]
+    }
+   ],
+   "location": [110.0, -2300.0, 80.0],
+   "missions": [
+    "MM_01_030_NotYourTurf",
+    "OM_Crisis_Guardian_A",
+    "SK_Lothal_050"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Lothal_055/SK_Lothal_055_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TeamPoint1",
+     "location": [131.256, 1880.0, 80.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TeamPoint2",
+     "location": [563.557, 1493.345, 90.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "TeamPoint3",
+     "location": [652.756, 2058.787, -35.0]
+    },
+    {
+     "point": "TacticalPoint_5",
+     "label": "TeamPoint4",
+     "location": [679.689, 1487.697, 80.0]
+    }
+   ],
+   "location": [350.0, 2590.0, 70.0],
+   "missions": [
+    "OM_Crisis_B2_B",
+    "SK_Lothal_055",
+    "SK_Lothal_055_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Mapuzo_010/SK_Mapuzo_010_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep_1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1.1",
+     "location": [-9663.556, 6731.367, 232.53]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_1.2",
+     "location": [-8775.857, 6981.64, 232.5]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_1.3",
+     "location": [-9965.738, 6882.581, 232.53]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_1.4",
+     "location": [-9253.994, 6956.503, 232.53]
+    }
+   ],
+   "location": [-9263.0, 7746.323, 318.0],
+   "missions": [
+    "OM_Crisis_Guardian_B",
+    "SK_Mapuzo_010",
+    "SK_Mapuzo_010_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Mapuzo_015/SK_Mapuzo_015_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TacticalPoint_Player_1.1",
+     "location": [-6840.0, 5357.6, 327.248]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TacticalPoint_Player_1.2",
+     "location": [-6445.364, 4960.0, 345.444]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TacticalPoint_Player_1.3",
+     "location": [-6409.929, 4684.975, 337.386]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "TacticalPoint_Player_1.4",
+     "location": [-6870.0, 4538.196, 327.502]
+    }
+   ],
+   "location": [-5750.0, 4400.0, 350.0],
+   "missions": [
+    "OM_Crisis_B1_B",
+    "SK_Mapuzo_015",
+    "SK_Mapuzo_015_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Mapuzo_015/SK_Mapuzo_015_Gameplay_Far",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TacticalPoint_Player_1.1",
+     "location": [-6840.0, 5357.6, 327.248]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TacticalPoint_Player_1.2",
+     "location": [-6445.364, 4960.0, 345.444]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TacticalPoint_Player_1.3",
+     "location": [-6223.042, 4551.413, 337.386]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "TacticalPoint_Player_1.4",
+     "location": [-6870.0, 4538.196, 327.502]
+    }
+   ],
+   "location": [-5750.0, 4400.0, 350.0],
+   "missions": [
+    "OM_Crisis_B1_B",
+    "SK_Mapuzo_015",
+    "SK_Mapuzo_015_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Mapuzo_015/SK_Mapuzo_015_Gameplay_Farther",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TacticalPoint_Player_1.1",
+     "location": [-6840.0, 5357.6, 327.248]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TacticalPoint_Player_1.2",
+     "location": [-6445.364, 4960.0, 345.444]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TacticalPoint_Player_1.3",
+     "location": [-6223.042, 4551.413, 337.386]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "TacticalPoint_Player_1.4",
+     "location": [-6870.0, 4538.196, 327.502]
+    }
+   ],
+   "location": [-5750.0, 4400.0, 350.0],
+   "missions": [
+    "OM_Crisis_B1_B",
+    "SK_Mapuzo_015",
+    "SK_Mapuzo_015_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Mapuzo_020/SK_Mapuzo_020_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_21",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-695.596, 1094.713, 1200.0]
+    },
+    {
+     "point": "TacticalPoint_22",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-662.428, 1422.661, 1200.0]
+    },
+    {
+     "point": "TacticalPoint_23",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [-458.579, 2074.264, 1213.727]
+    },
+    {
+     "point": "TacticalPoint_24",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-105.025, 1932.843, 1200.0]
+    }
+   ],
+   "location": [-1281.98, 2412.742, 1400.0],
+   "missions": [
+    "OM_Crisis_BXS_B",
+    "SK_Mapuzo_020",
+    "SK_Mapuzo_020_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Ryloth_010/SK_Ryloth_010_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [-23364.94, -30905.392, 3250.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [-23698.049, -30321.695, 3250.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [-23005.48, -30388.294, 3250.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [-22886.979, -30946.88, 3250.0]
+    }
+   ],
+   "location": [-24057.276, -30676.732, 3260.0],
+   "missions": [
+    "SK_Ryloth_010"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Ryloth_015/SK_Ryloth_015_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [-16432.849, -29953.464, 3250.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [-16032.849, -31348.657, 3250.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [-15682.849, -30453.464, 3250.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [-15682.849, -30753.464, 3250.0]
+    }
+   ],
+   "location": [-15416.425, -30676.732, 3310.0],
+   "missions": [
+    "OM_Crisis_Captain_A",
+    "SK_Ryloth_015",
+    "SK_Ryloth_015_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Ryloth_020/SK_Ryloth_020b_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [5535.0, -22850.0, 3036.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [5950.0, -22350.0, 3250.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [5996.921, -22902.734, 3250.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [5705.0, -22350.0, 3150.0]
+    }
+   ],
+   "location": [6168.865, -22612.621, 3347.066],
+   "missions": [
+    "OM_Crisis_BXM_A",
+    "SK_Ryloth_020",
+    "SK_Ryloth_020_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Ryloth_030/SK_Ryloth_030_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-7100.0, -19350.0, 2200.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-8200.0, -19300.0, 2200.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [-7450.0, -19650.0, 2200.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-7750.0, -19100.0, 2200.0]
+    }
+   ],
+   "location": [-7744.539, -18237.478, 2300.0],
+   "missions": [
+    "SK_Ryloth_030"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Ryloth_035/SK_Ryloth_035_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-4717.082, -21569.365, 2650.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-5043.503, -22349.34, 2750.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [-5382.915, -22165.492, 2750.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-6048.097, -22646.827, 2750.0]
+    }
+   ],
+   "location": [-3947.488, -23657.487, 2850.0],
+   "missions": [
+    "SK_Ryloth_035",
+    "SK_Ryloth_035_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Serolonis_010/SK_Serolonis_010_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep_1.1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TacticalPoint_Player1.1",
+     "location": [799.304, -3249.575, -55.157]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TacticalPoint_Player1.2",
+     "location": [633.521, -3534.754, -55.157]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TacticalPoint_Player1.3",
+     "location": [252.602, -3858.993, -55.157]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "TacticalPoint_Player1.4",
+     "location": [63.278, -4371.199, -55.157]
+    }
+   ],
+   "location": [1378.199, -3783.308, 56.939],
+   "missions": [
+    "Mission_MainStory_Placeholder",
+    "SK_Serolonis_010",
+    "SK_Serolonis_010_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Serolonis_015/SK_Serolonis_015_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-1207.181, -1000.0, -50.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-1506.895, -1010.493, -50.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [-2003.364, -890.256, -50.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-1986.163, -247.615, -50.0]
+    }
+   ],
+   "location": [-3000.0, -350.0, 50.0],
+   "missions": [
+    "OM_Crisis_Enforcer_B",
+    "SK_Serolonis_015"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Serolonis_020/SK_Serolonis_020_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [-1513.632, -7049.897, 150.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [-1201.666, -6740.451, 160.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [-1200.0, -7407.321, 150.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [-1500.0, -7634.744, 150.0]
+    }
+   ],
+   "location": [-1091.391, -7113.113, 210.0],
+   "missions": [
+    "SK_Serolonis_020",
+    "SK_Serolonis_020_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Serolonis_030/SK_Serolonis_030_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [-16035.47, 60.0, 334.702]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [-16553.123, -34.621, 360.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [-16512.811, 460.133, 350.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [-17092.835, 132.528, 350.0]
+    }
+   ],
+   "location": [-15507.003, 605.655, 410.0],
+   "missions": [
+    "SK_Serolonis_030"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Serolonis_035/SK_Serolonis_035_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [-17650.0, -8300.0, 350.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [-16650.0, -8150.0, 350.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [-17351.8, -7902.274, 350.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [-17958.081, -7652.833, 350.0]
+    }
+   ],
+   "location": [-18250.0, -8550.0, 400.0],
+   "missions": [
+    "SK_Serolonis_035",
+    "SK_Serolonis_035_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Sullust_010/SK_Sullust_010_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TacticalPoint_Player1",
+     "location": [-2460.673, 1826.859, -600.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TacticalPoint_Player2",
+     "location": [-2000.0, 1650.0, -700.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TacticalPoint_Player3",
+     "location": [-1600.0, 1200.0, -700.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "TacticalPoint_Player4",
+     "location": [-1241.0, 1922.0, -566.0]
+    }
+   ],
+   "location": [-2100.0, 1850.0, -550.0],
+   "missions": [
+    "SK_Sullust_010"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Sullust_015/SK_Sullust_015_Gameplay_Alt",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "TacticalPointPlayer1.1",
+     "location": [-2640.367, -714.406, -860.0]
+    },
+    {
+     "point": "TacticalPoint_0",
+     "label": "TacticalPointPlayer1.2",
+     "location": [-2903.955, -862.157, -960.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "TacticalPointPlayer1.3",
+     "location": [-3117.654, -636.916, -960.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "TacticalPointPlayer1.4",
+     "location": [-2835.594, -350.358, -960.0]
+    }
+   ],
+   "location": [-3140.0, -670.0, -890.0],
+   "missions": [
+    "MM_05_002_ImperialSkirmish",
+    "SK_Sullust_015"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Sullust_020/SK_Sullust_020_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_21",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [750.0, -3700.0, 637.03]
+    },
+    {
+     "point": "TacticalPoint_22",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [450.0, -3600.0, 632.814]
+    },
+    {
+     "point": "TacticalPoint_23",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [130.0, -3600.0, 635.421]
+    },
+    {
+     "point": "TacticalPoint_24",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-75.0, -3605.0, 640.738]
+    }
+   ],
+   "location": [500.0, -5600.0, 630.0],
+   "missions": [
+    "OM_Crisis_Striker_B",
+    "SK_Sullust_020",
+    "SK_Sullust_020_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Vandor_010/SK_Vandor_010_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [5300.0, 7450.0, 200.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [5400.0, 7650.0, 200.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [5600.0, 7000.0, 200.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [5500.0, 6500.0, 200.0]
+    }
+   ],
+   "location": [6055.461, 7062.522, 350.0],
+   "missions": [
+    "SK_Vandor_010",
+    "SK_Vandor_010_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Vandor_015/SK_Vandor_015_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [1750.0, 6800.0, 600.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [1800.0, 7850.0, 100.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [2150.0, 8250.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [2500.0, 8550.0, 0.0]
+    }
+   ],
+   "location": [-94.539, 9162.522, 200.0],
+   "missions": [
+    "OM_Crisis_Striker_A",
+    "SK_Vandor_015",
+    "SK_Vandor_015_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/SK_Vandor_020/SK_Vandor_020_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "CombatPrep_1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_23",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-1252.666, 1133.0, 129.996]
+    },
+    {
+     "point": "TacticalPoint_25",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-1234.0, 546.0, 129.996]
+    },
+    {
+     "point": "TacticalPoint_26",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [-2123.816, 591.0, 250.0]
+    },
+    {
+     "point": "TacticalPoint_27",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-2074.694, 1191.239, 229.996]
+    }
+   ],
+   "location": [-1700.0, 882.0, 250.0],
+   "missions": [
+    "SK_Vandor_020",
+    "SK_Vandor_020_Crisis"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Skirmish/Templates/Blank/Blank_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [-1700.0, 1850.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [-1900.0, 1850.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [-2100.0, 1850.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [-2300.0, 1850.0, 0.0]
+    }
+   ],
+   "location": [-2310.0, 1330.0, 100.0],
+   "missions": [
+    "OM_Cin_Testing"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_01_010_TheSerolonisJob/MM_01_010_TheSerolonisJob_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "Volume_CombatPrep_Encounter1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_20",
+     "label": "PlayerDestination_Trick",
+     "location": [-2149.54, -48.435, 50.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerDestination_Rodian",
+     "location": [-1610.0, -135.0, 50.0]
+    },
+    {
+     "point": "TacticalPoint_11",
+     "label": "PlayerDestination_Hawks_Normal",
+     "location": [-1790.0, 460.0, 50.0]
+    },
+    {
+     "point": "TacticalPoint_10",
+     "label": "PlayerDestination_Hawks_Longarm",
+     "location": [-1250.0, 300.0, 50.0]
+    }
+   ],
+   "location": [-2700.0, 850.0, 100.0],
+   "missions": [
+    "MM_01_010_SerolonisJob"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_01_010_TheSerolonisJob/MM_01_010_TheSerolonisJob_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "Volume_CombatPrep_Encounter2",
+   "destinations": [
+    {
+     "point": "TacticalPoint_25",
+     "label": "PlayerDestination_Rodian2",
+     "location": [-678.471, 1052.101, 50.0]
+    },
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerDestination_Trick2",
+     "location": [-650.0, 550.0, 50.0]
+    },
+    {
+     "point": "TacticalPoint_24",
+     "label": "PlayerDestination_Hawks2",
+     "location": [-650.0, 650.0, 50.0]
+    },
+    {
+     "point": "TacticalPoint_0",
+     "label": "PlayerDestination_Rodian3",
+     "location": [-650.0, 1250.0, 50.0]
+    }
+   ],
+   "location": [-788.842, 1098.946, 100.0],
+   "missions": [
+    "MM_01_010_SerolonisJob"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_01_010_TheSerolonisJob/MM_01_010_TheSerolonisJob_Gameplay",
+   "area": "BP_CombatPreparationArea_C_2",
+   "label": "Volume_CombatPrep_Encounter4",
+   "destinations": [
+    {
+     "point": "TacticalPoint_27",
+     "label": "PlayerDestination_Aurelio4",
+     "location": [8956.868, -8850.396, -550.043]
+    },
+    {
+     "point": "TacticalPoint_26",
+     "label": "PlayerDestination_Hawks4",
+     "location": [8593.754, -9179.369, -550.0]
+    },
+    {
+     "point": "TacticalPoint_7",
+     "label": "PlayerDestination_Trick4",
+     "location": [9350.0, -9350.0, -550.0]
+    },
+    {
+     "point": "TacticalPoint_15",
+     "label": "PlayerDestination_Kabb4",
+     "location": [8406.868, -8800.396, -550.043]
+    }
+   ],
+   "location": [8765.089, -8378.821, -497.0],
+   "missions": [
+    "MM_01_010_SerolonisJob"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_01_010_TheSerolonisJob/MM_01_010_TheSerolonisJob_Gameplay",
+   "area": "BP_CombatPreparationArea_C_3",
+   "label": "Volume_CombatPrep_Encounter3",
+   "destinations": [
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_Kabb3",
+     "location": [8950.0, -4910.0, -750.0]
+    },
+    {
+     "point": "TacticalPoint_31",
+     "label": "PlayerDestination_Hawks3",
+     "location": [8050.0, -4850.0, -750.0]
+    },
+    {
+     "point": "TacticalPoint_33",
+     "label": "PlayerDestination_Trick3",
+     "location": [8250.0, -4550.0, -750.0]
+    },
+    {
+     "point": "TacticalPoint_34",
+     "label": "PlayerDestination_Aurelio3",
+     "location": [8600.0, -4925.384, -750.0]
+    }
+   ],
+   "location": [8398.946, -3892.018, -697.486],
+   "missions": [
+    "MM_01_010_SerolonisJob"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_02_010_CoilReunion/MM_02_010_CoilReunion_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_36",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [6238.0, 1358.0, 329.674]
+    },
+    {
+     "point": "TacticalPoint_37",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [6148.0, 2045.0, 231.74]
+    },
+    {
+     "point": "TacticalPoint_38",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [6224.269, 1811.717, 329.636]
+    },
+    {
+     "point": "TacticalPoint_39",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [6375.0, 2544.0, 231.707]
+    }
+   ],
+   "location": [5405.568, 2397.126, 400.0],
+   "missions": [
+    "MM_02_010_CoilReunion"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_02_030_TheDarkGrotto/MM_02_030_TheDarkGrotto_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPrep_Enc01",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "Player_TacticalPoint_1.1",
+     "location": [-11948.519, -19645.0, 3030.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "Player_TacticalPoint_1.2",
+     "location": [-12326.0, -20750.0, 3030.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "Player_TacticalPoint_1.3",
+     "location": [-12314.086, -20029.0, 3026.587]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "Player_TacticalPoint_1.4",
+     "location": [-12217.0, -20344.876, 3026.587]
+    }
+   ],
+   "location": [-12958.246, -20209.309, 3135.0],
+   "missions": [
+    "MM_02_030_DarkGrotto"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_02_030_TheDarkGrotto/MM_02_030_TheDarkGrotto_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPrep_Enc02",
+   "destinations": [
+    {
+     "point": "TacticalPoint_33",
+     "label": "Player_TacticalPoint_2.1",
+     "location": [-321.91, -875.06, 109.517]
+    },
+    {
+     "point": "TacticalPoint_34",
+     "label": "Player_TacticalPoint_2.2",
+     "location": [-1206.188, 94.831, 418.417]
+    },
+    {
+     "point": "TacticalPoint_36",
+     "label": "Player_TacticalPoint_2.4",
+     "location": [-570.53, -171.792, 100.0]
+    },
+    {
+     "point": "TacticalPoint_35",
+     "label": "Player_TacticalPoint_2.3",
+     "location": [-1180.141, -217.074, 419.608]
+    }
+   ],
+   "location": [-1485.834, -229.22, 749.132],
+   "missions": [
+    "MM_02_030_DarkGrotto"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_02_050_SlugHQ/MM_02_050_SlugHQ_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [1100.0, 1900.0, 10.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [650.0, 2100.0, 10.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [500.0, 1700.0, 10.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [50.0, 2000.0, 10.0]
+    }
+   ],
+   "location": [809.22, -265.114, 100.0],
+   "missions": [
+    "MM_02_050_SlugHQ"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_02_050_SlugHQ/MM_02_050_SlugHQ_Gameplay",
+   "area": "BP_CombatPreparationArea_C_2",
+   "label": "BP_CombatPreparationArea2",
+   "destinations": [
+    {
+     "point": "TacticalPoint_40",
+     "label": "PlayerTacticalPoint_2.1",
+     "location": [2400.0, 12100.0, -400.0]
+    },
+    {
+     "point": "TacticalPoint_41",
+     "label": "PlayerTacticalPoint_2.2",
+     "location": [2100.0, 12300.0, -400.0]
+    },
+    {
+     "point": "TacticalPoint_42",
+     "label": "PlayerTacticalPoint_2.3",
+     "location": [2350.0, 12650.0, -400.0]
+    },
+    {
+     "point": "TacticalPoint_43",
+     "label": "PlayerTacticalPoint_2.4",
+     "location": [2550.0, 13000.0, -400.0]
+    }
+   ],
+   "location": [1650.441, 12310.78, -250.0],
+   "missions": [
+    "MM_02_050_SlugHQ"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_03_010_Bespin/MM_03_010_Bespin_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep_1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination1.1",
+     "location": [-2740.0, 9075.0, 150.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination1.2",
+     "location": [-3946.994, 9640.646, 136.756]
+    },
+    {
+     "point": "TacticalPoint_0",
+     "label": "PlayerDestination1.3",
+     "location": [-3858.583, 9608.778, 136.756]
+    },
+    {
+     "point": "TacticalPoint_5",
+     "label": "PlayerDestination1.4",
+     "location": [-1792.393, 9412.601, 136.183]
+    }
+   ],
+   "location": [-2270.0, 8690.0, 250.0],
+   "missions": [
+    "MM_03_010_Bespin"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_03_010_Bespin/MM_03_010_Bespin_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "CombatPrep_2",
+   "destinations": [
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerDestination2.1",
+     "location": [-16150.0, 1700.0, -20.0]
+    },
+    {
+     "point": "TacticalPoint_20",
+     "label": "PlayerDestination2.2",
+     "location": [-15150.0, 1700.0, -20.0]
+    },
+    {
+     "point": "TacticalPoint_21",
+     "label": "PlayerDestination2.3",
+     "location": [-15650.0, 1450.0, 100.0]
+    },
+    {
+     "point": "TacticalPoint_22",
+     "label": "PlayerDestination2.4",
+     "location": [-15650.0, 1450.0, 100.0]
+    }
+   ],
+   "location": [-15700.0, 2200.0, 100.0],
+   "missions": [
+    "MM_03_010_Bespin"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_03_010_Bespin/MM_03_010_Bespin_Gameplay",
+   "area": "BP_CombatPreparationArea_C_2",
+   "label": "CombatPrep_3",
+   "destinations": [
+    {
+     "point": "TacticalPoint_25",
+     "label": "PlayerDestination3.1",
+     "location": [-155550.0, -2200.0, -3320.0]
+    },
+    {
+     "point": "TacticalPoint_26",
+     "label": "PlayerDestination3.2",
+     "location": [-155550.0, -2850.0, -3320.0]
+    },
+    {
+     "point": "TacticalPoint_27",
+     "label": "PlayerDestination3.3",
+     "location": [-155770.0, -2630.0, -3320.0]
+    },
+    {
+     "point": "TacticalPoint_28",
+     "label": "PlayerDestination3.4",
+     "location": [-155770.0, -2630.0, -3320.0]
+    }
+   ],
+   "location": [-155250.0, -2700.0, -3250.0],
+   "missions": [
+    "MM_03_010_Bespin"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_04_010_CoilStrikesBack/MM_04_010_CoilStrikesBack_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "CombatPrepVolume_02",
+   "destinations": [
+    {
+     "point": "TacticalPoint_43",
+     "label": "TacticalPoint_Player2.1",
+     "location": [3100.0, 7400.0, -1043.9]
+    },
+    {
+     "point": "TacticalPoint_44",
+     "label": "TacticalPoint_Player2.2",
+     "location": [3100.0, 7100.0, -1050.0]
+    },
+    {
+     "point": "TacticalPoint_45",
+     "label": "TacticalPoint_Player2.3",
+     "location": [2700.0, 6900.0, -1050.0]
+    },
+    {
+     "point": "TacticalPoint_46",
+     "label": "TacticalPoint_Player2.4",
+     "location": [2700.0, 7700.0, -1050.0]
+    }
+   ],
+   "location": [3240.857, 7278.403, -942.64],
+   "missions": [
+    "MM_04_010_CoilStrikesBack"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_04_030_RetakeLuunata/MM_04_030_RetakeLuunata_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea_00",
+   "destinations": [
+    {
+     "point": "TacticalPoint_52",
+     "label": "PlayerTacticalPoint_0.1",
+     "location": [145200.0, -575900.0, -17300.0]
+    },
+    {
+     "point": "TacticalPoint_53",
+     "label": "PlayerTacticalPoint_0.2",
+     "location": [144800.0, -576250.0, -17300.0]
+    },
+    {
+     "point": "TacticalPoint_54",
+     "label": "PlayerTacticalPoint_0.3",
+     "location": [145000.0, -576800.0, -17300.0]
+    },
+    {
+     "point": "TacticalPoint_55",
+     "label": "PlayerTacticalPoint_0.4",
+     "location": [144550.0, -577100.0, -17300.0]
+    }
+   ],
+   "location": [146600.0, -576500.0, -17000.0],
+   "missions": [
+    "MM_04_030_RetakeLuunata"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_04_030_RetakeLuunata/MM_04_030_RetakeLuunata_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea_02",
+   "destinations": [
+    {
+     "point": "TacticalPoint_21",
+     "label": "PlayerTacticalPoint_2.1",
+     "location": [120000.0, -585200.0, -4850.0]
+    },
+    {
+     "point": "TacticalPoint_22",
+     "label": "PlayerTacticalPoint_2.2",
+     "location": [119800.0, -585000.0, -4850.0]
+    },
+    {
+     "point": "TacticalPoint_23",
+     "label": "PlayerTacticalPoint_2.3",
+     "location": [120000.0, -584800.0, -4850.0]
+    },
+    {
+     "point": "TacticalPoint_24",
+     "label": "PlayerTacticalPoint_2.4",
+     "location": [120200.0, -585000.0, -4850.0]
+    }
+   ],
+   "location": [120000.0, -585300.0, -4750.0],
+   "missions": [
+    "MM_04_030_RetakeLuunata"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_04_030_RetakeLuunata/MM_04_030_RetakeLuunata_Gameplay",
+   "area": "BP_CombatPreparationArea_C_2",
+   "label": "BP_CombatPreparationArea_03",
+   "destinations": [
+    {
+     "point": "TacticalPoint_104",
+     "label": "PlayerTacticalPoint_3.1",
+     "location": [119600.0, -591650.0, 56500.0]
+    },
+    {
+     "point": "TacticalPoint_105",
+     "label": "PlayerTacticalPoint_3.2",
+     "location": [120500.0, -591650.0, 56500.0]
+    },
+    {
+     "point": "TacticalPoint_106",
+     "label": "PlayerTacticalPoint_3.3",
+     "location": [119750.0, -591950.0, 56500.0]
+    },
+    {
+     "point": "TacticalPoint_107",
+     "label": "PlayerTacticalPoint_3.4",
+     "location": [120650.0, -591650.0, 56500.0]
+    }
+   ],
+   "location": [120050.0, -592250.0, 56600.0],
+   "missions": [
+    "MM_04_030_RetakeLuunata"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_04_030_RetakeLuunata/MM_04_030_RetakeLuunata_Gameplay",
+   "area": "BP_CombatPreparationArea_C_3",
+   "label": "BP_CombatPreparationArea_01",
+   "destinations": [
+    {
+     "point": "TacticalPoint_140",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [120546.712, -578091.02, -4690.0]
+    },
+    {
+     "point": "TacticalPoint_141",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [119546.712, -578111.02, -4600.0]
+    },
+    {
+     "point": "TacticalPoint_142",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [120176.712, -578211.02, -4790.0]
+    },
+    {
+     "point": "TacticalPoint_143",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [119901.712, -578441.02, -4790.0]
+    }
+   ],
+   "location": [119900.0, -577650.0, -4700.0],
+   "missions": [
+    "MM_04_030_RetakeLuunata"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_04_050_DenBattle/MM_04_050_DenBattle_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_20",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [3177.759, 7543.714, -700.0]
+    },
+    {
+     "point": "TacticalPoint_21",
+     "label": "PlayerTacticalPoint_1.2_Trick",
+     "location": [2172.991, 7556.39, -691.807]
+    },
+    {
+     "point": "TacticalPoint_22",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [2908.868, 7947.725, -700.0]
+    },
+    {
+     "point": "TacticalPoint_23",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [2100.0, 8000.0, -700.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerTacticalPoint_1.5_Tel",
+     "location": [3485.689, 8044.545, -700.0]
+    },
+    {
+     "point": "TacticalPoint_8",
+     "label": "PlayerTacticalPoint_1.6",
+     "location": [2856.959, 7351.71, -700.0]
+    }
+   ],
+   "location": [2750.0, 7150.0, -550.0],
+   "missions": [
+    "MM_04_050_ANewOrder"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_05_010_UmbaraRescue/MM_05_010_UmbaraRescue_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "BP_CombatPreparationArea",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerTacticalPoint_1.1",
+     "location": [-1350.0, -1060.0, 224.753]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerTacticalPoint_1.2",
+     "location": [-1600.0, -1070.0, 220.563]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerTacticalPoint_1.3",
+     "location": [-1994.73, -660.889, 336.141]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerTacticalPoint_1.4",
+     "location": [-2554.776, -232.604, 400.0]
+    },
+    {
+     "point": "TacticalPoint_36",
+     "label": "TacticalPoint_Rex",
+     "location": [-1800.0, -696.672, 211.157]
+    }
+   ],
+   "location": [-356.462, -304.424, 304.763],
+   "missions": [
+    "MM_05_010_UmbaraRescue"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_05_030_BellyOfTheBeast/MM_05_030_BellyOfTheBeast_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep_1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_01.1",
+     "location": [7450.0, 6050.0, 50.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_01.2",
+     "location": [6744.318, 6499.447, 50.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_01.3",
+     "location": [5650.0, 6494.706, 50.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_01.4",
+     "location": [6200.0, 5900.0, 50.0]
+    }
+   ],
+   "location": [9120.514, 5724.314, 100.0],
+   "missions": [
+    "MM_05_030_BellyBeast"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_05_030_BellyOfTheBeast/MM_05_030_BellyOfTheBeast_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "CombatPrep_2",
+   "destinations": [
+    {
+     "point": "TacticalPoint_0",
+     "label": "PlayerDestination_02.1",
+     "location": [5750.0, 68010.0, -50.0]
+    },
+    {
+     "point": "TacticalPoint_5",
+     "label": "PlayerDestination_02.2",
+     "location": [6150.0, 68400.0, -50.0]
+    },
+    {
+     "point": "TacticalPoint_6",
+     "label": "PlayerDestination_02.3",
+     "location": [6718.811, 68297.486, -50.0]
+    },
+    {
+     "point": "TacticalPoint_7",
+     "label": "PlayerDestination_02.4",
+     "location": [7050.0, 67900.0, -50.0]
+    }
+   ],
+   "location": [7430.515, 68814.178, 50.0],
+   "missions": [
+    "MM_05_030_BellyBeast"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_06_090_FathomAndFinale/MM_06_090_FathomAndFinale_Gameplay",
+   "area": "BP_CombatPreparationArea_C_1",
+   "label": "CombatPrep2",
+   "destinations": [
+    {
+     "point": "TacticalPoint_0",
+     "label": "PlayerDestination_2.1",
+     "location": [12650.0, 2250.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_5",
+     "label": "PlayerDestination_2.2",
+     "location": [12850.0, 2250.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_7",
+     "label": "PlayerDestination_2.4",
+     "location": [13337.632, 1850.0, -200.0]
+    },
+    {
+     "point": "TacticalPoint_6",
+     "label": "PlayerDestination_2.3",
+     "location": [13000.0, 1850.0, -200.0]
+    }
+   ],
+   "location": [12650.0, 2566.0, 100.0],
+   "missions": [
+    "MM_06_090_FathomFinale"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_06_090_FathomAndFinale/MM_06_090_FathomAndFinale_Gameplay",
+   "area": "BP_CombatPreparationArea_C_2",
+   "label": "CombatPrep3",
+   "destinations": [
+    {
+     "point": "TacticalPoint_8",
+     "label": "PlayerDestination_3.1",
+     "location": [22650.0, 9150.0, 27130.0]
+    },
+    {
+     "point": "TacticalPoint_9",
+     "label": "PlayerDestination_3.2",
+     "location": [22650.0, 10250.0, 27130.0]
+    },
+    {
+     "point": "TacticalPoint_10",
+     "label": "PlayerDestination_3.3",
+     "location": [22296.464, 9603.536, 27130.0]
+    },
+    {
+     "point": "TacticalPoint_11",
+     "label": "PlayerDestination_3.4",
+     "location": [22296.464, 9796.464, 27130.0]
+    }
+   ],
+   "location": [22407.589, 9714.333, 27202.534],
+   "missions": [
+    "MM_06_090_FathomFinale"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_06_090_FathomAndFinale/MM_06_090_FathomAndFinale_Gameplay",
+   "area": "BP_CombatPreparationArea_C_3",
+   "label": "CombatPrep4",
+   "destinations": [
+    {
+     "point": "TacticalPoint_12",
+     "label": "PlayerDestination_4.1",
+     "location": [109700.0, -23150.0, 30.0]
+    },
+    {
+     "point": "TacticalPoint_13",
+     "label": "PlayerDestination_4.2",
+     "location": [111600.0, -23200.0, 30.0]
+    },
+    {
+     "point": "TacticalPoint_14",
+     "label": "PlayerDestination_4.3",
+     "location": [109100.0, -23400.0, 30.0]
+    },
+    {
+     "point": "TacticalPoint_15",
+     "label": "PlayerDestination_4.4",
+     "location": [111400.0, -23350.0, 30.0]
+    }
+   ],
+   "location": [111457.589, -21385.667, 102.534],
+   "missions": [
+    "MM_06_090_FathomFinale"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/StoryMissions/MM_06_090_FathomAndFinale/MM_06_090_FathomAndFinale_Gameplay",
+   "area": "BP_CombatPreparationArea_C_4",
+   "label": "CombatPrep5",
+   "destinations": [
+    {
+     "point": "TacticalPoint_16",
+     "label": "PlayerDestination_5.1",
+     "location": [129845.0, -33805.0, -6770.0]
+    },
+    {
+     "point": "TacticalPoint_17",
+     "label": "PlayerDestination_5.2",
+     "location": [131260.0, -33765.0, -6770.0]
+    },
+    {
+     "point": "TacticalPoint_18",
+     "label": "PlayerDestination_5.3",
+     "location": [129185.0, -34015.0, -6770.0]
+    },
+    {
+     "point": "TacticalPoint_19",
+     "label": "PlayerDestination_5.4",
+     "location": [130795.0, -33890.0, -6770.0]
+    }
+   ],
+   "location": [131467.589, -33240.667, -6697.466],
+   "missions": [
+    "MM_06_090_FathomFinale"
+   ]
+  },
+  {
+   "package": "/Game/Game/Maps/Test/TestRepeatable/TestRepeatable_Gameplay",
+   "area": "BP_CombatPreparationArea_C_0",
+   "label": "CombatPrep1",
+   "destinations": [
+    {
+     "point": "TacticalPoint_1",
+     "label": "PlayerDestination_1",
+     "location": [-1700.0, 1850.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_2",
+     "label": "PlayerDestination_2",
+     "location": [-1900.0, 1850.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_3",
+     "label": "PlayerDestination_3",
+     "location": [-2100.0, 1850.0, 0.0]
+    },
+    {
+     "point": "TacticalPoint_4",
+     "label": "PlayerDestination_4",
+     "location": [-2300.0, 1850.0, 0.0]
+    }
+   ],
+   "location": [-2310.0, 1330.0, 100.0],
+   "missions": [
+    "OM_Placeholder_Repeatable"
+   ]
+  }
+ ]
+}

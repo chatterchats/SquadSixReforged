@@ -13,6 +13,10 @@ unchanged from 1.1.4, now split across modules. The Core container is now built 
 
 ### Added
 
+- `tools/map_scan.py` reads every deployment area and its destination points straight from the
+  game's levels into `data/mapscan.json`, and checks that `placement.lua`'s hard-coded map layouts
+  each still match exactly one area. It reproduces arctco's published figures: 89 areas, a median
+  lane span of 1,060 uu, 86 of 89 under 2,000 uu.
 - A startup self-check. The log now says whether every game name the runtime depends on still
   resolves: `selfcheck phase=startup ...` once the squad-selection assets load, and
   `selfcheck phase=mission ...` in the first mission. After a game update, `missing=` lists

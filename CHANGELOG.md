@@ -18,6 +18,13 @@ unchanged from 1.1.4, now split across modules. The Core container is now built 
   `selfcheck phase=mission ...` in the first mission. After a game update, `missing=` lists
   exactly what was renamed or removed.
 
+### Fixed
+
+- `squadsixrescue` could leave an operator stranded. When placing two stuck operators on their
+  squadmates failed because the engine accepted a teleport but put the operator somewhere else,
+  the command undid the first move but left that operator wherever it landed. Both are now put
+  back.
+
 ### Changed
 
 - Rescue Jae Mordant (HM_Jae_020) is no longer raised to six by the container. 1.1.4 already kept
@@ -28,6 +35,9 @@ unchanged from 1.1.4, now split across modules. The Core container is now built 
   squad limit, but UAssetAPI couldn't read them. With them in the container, the runtime has
   nothing left to raise, so a correct install should log `data_container=loaded`.
 
+- The runtime's squad-limit sweep reads only mission definitions (`BrunoMissionData`) instead of
+  probing every DataAsset in the game, which threw and caught an error for each non-mission asset
+  on every pass.
 - The runtime is split into `main.lua` (loading and hook registration), `limits.lua`,
   `lineup.lua`, `placement.lua` and `common.lua`. The code is moved unchanged; 1.1.4's single file
   had reached Lua's limit of 200 top-level locals, so any addition would have stopped it loading.

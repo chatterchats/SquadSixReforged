@@ -9,7 +9,12 @@ local unwrap = Common.unwrap
 local full_name = Common.full_name
 
 local MAXIMUM_PROPERTY = "Max" .. "Squad" .. "Size"
--- apply_data_limits sweeps every DataAsset in the process and only latches
+-- Every mission definition in the game is a BrunoMissionData (all 125, read from the cooked
+-- packages). Up to 1.1.4 the sweep enumerated every DataAsset and probed each one for
+-- MaxSquadSize inside a pcall, so every non-mission asset cost a thrown error per pass.
+local MISSION_CLASS = "BrunoMissionData"
+local MISSION_CLASS_PATH = "/Script/Bruno.BrunoMissionData"
+-- apply_data_limits sweeps every mission definition in the process and only latches
 -- once it has read more than ten. Until it latches the maintenance loop
 -- re-runs that sweep every five seconds for as long as the game is open --
 -- which means it can be enumerating UObjects during a level transition,
@@ -164,7 +169,7 @@ end
 -- sweep and the per-screen re-sweep cannot drift apart. Returns nil when the
 -- object list could not be read at all, which the callers report differently.
 local function sweep_data_limits()
-    local objects = FindAllOf("DataAsset")
+    local objects = FindAllOf(MISSION_CLASS)
     if objects == nil then return nil end
 
     local counts = {
@@ -308,6 +313,7 @@ end
 return {
     -- Every game name this module depends on, for selfcheck.lua.
     game_names = {
+        {"class", MISSION_CLASS_PATH},
         {"property", "/Script/BitReactorGame.BitReactorMissionData", MAXIMUM_PROPERTY},
         {"property", "/Script/BitReactorGame.BitReactorMissionData", REQUIREMENTS_PROPERTY},
         {"property", "/Script/BitReactorGame.CharacterRequirement", AUTO_ASSIGN_PROPERTY},

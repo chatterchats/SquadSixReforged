@@ -1506,6 +1506,12 @@ local function manual_peer_rescue(area, units)
         local actual = actor_location(outlier.actor)
         if not call_ok or accepted == false or actual == nil
             or distance_squared(actual, target) >= MIN_UNIT_SEPARATION_SQ then
+            -- This outlier may have moved too: an accepted teleport can land more than a
+            -- tile from its target. Put it back with the others.
+            pcall(function()
+                outlier.actor:K2_SetActorLocationAndRotation(
+                    originals[index], rotations[index], false, {}, true)
+            end)
             for rollback = 1, #moved do
                 pcall(function()
                     bad[rollback].actor:K2_SetActorLocationAndRotation(

@@ -5,8 +5,10 @@
 --   mock.load(scripts_dir)      -- runs main.lua
 --   mock.run_until(ms)          -- fires delayed actions due by then (simulated time)
 --   mock.notify(class_path)     -- constructs an object of that class (NotifyOnNewObject)
+--   mock.hooks[path].pre(...)   -- calls a registered hook; mock.commands[name]() a console command
+--   mock.actor(name, location)  -- an actor that can be moved; mock.first_of[class] = object
 --   mock.transcript             -- log lines and registrations, in order
-local mock = {transcript = {}, missions = {}}
+local mock = {transcript = {}, missions = {}, hooks = {}, commands = {}, first_of = {}}
 
 local function record(line) mock.transcript[#mock.transcript + 1] = line end
 
@@ -75,15 +77,31 @@ mock.game_properties = {
     ["/Script/BitReactorGame.TacticalGameState"] = {"PlayerSquad"},
 }
 
+-- An actor with a location. `move` decides where a teleport lands and what it returns; by
+-- default the actor goes exactly where it was asked to and the call reports success.
+function mock.actor(name, location)
+    local self
+    self = object(name, {}, {
+        K2_GetActorLocation = function() return {X = self.at.X, Y = self.at.Y, Z = self.at.Z} end,
+        K2_GetActorRotation = function() return {Pitch = 0, Yaw = 0, Roll = 0} end,
+        K2_SetActorLocationAndRotation = function(_, target)
+            local landed, result = target, true
+            if self.move then landed, result = self.move(target) end
+            self.at = {X = landed.X, Y = landed.Y, Z = landed.Z}
+            return result
+        end,
+    })
+    rawset(self, "at", {X = location.X, Y = location.Y, Z = location.Z})
+    return self
+end
+
 local delayed, loops, notifications, now = {}, {}, {}, 0
 
 function mock.install(options)
     options = options or {}
     local missing = options.missing or {}
     local properties = options.properties or mock.game_properties
-    local data_assets = {object("DataAsset /Game/Other/NotAMission")}
     for _, value in ipairs(options.missions or {}) do
-        data_assets[#data_assets + 1] = value
         mock.missions[#mock.missions + 1] = value
     end
 
@@ -102,6 +120,7 @@ function mock.install(options)
     print = function(message) record("log " .. tostring(message)) end
     RegisterHook = function(path, pre, post)
         record("hook " .. path .. (post and " +post" or ""))
+        mock.hooks[path] = {pre = pre, post = post}
         return 1, post and 2 or nil
     end
     StaticFindObject = function(path)
@@ -113,14 +132,17 @@ function mock.install(options)
         notifications[class] = notifications[class] or {}
         table.insert(notifications[class], callback)
     end
-    RegisterConsoleCommandHandler = function(name) record("command " .. name) end
+    RegisterConsoleCommandHandler = function(name, callback)
+        record("command " .. name)
+        mock.commands[name] = callback
+    end
     ExecuteWithDelay = function(ms, callback) delayed[#delayed + 1] = {at = now + ms, callback = callback} end
     ExecuteInGameThread = function(callback) callback() end
     LoopAsync = function(ms, callback) loops[#loops + 1] = {every = ms, callback = callback} end
     LoadAsset = function(path) record("load " .. path) end
-    FindFirstOf = function() return nil end
+    FindFirstOf = function(class) return mock.first_of[class] end
     FindAllOf = function(class)
-        if class == "DataAsset" then return data_assets end
+        if class == "BrunoMissionData" then return mock.missions end
         return nil
     end
 end

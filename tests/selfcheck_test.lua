@@ -32,7 +32,7 @@ mock.run_until(1000)
 mock.notify("/Script/BitReactorGame.TacticalGameState")
 mock.run_until(mock.now() + 40000)
 
-mock.expect("selfcheck phase=startup ok=19 missing=BrunoActivitySlotData%.index_7_31948AF04E3D570FC0E4BBBEA45BB788 unchecked=TacticalPoint%.OwningTeam",
+mock.expect("selfcheck phase=startup ok=20 missing=BrunoActivitySlotData%.index_7_31948AF04E3D570FC0E4BBBEA45BB788 unchecked=TacticalPoint%.OwningTeam",
     "a re-keyed field is missing and a failed reflection call is unchecked")
 mock.expect("selfcheck phase=mission ok=2 missing=BP_CombatPreparationArea_C:ExternalMovePlayerUnitsIntoPosition unchecked=none",
     "a renamed Blueprint function is reported after the last mission attempt")

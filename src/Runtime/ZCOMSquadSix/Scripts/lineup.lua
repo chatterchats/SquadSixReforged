@@ -1,6 +1,6 @@
 -- Squad selection: six activity slots, two extra presentation proxies, the six-model
 -- lineup on the diorama, and room for six nameplates.
--- Moved verbatim from main.lua (1.1.4); main.lua loads this module.
+-- Why each rule exists, with the reports behind it: docs/runtime-notes.md.
 local Common = require("common")
 local TARGET_SIZE = Common.TARGET_SIZE
 local HOLOGRAM_MANAGER_ASSET = Common.HOLOGRAM_MANAGER_ASSET
@@ -31,11 +31,8 @@ local PROXY_ARRAY_PROPERTY = "Customization Proxy Actors"
 local SLOT_INDEX_PROPERTY = "index_7_31948AF04E3D570FC0E4BBBEA45BB788"
 -- The lineup diorama has four authored attachment slots.
 local AUTHORED_SLOTS = 4
--- A capture is only believable when consecutive authored slots are really
--- apart. Before the Blueprint places them the pool sits at the origin, or one
--- actor holds a stale transform while the rest are still at 0/0/0; 1.0.4
--- cached exactly that and scattered the models. This is the only condition
--- the reports actually evidence, so it is the only one enforced.
+-- A captured layout is only trusted when consecutive authored slots are really
+-- apart: an unplaced pool sits at the origin or holds stale transforms.
 local MIN_SLOT_SEPARATION_SQ = 100.0
 local ACTIVITY_CHARACTER_PROPERTY = "characterVM"
 local registered_slot_hook = false
@@ -147,19 +144,12 @@ local function ensure_proxy_pool(owner)
     return added > 0
 end
 
--- The stock lineup diorama has four authored attachment slots. ShowLineup
--- iterates every selected character and clones every proxy actor, but its Set
--- Diorama Slot calls cannot place indexes 4 and 5. Reuse the four authored
--- positions and extrapolate along the same row so a five- or six-model lineup
--- stays centred and keeps character/nameplate order from left to right.
+-- The diorama has four authored slots, and the Blueprint can't place indexes 4
+-- and 5, so a five- or six-model row is derived from the four authored
+-- positions, keeping character and nameplate order. A four-model lineup is left
+-- exactly where the Blueprint put it.
 --
--- A four-model lineup is left exactly where the Blueprint put it. 1.0.4
--- applied the six-wide layout unconditionally, which on every four-slot
--- mission pushed each model one slot away from its own name plate and parked
--- a stale full-scale proxy outside the diorama.
--- Returns the layout, or nil plus a short reason for the log. The reason is
--- what makes a report decisive: it says whether a lineup was left alone
--- because the pool was unplaced or because something else refused.
+-- Returns the layout, or nil and a short reason for the log.
 local function capture_authored_layout(actors)
     local locations, rotations = {}, {}
     for index = 1, AUTHORED_SLOTS do
@@ -218,12 +208,9 @@ local function place_lineup_models(owner, proxies, used, allow_capture)
     local layout_key = object_key(owner)
     if layout_key == "" then return false, "no_owner_key" end
 
-    -- Capture at most once per manager. After the first pass has moved the
-    -- proxies, an authored row and a row this mod already shifted look alike:
-    -- both are evenly spaced with the same step. Re-deriving would therefore
-    -- shift the lineup one slot further left on every pass, which is the
-    -- cumulative Edit Squad drift fixed in 1.0.0. The 1.0.5 validation is what
-    -- makes the single capture trustworthy; 1.0.4 cached whatever it saw.
+    -- Capture at most once per manager: after the first pass, a row this mod
+    -- shifted looks just like an authored one, and re-deriving from it would
+    -- drift the lineup on every Edit Squad.
     local captured, reason = nil, nil
     if allow_capture and used >= AUTHORED_SLOTS
         and lineup_layouts[layout_key] == nil then
@@ -241,20 +228,10 @@ local function place_lineup_models(owner, proxies, used, allow_capture)
         if not valid(actors[index]) then return false, "invalid_overflow_proxy" end
     end
 
-    -- Fit the row into the space the game framed, rather than growing past
-    -- it. Up to 1.0.6 the overflow straddled the authored row -- six models
-    -- spanned 225 uu where the authored four span 135 -- and the outer two
-    -- were kept on screen by widening every camera in the world by 22
-    -- degrees. That widening was never scoped and never restored, so it also
-    -- widened the Appearance/Outfits camera, whose zoom is driven by moving
-    -- the camera rather than by field of view: the editor zoomed out much too
-    -- far and would not zoom in past full body. Squad select and the editor
-    -- share this stage -- these proxies are the manager's customization proxy
-    -- actors -- so the fix is to stop needing the camera at all.
-    --
-    -- The step shrinks by exactly the ratio of the gaps, so whatever the
-    -- width the outermost two models land on the authored outer slots: six
-    -- models step 27 uu where four step 45, and both rows span -68..67.
+    -- Fit the row into the span of the authored four rather than widening it,
+    -- so no camera has to change (squad select shares this stage with the
+    -- character editor). Step and scale both shrink by (4 - 1) / (used - 1), so
+    -- the outer models land on the authored outer slots.
     local fit = (AUTHORED_SLOTS - 1) / (used - 1)
     local centre_offset = (used - 1) / 2.0
     -- The authored row's own centre, so the fitted row stays concentric with
@@ -278,15 +255,10 @@ local function place_lineup_models(owner, proxies, used, allow_capture)
         local nearest = math.max(1, math.min(AUTHORED_SLOTS,
             math.floor(authored_index + 0.5)))
         -- Each proxy keeps its own character's scale, reduced by the same
-        -- ratio as the step so the models close up without overlapping. The
-        -- base is re-read whenever the Blueprint has put a new scale on the
-        -- actor -- swapping an operator into a slot brings that character's
-        -- own scale with it, and a base cached once for the manager would
-        -- keep showing the previous occupant's size. It is only reused when
-        -- the actor still carries exactly what this mod last wrote, which is
-        -- what stops the fit compounding into a row that shrinks a little on
-        -- every pass. The Blueprint never places proxies past the authored
-        -- four, so those take slot four's scale as their base, as always.
+        -- ratio. The base is re-read when the Blueprint has put a new scale on
+        -- the actor, and reused only while the actor still carries this mod's
+        -- last write, so the fit never compounds. Overflow proxies take slot
+        -- four's scale.
         local actor_key = object_key(actor)
         local record = fitted_scales[actor_key]
         local live = actor_scale(actor)
@@ -333,10 +305,9 @@ local function activity_slot_character(slot)
     return false, nil
 end
 
--- Hide every proxy the current lineup does not use: the ones past the incoming
--- slot count, and the ones whose slot holds no character. 1.0.4 bailed out
--- unless the incoming count was exactly six, so a four-slot mission kept the
--- previous lineup's fifth and sixth models on screen next to four name plates.
+-- Hide every proxy this lineup doesn't use: past the slot count, or whose slot
+-- holds no character, so a four-slot mission doesn't keep the previous lineup's
+-- fifth and sixth models.
 local function trim_lineup_proxies(activity_slots, proxies, owner_key, used)
     activity_slots = unwrap(activity_slots)
     proxies = unwrap(proxies)
@@ -392,36 +363,14 @@ local function trim_lineup_proxies(activity_slots, proxies, owner_key, used)
     return hidden
 end
 
--- One lineup pass: lay the models out and hide the ones this lineup does not
--- use. Idempotent, so it is safe to run from the pre-hook and again from a
--- deferred tick, and it needs to be: 1.0.4 did this work only in the pre-hook,
--- and moving it to the post-hook alone left operators 5 and 6 unplaced (UE4SS
--- never calls post-hooks on Blueprint functions).
+-- One lineup pass lays the models out and hides the unused ones. It is
+-- idempotent and runs from the pre-hook and again on the next tick; `source` in
+-- its log line says which did the work.
 --
--- `source` and the deduplicated result line are what make a report decisive
--- about which of those two paths actually did the work.
--- Describes the pool as it stands before this pass touches it. This used to
--- live in the post-hook, which meant it was never logged at all: UE4SS
--- registers script hooks with one id for both halves and only calls the
--- pre-hook, so no report could ever show the proxy positions or scales.
--- Diagnostics only: this builds the before_positions/before_scales text and
--- nothing else. It crashed the game anyway, twice on one install.
---
--- `GetClonedFromCharacter` is declared with parameters -- the cooked
--- Blueprint calls it as an EX_LocalVirtualFunction with a Parameters list --
--- and this called it with none. UE4SS answers that with
--- "[UFunction::setup_metamethods -> __call] UFunction expected {} parameters,
--- received {}", and then access-violates inside its own error formatting. The
--- surrounding pcall never had a chance: UE4SS raises in C++ and dies building
--- the message, before Lua sees an error to catch. Two live crash reports have
--- that exact frame (`UFunction __call` under `TArray:ForEach`), and the
--- `cloned_proxies=` counter it fed read 0 in every log line it ever produced.
--- The call is gone and the field with it.
---
--- The `ForEach` is gone too, in favour of the indexed read the rest of this
--- file uses. It is a second UE4SS path that raises on its own terms -- "Tried
--- iterating an array but the unreal property has no registered handler" --
--- and reaching it costs the same crash. Nothing here is worth a crash.
+-- describe_proxies records the pool as it stands before the pass, for the log.
+-- Diagnostics only, and kept to plain indexed reads: calling
+-- GetClonedFromCharacter or TArray:ForEach from here crashed the game inside
+-- UE4SS, where pcall can't catch it.
 local function describe_proxies(proxies, proxy_count)
     local counts = {valid = 0, hidden = 0}
     local positions, scales = {}, {}
@@ -460,10 +409,8 @@ local function run_lineup_pass(owner, activity_slots_param, used, source)
     local owner_key = object_key(owner)
     local proxies = proxy_array(owner)
     local proxy_count = array_count(proxies)
-    -- Described before the pass touches anything, because the result is only
-    -- known afterwards and the key includes it. The first pass legitimately
-    -- refuses an unplaced pool; keying on source alone hid whether a later
-    -- pass ever succeeded, which is why a verified log showed only refusals.
+    -- Read before the pass moves anything. The result is only known afterwards
+    -- and is part of the log key, so each new outcome is logged once.
     local counts, positions, scales = describe_proxies(proxies, proxy_count)
 
     local applied, result = place_lineup_models(owner, proxies, used, true)
@@ -491,12 +438,9 @@ local function run_lineup_pass(owner, activity_slots_param, used, source)
     end
 end
 
--- Pre-hook. The pool must hold six actors before the Blueprint starts cloning.
--- The layout also runs here, which is where 1.0.4 ran it and where six models
--- demonstrably appeared: on the first pass the pool is unplaced and the
--- capture is refused, and on every later pass the proxies still carry the
--- transforms the Blueprint gave them last time. The capture validation added
--- in 1.0.5 is what makes reading them here safe.
+-- Pre-hook. Grows the pool to six before the Blueprint starts cloning, then
+-- lays out the row from the transforms the proxies carry from the last pass;
+-- the capture check rejects an unplaced pool.
 local function lineup_prehook(context, activity_slots_param, clear_previous_param)
     local owner = unwrap(context)
     if not valid(owner) then return end
@@ -520,10 +464,8 @@ local function lineup_prehook(context, activity_slots_param, clear_previous_para
     local used = array_count(activity_slots_param)
     if used >= 0 then lineup_widths[owner_key] = used end
 
-    -- Never let the deferred closure retain activity_slots_param itself. The
-    -- crash dump from 1.1.0 records "TArray index out of range" at unwrap()
-    -- after source=pre and before source=deferred, which is the exact lifetime
-    -- failure produced by reading a hook-owned RemoteParam after return.
+    -- Never let the deferred closure keep activity_slots_param: hook parameters
+    -- are only valid while the hook runs, and reading one afterwards crashed.
     local activity_slots_snapshot = snapshot_array(activity_slots_param, used)
     run_lineup_pass(owner, activity_slots_snapshot, used, "pre")
 

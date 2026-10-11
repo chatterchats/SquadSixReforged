@@ -1,7 +1,7 @@
 -- Tactical deployment: extra player destinations for operators 5 and 6, rescue of
 -- badly staged operators, the post-relocation repair and watchdog passes, and the
 -- squadsixrescue console command.
--- Moved verbatim from main.lua (1.1.4); main.lua loads this module.
+-- Why each rule exists, with the reports behind it: docs/runtime-notes.md.
 local Common = require("common")
 local TARGET_SIZE = Common.TARGET_SIZE
 local log = Common.log
@@ -20,15 +20,10 @@ local PLACEMENT_TRIGGER_FUNCTIONS = {
     "/Script/BitReactorGame.CombatPreparationArea:TriggerPreCombat",
     "/Script/BitReactorGame.CombatPreparationArea:TriggerCombatInit",
 }
--- The relocation itself. ACombatPreparationArea::MovePlayerUnitsIntoPosition
--- is the native function that reads PlayerDestinations and moves the squad, so
--- its pre-hook is the exact instant before the squad is disturbed. That beats
--- guessing from a delay ladder.
--- BP_CombatPreparationArea overrides it, so the UFunction that actually runs
--- belongs to the Blueprint class, not to the native base. Hooking the base
--- registered cleanly and never fired once: a verified run logged
--- relocation_hook=true with relocation_pre=false. The BP asset carries both
--- names; hook whatever resolves and let the log say which one ran.
+-- The relocation: its pre-hook is the instant before the squad is moved.
+-- BP_CombatPreparationArea overrides the native function, so the Blueprint
+-- names are the ones that run; all three are hooked and the log says which
+-- fired.
 local MOVE_UNITS_FUNCTIONS = {
     "/Game/Game/Core/Blueprints/BP_CombatPreparationArea.BP_CombatPreparationArea_C:MovePlayerUnitsIntoPosition",
     "/Game/Game/Core/Blueprints/BP_CombatPreparationArea.BP_CombatPreparationArea_C:ExternalMovePlayerUnitsIntoPosition",
@@ -54,20 +49,11 @@ local MIN_DESTINATION_SEPARATION_SQ = 10000.0
 -- judgement about the position: the operators worth rescuing are exactly the
 -- ones standing somewhere wrong, so this stays generous.
 local MAX_DESTINATION_DISTANCE_SQ = 4000000.0
--- Whether a position is somewhere an operator can usefully be, though, is a
--- different question, and until 1.0.9 the same 2000 uu radius answered both.
--- Deployment lanes are far smaller than that: across the 89 preparation areas
--- in the game the authored destinations span a median of 1064 uu and 86 of
--- the 89 span less than 2000. So a staged position most of a lane's width
--- outside the lane passed as "near the deployment area" and was promoted to
--- a permanent destination. SK_Serolonis_020 is the reported case -- one
--- operator staged 906 uu outside the authored shape, in a rock, and the mod
--- made that its destination.
---
--- The area itself carries the answer. Its PlayerDestinations are the points
--- the map author marked for player deployment, so their convex hull is the
--- deployment lane, and a position is acceptable when it lies inside that hull
--- or within one tactical step of its edge.
+-- Whether a position is usable is a different question from membership. The
+-- deployment lane is the convex hull of the area's authored PlayerDestinations,
+-- and a position is acceptable inside it or within one tactical step of its
+-- edge. Lanes span a median of about 1,060 uu, so the 2,000 uu membership
+-- radius would accept positions well outside them.
 local DEPLOYMENT_EDGE_TOLERANCE = 100.0
 -- Two operators closer together than one tactical step are on the same tile.
 local MIN_UNIT_SEPARATION_SQ = 10000.0
@@ -83,106 +69,57 @@ local STAGING_WINDOW_MS = 500
 -- fighting it in a loop would be worse than the bug. An explicit console
 -- invocation bypasses this budget because the player confirms the failure.
 local MAX_REPAIRS_PER_UNIT = 2
--- Enough lines for a report to show the whole ladder without flooding one
--- deployment. The count is reset by begin_deployment so an early encounter
--- cannot make every later encounter in the same session silent.
--- Raised from four in 1.0.9. A relocation can now schedule more than one
--- ladder, and four was already being spent inside a single mission: an
--- attached MM_06_090 log used all four on its first two encounters and every
--- fight after that was silent, which is the opposite of what this cap is for.
+-- Enough repair lines to show a whole ladder without flooding the log. Reset
+-- per deployment, so later encounters in a session are still reported.
 local MAX_REPAIR_REPORTS = 8
 -- Repairs run this long after the relocation and no longer. The window has to
 -- cover a relocation that settles slowly, and has to close before the player
 -- has control -- two operators standing a tile apart in normal play look
 -- exactly like the pair this pass exists to separate.
 local REPAIR_DELAYS_MS = {100, 500, 2000}
--- Prorp's 1.0.9 Serolonis log was clean through post2000, then showed an
--- operator at 0/0/-5513 in the eight-second final census without another
--- relocation firing. These later checks cover that proven gap, but use only
--- hard-invalid signatures so they cannot pull back an operator who has begun
--- moving normally after control is returned.
+-- Late checks after the repair ladder, for operators displaced after it ends.
+-- They act only on hard-invalid signatures, so they never pull back an operator
+-- the player has started moving.
 local WATCHDOG_DELAYS_MS = {3500, 5000, 7000, 7500}
 -- The manual peer fallback exists only for Sambuco's literal spawn-bad
 -- shape: exactly two hard-invalid outliers, far from all remaining distinct
 -- operators forming one compact live cluster. It refuses looser guesses.
 local MANUAL_PEER_CLUSTER_RADIUS_SQ = 1000000.0
 local MANUAL_PEER_OUTLIER_DISTANCE_SQ = 4000000.0
--- BP_CombatPreparationArea carries two names for the relocation, and both
--- hooks fire for a single event within a few milliseconds of each other. A
--- second, genuinely separate relocation is seconds later: on SK_Kaller_025 the
--- squad is correct at the last repair pass, 2 s after the first relocation,
--- and two operators are on the rocks and at the world origin by 5 s after it.
--- Coalescing on time rather than on the area tells those two cases apart,
--- where 1.0.8's one-ladder-per-area rule could not.
+-- Both relocation hook names fire for one event within milliseconds; a
+-- genuinely separate relocation comes seconds later. Coalescing on time tells
+-- the two apart.
 local RELOCATION_COALESCE_MS = 250
 -- Each ladder is bounded, and MAX_REPAIRS_PER_UNIT still caps how often its
 -- automatic passes can move one operator, so this limits pathological firing.
 local MAX_RELOCATION_LADDERS = 4
 
--- Cold Metal (SK_Kaller_020_Gameplay_Alt) authors its skirmish-intro capsule
--- inside the broad linked tactical volume but 513 uu outside the four-point
--- deployment quadrilateral. One of its six initial spawn transforms can
--- instead put Hawks at 0/0 on the snowy hill, outside that tactical volume.
--- The other overflow operator has been observed at 45/-1607/96, 113 uu away,
--- so this is also a distinct tactical step.
---
--- Match the authored PlayerDestinations rather than a localized mission name
--- or a brittle UObject path. This keeps the exception pinned to the one map
--- whose cooked geometry proves the replacement location is intentional.
+-- Placement profiles: exact corrections for maps whose staging is known to be
+-- bad. Each is matched by the area's authored PlayerDestinations, not by a
+-- mission name or object path, so it applies only to the map whose cooked
+-- geometry justifies it.
 local PLACEMENT_PROFILE_MATCH_RADIUS_SQ = 2500.0
 local PLACEMENT_PROFILE_MEMBER_RADIUS_SQ = 40000.0
--- The geometry of a derived rescue point, grouped into one table the way
--- REPAIR is. It was four separate locals until 1.1.4, when the file turned
--- out to sit exactly on Lua's 200 top-level local limit and the two heights
--- below would not fit beside them.
+-- The geometry of a derived rescue point, in one table to stay clear of Lua's
+-- 200-local limit.
 local RESCUE = {}
--- K2_SetActorLocationAndRotation can settle a few units away from the exact
--- request. Ten uu is enough to treat that as the same rescue point while
--- remaining below the smallest derived point's 29.8 uu interior clearance.
--- Keep this separate from MIN_UNIT_SEPARATION_SQ: one tactical tile is wider
--- than the inset and would accept a point that is still outside the lane.
+-- A teleport can settle a few uu from the request; within 10 uu counts as the
+-- same rescue point. Deliberately smaller than a tactical tile, which would
+-- accept a point still outside the lane.
 RESCUE.settled_radius_sq = 100.0
--- The midpoint of an authored edge is *on* the deployment shape's boundary,
--- not inside it, and a boundary point is exactly where a strict inside test
--- or a tile snap can round the wrong way -- which is the failure being
--- repaired. Every derived rescue point is therefore pulled this far towards
--- the centroid of the four authored points. On the shortest edge any profile
--- uses, Kaller 025's 360 uu left edge, that is a 34 uu step inwards, which
--- still leaves it 174 uu from the nearest authored destination: comfortably
--- past MIN_DESTINATION_SEPARATION_SQ and nowhere near the next operator.
--- A rescue the map itself authors carries its own evidence and is used as
--- written, so this applies only where inset_rescues says so.
+-- An edge midpoint lies on the lane's boundary, where an inside test or a tile
+-- snap can round the wrong way, so derived points are pulled this fraction of
+-- the way to the centroid. A profile's rescues are inset only when it sets
+-- inset_rescues; one the map itself authors is used as written.
 RESCUE.inset = 0.15
--- A derived rescue point takes its height by interpolating between the two
--- authored destinations whose edge it sits on. Where the edge is a ramp or a
--- staircase that is right; where it spans a cliff, nothing along it is on any
--- surface and interpolating invents a height in mid-air. Reject the edge
--- rather than guess.
---
--- Measured across the hulls of all 89 authored deployment lanes -- 335 edges,
--- from lab/private/destination-point-scan/mapscan.json -- the rise is under
--- 25 uu on 56 of the 128 edges that rise at all, and runs continuously up to
--- about 220 with no gap that separates a slope from a step. There is no
--- threshold that tells those apart, so this does not try to be one: above 220
--- the data *is* gapped (250, 318, 400, 500, 600), and those six edges are
--- lanes that straddle a drop. 250 uu keeps every edge the interpolation can
--- reasonably serve, including Fathom's 200 uu staircase, and refuses only the
--- handful where it plainly cannot.
+-- A derived point takes its height by interpolating along its edge. An edge
+-- that rises more than this spans a drop rather than a slope or stairs (across
+-- all 89 lanes the rises are continuous up to about 220 uu, then gapped), so it
+-- is rejected rather than given a height in mid-air.
 RESCUE.level_tolerance = 250.0
--- An operator standing on a destination sits a capsule height above it, and
--- the offset is normally measured from the operators who are doing exactly
--- that. When none of them is -- which is precisely the deployment that needs
--- rescuing, because every operator is somewhere wrong -- the measurement has
--- no sample and used to fall back to zero, placing every derived point one
--- capsule height *below* the floor. Harakiri's Fathom operator landed in a
--- crate and then on a ledge over the void; MortisVenunum's log asked for
--- Z=750 on a floor at 850-864 and the capsule settled at 865, one recovery
--- that happened to have something underneath it.
---
--- 100 uu is the measured offset on Kaller and the larger of the two heights
--- the 1.0.8 profile work recorded (Fathom is nearer 70), so an unsampled
--- guess errs upwards: a point slightly above the floor drops onto it, a point
--- below it is inside geometry.
+-- An operator's capsule height above its destination, used when no operator in
+-- this deployment stands on one to measure from. Erring high is safe: a point
+-- slightly above the floor drops onto it, one below it is inside geometry.
 RESCUE.capsule_height = 100.0
 local PLACEMENT_PROFILES = {
     {
@@ -190,11 +127,9 @@ local PLACEMENT_PROFILES = {
         -- The fifth staged position is valid on this map; rescue only an
         -- operator the linked tactical volume conclusively rejects.
         outside_volume_only = true,
-        -- This rescue is the cooked map's own skirmish-intro capsule
-        -- transform, not a point derived from the deployment quadrilateral --
-        -- it sits 513 uu outside it -- so it is used exactly as authored and
-        -- is not inset. Its evidence is that the map spawns a player there;
-        -- the tactical-volume check after the move is what confirms it.
+        -- The map's own skirmish-intro capsule transform, 513 uu outside the
+        -- quadrilateral, used as authored; the tactical-volume check after the
+        -- move confirms it.
         destinations = {
             {X = 700, Y = -2500, Z = 30},
             {X = 950, Y = -2150, Z = 0},
@@ -207,13 +142,8 @@ local PLACEMENT_PROFILES = {
     },
     {
         name = "Kaller025",
-        -- The reported six-unit staging was the four points below, one
-        -- operator at 6369/-1393 on the rocks, and one at 0/0/261. Keep both
-        -- overflow operators inside the quadrilateral the map authors marked
-        -- for player deployment: these are the midpoints of its left and
-        -- right edges, drawn in towards the centre by RESCUE.inset. Z=500 is
-        -- the capsule centre observed at the four surrounding 400-Z
-        -- TacticalPoints.
+        -- Midpoints of the left and right edges, drawn in by RESCUE.inset. Z is
+        -- the capsule centre measured at the surrounding TacticalPoints.
         inset_rescues = true,
         destinations = {
             {X = 5000, Y = -1140, Z = 400},
@@ -228,14 +158,8 @@ local PLACEMENT_PROFILES = {
     },
     {
         name = "FathomFinale",
-        -- MM_06_090, preparation area 2. The report's four ordinary units
-        -- match these cooked points exactly; the two overflow positions at
-        -- 22009/9775 and 22683/9694 were outside the deployment zone -- one
-        -- by 33 uu, the other by 287, which is the reported difference
-        -- between an operator that can walk back in and one that cannot.
-        -- These replacements are the midpoints of the lane's two 575 uu side
-        -- edges, drawn in by RESCUE.inset. Neither extrapolates beyond the
-        -- authored four-point shape.
+        -- MM_06_090, preparation area 2: midpoints of the lane's two side
+        -- edges, drawn in by RESCUE.inset.
         inset_rescues = true,
         destinations = {
             {X = 22650, Y = 9150, Z = 27130},
@@ -280,11 +204,9 @@ local repair_counts = {}
 local repair_reported = 0
 local placement_rescue_reported = {}
 
--- An actor the placement pass never reached sits at the world origin plus its
--- own capsule height -- EvilPoptart1987 logged 0/0/261 for the operator that
--- could not move -- so the test has to ignore Z. The closest authored player
--- destination in the game is 224 uu from the XY origin (HM_Kabb_020), so a
--- 100 uu radius cannot mistake a real deployment point for this.
+-- An actor the placement never reached sits at the world origin, plus its
+-- capsule height, so the test ignores Z. No authored destination is within 224
+-- uu of the XY origin.
 local function at_world_origin(location)
     if location == nil then return false end
     return location.X * location.X + location.Y * location.Y <= ORIGIN_RADIUS_SQ
@@ -302,22 +224,11 @@ local function actor_inside_tactical_area(volume, actor)
     return nil
 end
 
--- Where the game itself stood this operator up before combat. That position
--- is the one thing about a deployment we can trust: the game chose it, so it
--- is on ground the map author approved and on the tactical grid. The scan of
--- the cooked levels says there is no alternative to fall back on -- 53 of the
--- 89 deployment areas author no spare TacticalPoint anywhere near the squad,
--- and MM_02_030, HM_Jae_010 and SK_Kaller_020, the three maps the 1.0.5
--- reports actually name, author none at all.
---
--- First reading wins, and only inside the staging window: once the relocation
--- has run, the position on offer is the broken one we are trying to undo.
--- `trusted` marks a position this mod chose rather than one the game staged.
--- The repair tests an untrusted snapshot against the authored lane before
--- restoring anybody to it; a trusted one is used as written, because the
--- rescue that produced it already argued for the location -- Cold Metal's is
--- the cooked map's own skirmish-intro capsule, 513 uu outside the deployment
--- quadrilateral.
+-- Where the game itself stood each operator before combat: on approved ground
+-- and on the grid, and most deployment areas author no spare TacticalPoint to
+-- fall back on. First reading wins, and only inside the staging window.
+-- `trusted` marks a position this mod chose; the repair tests untrusted
+-- snapshots against the authored lane before using them.
 local function remember_staged_position(member, entry, volume, trusted)
     if not staging_window_open then return end
     local key = object_key(member)
@@ -325,10 +236,8 @@ local function remember_staged_position(member, entry, volume, trusted)
     if entry.location == nil then return end
     -- An operator already at the origin was never placed; do not enshrine it.
     if at_world_origin(entry.location) then return end
-    -- Cold Metal proves that an initial spawn is not automatically safe: it
-    -- can put Hawks on the snowy hill outside the playable volume. Never turn
-    -- a position the game itself rejects into either a repair target or a
-    -- destination candidate.
+    -- An initial spawn can itself be outside the playable volume (Cold Metal),
+    -- so never keep a position the game rejects.
     if actor_inside_tactical_area(volume, member) == false then return end
     staged_positions[key] = {
         actor = member,
@@ -338,19 +247,9 @@ local function remember_staged_position(member, entry, volume, trusted)
     }
 end
 
--- Collect the player units standing in this deployment area, and record how
--- the count was arrived at.
---
--- The filter is proximity to an authored destination, not world identity. A
--- verified mission launch logged raw=12 valid=12 in_world=0: every squad
--- member was readable and every one was rejected by comparing
--- member:GetWorld() against area:GetWorld() by name. That comparison is what
--- left a six-operator squad on a four-destination map with two units
--- relocated onto the same tile. Distance does the job the world check was
--- meant to do -- a unit standing in the deployment area is in the right
--- world, in the playable space, and on ground the map author approved -- and
--- unlike the world check it demonstrably works. The world name is still
--- recorded, as a number in the log rather than a gate on behaviour.
+-- The player units standing in this deployment area, and how the count was
+-- reached. The filter is distance to an authored destination; comparing worlds
+-- by name rejected every unit, so the world match is only counted for the log.
 local function collect_members(members, area_world_name, anchors, volume, stats)
     local result = {}
     local count = array_count(members)
@@ -649,24 +548,13 @@ local function inside_deployment(polygon, point)
     return false
 end
 
--- Where to put an overflow operator on a map that has no hand-verified
--- profile. The three profiles hardcode inset midpoints of authored edges;
--- this derives the same shape from whatever destinations the area actually
--- carries, so it works on all 89 preparation areas instead of three.
+-- Rescue points for a map without a profile: inset midpoints of the authored
+-- lane's edges. Height is the median offset of operators already standing on
+-- destinations, else RESCUE.capsule_height.
 --
--- Z is self-calibrating. An operator standing on a destination sits a capsule
--- height above it -- about 100 uu on Kaller, 70 on Fathom -- so rather than
--- guess, take the offset from the operators who are already standing on their
--- destinations in this very deployment. Where none of them is, fall back to
--- RESCUE.capsule_height rather than to zero.
---
--- `ignore_units` drops the unit-proximity *rejection* while keeping units in
--- the clearance used for ordering. The repair fallback needs it: it rebuilds
--- this pool after the rescue has already stood operators on the points it
--- derived, and rejecting those points leaves it with nothing to offer. Where
--- a point is genuinely occupied the caller checks that itself. The expansion
--- path leaves it off, because a new *destination* on top of a standing
--- operator is a different and worse mistake.
+-- `ignore_units` keeps occupied points in the pool, for the repair, which
+-- checks occupancy itself; the destination expansion leaves it off, since a
+-- destination on a standing operator is worse.
 local function derive_rescue_points(polygon, destinations, units, wanted, ignore_units)
     if polygon == nil or wanted < 1 then return {} end
 
@@ -703,14 +591,9 @@ local function derive_rescue_points(polygon, destinations, units, wanted, ignore
             X = mx + (cx - mx) * RESCUE.inset,
             Y = my + (cy - my) * RESCUE.inset,
         }
-        -- Interpolate between the two ends of the edge rather than take the
-        -- height of the nearest destination. On a lane whose corners sit at
-        -- different heights the nearest destination to an inset midpoint can
-        -- be the one on the other level, and two points a couple of hundred
-        -- uu apart then get heights a couple of hundred uu apart -- at least
-        -- one of them inside the geometry. Harakiri's Fathom stairs are the
-        -- reported case: 1.1.3 derived 13074/2050 at Z=-200 and 12845/2050 at
-        -- Z=0 off the same staircase, and put an operator in a crate.
+        -- Interpolate the height along the edge rather than take the nearest
+        -- destination's: on a lane with corners at two heights the nearest can
+        -- be on the other level.
         local rise = math.abs((first.Z or 0) - (second.Z or 0))
         local clearance = math.huge
         for _, destination in ipairs(destinations) do
@@ -774,11 +657,9 @@ local function inset_rescue(profile, rescue)
     }
 end
 
--- Match a cooked four-point fingerprint after any level-instance translation
--- or yaw rotation. The old Cold Metal comparison used absolute coordinates,
--- so it silently stopped matching as soon as the same sublevel was instanced
--- elsewhere. Two points establish the 2-D rigid transform; all four must then
--- match distinct live destinations within 50 uu before a profile can act.
+-- Match a profile's four-point fingerprint under any level-instance translation
+-- or yaw rotation: two points give the transform, then all four must match
+-- distinct live destinations within 50 uu.
 local function match_placement_profile(profile, destinations)
     if destinations == nil or #destinations < #profile.destinations then return nil end
 
@@ -893,28 +774,17 @@ local function minimum_distance_assignments(targets, candidates, wanted)
     return best or {}
 end
 
--- Some maps stage overflow operators somewhere that is technically inside
--- the broad tactical volume but outside the small player deployment lane.
--- Act only on exact cooked four-point fingerprints and place the overflow
--- inside that authored shape before turning those positions into destinations.
---
--- Every profile is tried, not just profiles up to the first match. The three
--- shipped fingerprints are provably non-congruent -- each one matches exactly
--- one of the game's 89 preparation areas, at scale 1 and yaw 0 -- but that is
--- a property of this list, not of the matcher, and a fourth profile could
--- quietly break it. Two profiles claiming one map means the evidence for
--- which correction belongs here is gone, so nothing is moved.
+-- Move overflow operators the game staged inside the tactical volume but
+-- outside the deployment lane, before their positions become destinations.
+-- Every profile is tried; if two match one map, nothing is moved.
 local function rescue_known_staging(destinations, volume)
     if not staging_window_open then return 0 end
 
     local units = every_player_unit()
     if #units < 1 then return 0 end
     for _, unit in ipairs(units) do unit.rotation = actor_rotation(unit.actor) end
-    -- A deployment with four authored points and six operators needs two safe
-    -- additions, not permission to move every operator whose pre-relocation
-    -- staging strip happens to sit outside the later destination polygon.
-    -- Prorp's Serolonis log proved that distinction: 1.0.9 moved four staged
-    -- operators even though only two destinations were missing.
+    -- Only as many moves as destinations are missing: four authored points and
+    -- six operators means at most two.
     local missing = math.min(#units, TARGET_SIZE) - #destinations
     if missing < 1 then return 0 end
 
@@ -936,9 +806,7 @@ local function rescue_known_staging(destinations, volume)
         end
     end
     -- No profile: derive the lane and its rescue points from the area's own
-    -- authored destinations. A profile stays preferred where one matches --
-    -- its points come from the cooked map and are reproduced in the tests --
-    -- but every other preparation area now gets the same treatment.
+    -- destinations.
     local authored = {}
     for _, destination in ipairs(destinations) do
         if destination.location ~= nil then
@@ -976,13 +844,9 @@ local function rescue_known_staging(destinations, volume)
     end
     if #targets < 1 then return 0 end
 
-    -- Resolve occupancy before assignment. Otherwise an occupied first target
-    -- can claim the only candidate, fail the later blocked check, and starve a
-    -- free second target. A candidate within ten XY units is already settled;
-    -- any non-candidate inside a tactical tile simply makes that target
-    -- unavailable. Candidates farther than ten units are allowed to claim and
-    -- move onto their nearby target, which closes the old outside-but-skipped
-    -- band between the 30-34 uu inset and the 100 uu separation radius.
+    -- Resolve occupancy before assignment, so an occupied first target can't
+    -- claim the only candidate and starve a free one. A candidate within 10 uu
+    -- of a target is already settled there.
     local candidate_set, settled = {}, {}
     for _, candidate in ipairs(candidates) do candidate_set[candidate] = true end
 
@@ -1057,11 +921,9 @@ local function rescue_known_staging(destinations, volume)
         log("placement_rescue=" .. label
             .. " moved=" .. table.concat(moves, ","))
     end
-    -- Hand back where the operators were deliberately put. The lane test that
-    -- follows exists to reject positions the *game* staged badly; a position
-    -- this pass chose on evidence -- Cold Metal's rescue is the cooked map's
-    -- own skirmish-intro capsule, 513 uu outside its deployment
-    -- quadrilateral -- must not be thrown out by it.
+    -- Return the rescued positions: the lane test that follows rejects
+    -- positions the game staged badly, and must not reject one this pass chose
+    -- deliberately.
     return rescued, placed
 end
 
@@ -1078,17 +940,9 @@ local function strand_reason(unit, index, units, anchors, volume, polygon)
         end
     end
 
-    -- Prefer the game's own answer. ATacticalAreaVolume::IsActorInsideTacticalArea
-    -- is what "out of bounds" means to the game; a radius around the authored
-    -- destinations is only ever an approximation of it. York117's operators
-    -- ended up under the map, which a distance test can easily call fine.
-    -- The deployment lane is asked first, because the tactical volume is the
-    -- wrong instrument for this question and three maps now prove it. It
-    -- accepted SK_Serolonis_020's operator 906 uu outside the authored shape,
-    -- in a rock, and Kaller 025's on the rocks at 6369/-1393. It describes
-    -- the battlefield the fight happens on, not the lane the squad deploys
-    -- into, so a conclusive "inside" from it is not evidence the operator can
-    -- be commanded.
+    -- Ask the deployment lane first, then the game's tactical volume. The
+    -- volume describes the whole battlefield, so "inside" from it doesn't mean
+    -- the operator can be commanded.
     if inside_deployment(polygon, unit.location) == false then return "off_lane" end
 
     if volume ~= nil then
@@ -1140,12 +994,9 @@ local function hard_strand_reasons(units, volume, polygon)
     return reasons
 end
 
--- The signatures an operator cannot have arrived at by playing. `off_lane`
--- and `off_area` are deliberately absent: after control returns they describe
--- an operator the player walked somewhere, and teleporting that operator back
--- into the deployment lane would be the mod breaking a working mission.
--- One table rather than three top-level locals: the main chunk is at Lua's
--- 200-local ceiling.
+-- Signatures an operator can't reach by playing. `off_lane` and `off_area` are
+-- absent: after control returns they describe an operator the player walked
+-- somewhere.
 local REPAIR = {}
 REPAIR.lane_fallback = {
     origin = true,
@@ -1154,80 +1005,29 @@ REPAIR.lane_fallback = {
     outside_volume = true,
 }
 
--- How far outside the authored lane a staged snapshot may sit and still be
--- somewhere to put an operator back. Beyond this it is not the edge of the
--- deployment, it is a different place on the map.
---
--- The overflow operators the game stages just outside a four-point lane are
--- the normal case and must keep working: Sambuco's fifth and sixth on
--- HM_Kabb_010 sit 185 and 215 uu outside a lane 395 uu across. prorp's
--- HM_Kabb_020 logs are the failure -- the game stages that squad on a strip
--- 1470 to 1825 uu outside its lane, well inside the tactical volume, so every
--- snapshot was accepted and the repair spent the deployment hauling operators
--- back out to it.
---
--- 1000 uu is about one whole deployment lane: across the 89 authored areas
--- the widest destination pair spans a median of 1060 uu. A snapshot further
--- outside the lane than the lane is wide is not a staging position for it.
--- That leaves 4.6x headroom over Sambuco and rejects prorp by 1.5x.
+-- How far outside the authored lane a staged snapshot may be and still be a
+-- place to put an operator back: about one lane's width. Overflow operators
+-- staged just outside the lane are normal; a squad staged on a strip far
+-- outside it is not a target.
 REPAIR.max_staging_offset = 1000.0
 
--- The reason an operator can hold for a moment on its way somewhere legal.
--- MovePlayerUnitsIntoPosition walks the squad rather than teleporting it, and
--- an operator mid-walk is outside the authored lane exactly as a stranded one
--- is. A live 1.1.2 log caught the consequence: the post500 and post2000 rungs
--- repaired the same three operators 1.5 seconds apart, to identical targets
--- but from very different live positions, and the squad still came to rest at
--- Z 11 against staged targets of Z 60-99. Both repairs fought the walk and
--- neither stuck.
---
--- So these two reasons now require the operator to have settled -- the same
--- position as the previous pass -- before anything moves it. A genuinely
--- stranded operator does not move, so this costs a real failure nothing; the
--- hard signatures below are unaffected and still repair on first sight.
--- `off_lane` only. `off_area` means further than 2000 uu from every authored
--- destination, which is a relocation that went wrong rather than a walk in
--- progress -- no operator walks there -- so it is still repaired on sight.
+-- A reason that also describes an operator still walking into place, since the
+-- relocation walks the squad. Repaired only once the operator has stopped
+-- moving between passes; the hard signatures are repaired on sight.
 REPAIR.soft_settle = {
     off_lane = true,
 }
 REPAIR.settled_radius_sq = 100.0
 local observed_positions = {}
 
--- Undo a relocation that went wrong.
+-- Undo a relocation that went wrong. CalculateRushTargets_V2 can give two
+-- operators the same target, or one none, leaving it on a squadmate's tile, at
+-- the world origin or outside the area: it can still shoot but can't move.
 --
--- BP_CombatPreparationArea asks CalculateRushTargets_V2 for one target per
--- player unit and then moves everyone. With six operators it can return the
--- same target twice, or none at all, and the operator is left on a squadmate's
--- tile, at the world origin, or outside the deployment area. It can still
--- shoot and use abilities from there; it cannot move. That is every 1.0.5
--- report: two units at -12958/-20209 on MM_02_030, two at -25/-1112 on
--- HM_Jae_010, one at 0/0/261 on SK_Kaller_020.
---
--- The staged position is the first choice and stays the first choice: the
--- cooked levels author no spare TacticalPoint near the squad in 53 of 89
--- deployment areas, and none at all in the three maps above, so a staged
--- repair does not invent a position -- it returns the operator to one the
--- game itself put a unit on.
---
--- An operator with no staged position used to get nothing at all. That is
--- Darkened0Sky's whole mission: `staged=4` against six operators, and every
--- rung from post100 to watch3500 reporting `restored=0` with the two broken
--- operators listed as `:unstaged`. It is also Xywzel's, and it is what
--- `repairable=false` in the deployment_state line has been announcing since
--- 1.1.2 without being able to act on it.
---
--- remember_staged_position refuses to enshrine a position the tactical volume
--- rejects, which is correct and is exactly why those two operators have no
--- snapshot: they were already outside when the squad was staged. So the
--- fallback cannot come from the squad's own history. It comes from the
--- authored lane instead -- the same inset edge midpoints derive_rescue_points
--- has been placing operators on since 1.1.0, derived from the mission's own
--- destinations rather than from the ones this mod appended.
---
--- Deliberately narrow: it applies only to the hard-invalid signatures, never
--- to `off_lane` alone, so an operator the player has walked out of the lane
--- is never teleported back. The two-repair budget still applies.
+-- Each operator goes back to its staged position. Without one, the hard-invalid
+-- signatures fall back to an inset point of the authored lane; `off_lane` alone
+-- never does, since the player may have walked there. At most two automatic
+-- repairs per operator.
 local function repair_stranded_units(area, via, hard_only, ignore_budget)
     area = unwrap(area)
     if not valid(area) then return 0 end
@@ -1246,19 +1046,10 @@ local function repair_stranded_units(area, via, hard_only, ignore_budget)
     local hard_reasons = hard_only
         and hard_strand_reasons(units, volume, polygon) or {}
 
-    -- Derived lazily: most passes find nothing to repair, and the ones that
-    -- do usually have a staged position to repair to. The pool is built from
-    -- the mission's own destinations, never from the ones this mod appended,
-    -- because those are the positions the operator is stranded on.
-    --
-    -- Derived ignoring where the operators currently stand. By the time a
-    -- repair rung runs, the rescue has usually already put operators on these
-    -- very points, and deriving against live positions rejected every one of
-    -- them -- which is why Harakiri's shared_tile operator read `:unstaged`
-    -- on every rung with an empty pool behind it. Occupancy is still honored,
-    -- just below, where a point can be skipped rather than never offered.
-    -- The mission's own lane, derived once and shared by the fallback below
-    -- and by the staged-position test above it.
+    -- The authored lane and its fallback points, derived lazily and from the
+    -- mission's own destinations only. Derived ignoring where operators stand,
+    -- since the rescue may already have put them there; occupancy is checked
+    -- per point below.
     local authored_points, authored_lane, authored_built = nil, nil, false
     local function authored_shape()
         if not authored_built then
@@ -1348,21 +1139,8 @@ local function repair_stranded_units(area, via, hard_only, ignore_budget)
             local staged, fallback, off_lane_staging = nil, false, false
             if not moving then
                 staged = staged_positions[unit.key]
-                -- A snapshot taken outside the authored lane is not a place to
-                -- put anybody back. prorp's HM_Kabb_020 logs are the reported
-                -- case: the game stages that squad on a strip around X=2200 to
-                -- 2650, more than a thousand uu outside a lane that spans
-                -- X=-200 to 1045, and the strip is inside the tactical volume,
-                -- so remember_staged_position accepted all six. Two seconds
-                -- after the game had correctly relocated the squad into the
-                -- lane, post2000 moved four operators back out to it and
-                -- called them restored -- seven such restorations across the
-                -- run, every one of them undone by the game afterwards.
-                --
-                -- A position this mod deliberately chose is exempt: Cold
-                -- Metal's authored rescue sits 513 uu outside its own
-                -- deployment quadrilateral and is trusted on the evidence
-                -- that the map spawns a player there.
+                -- A snapshot far outside the authored lane isn't a place to put
+                -- anyone back. Positions this mod chose are exempt.
                 local offset = staged ~= nil and not staged.trusted
                     and lane_offset(staged.location) or nil
                 if offset ~= nil and offset > REPAIR.max_staging_offset then
@@ -1448,13 +1226,10 @@ local function repair_stranded_units(area, via, hard_only, ignore_budget)
     return restored, stranded
 end
 
--- Sambuco's two operators spawned at -80.6/40.8/-764.4, which is inside the
--- XY origin signature and is therefore correctly refused as a staged repair
--- target. His proven synchronous workaround used two different live squad
--- peers instead. Reproduce that only for the same tightly constrained shape:
--- two hard-invalid outliers, more than 2000 uu from every remaining distinct
--- operator, whose entire cluster is at most 1000 uu wide. The destinations
--- are occupied on purpose; this is an explicit command, not automatic repair.
+-- Last resort for squadsixrescue: two hard-invalid operators far from a tight
+-- cluster of the other four are placed on two live squadmates' tiles, a
+-- workaround a player proved in a live mission. Only that exact shape; the
+-- shared tiles are deliberate.
 local function manual_peer_rescue(area, units)
     local anchors = destination_anchors(area)
     if #anchors < 1 then return 0, "no_destinations" end
@@ -1530,17 +1305,11 @@ local function manual_peer_rescue(area, units)
     return #moved, nil, table.concat(moves, ",")
 end
 
--- BP_CombatPreparationArea gathers only PlayerDestinations and then asks
--- CalculateRushTargets_V2 for one result per player unit. Several maps author
--- only four destinations. Units five and six are initially in a valid spawn
--- area, but the later combat-prep relocation receives no valid targets for
--- them and can send them to an invalid/default location. Preserve those safe
--- initial positions as real, distinct TacticalPoint destinations before the
--- relocation is calculated.
---
--- Every destination added here is a position a player unit is already
--- standing on. Nothing is extrapolated or interpolated, because a synthesised
--- point has no navigation check behind it and can land inside terrain.
+-- The relocation asks CalculateRushTargets_V2 for one target per unit from
+-- PlayerDestinations, and many maps author only four, so operators five and six
+-- can be sent somewhere invalid. Add destinations at positions operators
+-- already stand on, before the relocation is calculated; nothing is
+-- extrapolated, since an invented point has no navigation check.
 local function ensure_player_destinations(area)
     area = unwrap(area)
     if not valid(area) then return false end
@@ -1571,29 +1340,17 @@ local function ensure_player_destinations(area)
     end
     if #valid_destinations < 1 then return false end
 
-    -- 1.0.4 asked for six destinations unconditionally, and TriggerPreCombat
-    -- can fire before the squad is populated. On a two-unit tutorial that
-    -- added two destinations the mission never authored, and the relocation
-    -- pass then moved an authored unit onto one of them, leaving it short of
-    -- the action points the script expects. A squad we cannot read is a squad
-    -- we do not touch; the bounded retries at the hook site run again once it
-    -- is populated.
-    -- Run exact map-profile rescues before the proximity-filtered squad read.
-    -- The Kaller report's sixth operator was at 0/0, more than 2000 uu from
-    -- every destination, so the old order filtered it out before the rescue
-    -- code could ever see it.
+    -- A squad that can't be read yet is left alone; the retries at the hook
+    -- site run again. Profile rescues run before the proximity-filtered read,
+    -- which would drop an operator far from every destination.
     local staging_rescued, rescued_positions = rescue_known_staging(
         valid_destinations, linked_tactical_area(area))
 
     local members, stats = player_squad_members(area, anchors)
     last_member_stats = stats
     if members == nil or #members < 1 then return false end
-    -- Ask for one destination per operator in the squad, not one per operator
-    -- that happened to pass the proximity filter. On MM_02_030 the filter read
-    -- five of six (near=5 raw=6), so the first pass -- the only pass
-    -- guaranteed to run before the game relocates anybody -- settled for five
-    -- destinations and stopped. The filter still decides which positions are
-    -- safe to reuse; it no longer decides how many are needed.
+    -- One destination per operator in the squad, not per operator that passed
+    -- the proximity filter.
     local squad_size = stats.squad_size or #members
     if squad_size < #members then squad_size = #members end
     local desired = math.min(squad_size, TARGET_SIZE)
@@ -1632,11 +1389,8 @@ local function ensure_player_destinations(area)
             }
         end
     end
-    -- Positions this pass deliberately moved inside the lane are the safest
-    -- destination additions available, so consume them first. Without this,
-    -- the generic rescue moved the two candidates nearest its targets and the
-    -- furthest two untouched staging-strip positions won the descending sort
-    -- below, becoming the actual destinations instead.
+    -- Positions this pass rescued into the lane are the safest additions, so
+    -- they come first.
     table.sort(candidates, function(left, right)
         if left.rescued ~= right.rescued then return left.rescued end
         return left.nearest > right.nearest
@@ -1656,28 +1410,9 @@ local function ensure_player_destinations(area)
     end
     local lane = deployment_polygon(lane_points)
 
-    -- Darkened0Sky's Lothal crisis: four authored points, six operators, and
-    -- both additions taken from positions outside the authored lane. Two
-    -- operators deployed where the tactical volume went on to refuse them,
-    -- and neither could be commanded again -- `outside_lane=2` in the
-    -- expansion line, then `outside_volume:unstaged restored=0` on every
-    -- repair rung.
-    --
-    -- Cold Metal is the case that says an off-lane position is not
-    -- automatically wrong. One of its two additions is a position this pass
-    -- deliberately rescued into the lane; the other sits 605 uu outside a
-    -- quadrilateral that understates the map's real deployment area, and has
-    -- never been reported as stuck. So the discriminator is not "this
-    -- candidate is off-lane". It is "every position this pass is about to
-    -- add is off-lane, and not one of them was rescued there" -- no evidence
-    -- left that the authored lane is wider than its four points. Cold Metal
-    -- keeps a trusted addition and keeps its behaviour; Darkened0Sky's had
-    -- none, and gets interior points derived from the authored shape instead.
-    --
-    -- Derived points are prepended rather than substituted. If the lane
-    -- yields fewer than are needed, the original candidates still get their
-    -- turn: an operator with a destination somewhere is better off than an
-    -- operator the game never assigned one to.
+    -- If every position about to be added is outside the authored lane and none
+    -- was rescued there, prepend points derived from the lane. The off-lane
+    -- candidates still follow, since a destination somewhere beats none.
     local missing = desired - #valid_destinations
     if lane ~= nil and missing > 0 and #candidates > 0 then
         local considered, off_lane_only = 0, true
@@ -1725,18 +1460,9 @@ local function ensure_player_destinations(area)
         for _, destination in ipairs(valid_destinations) do
             nearest = math.min(nearest, distance_squared(candidate.location, destination.location))
         end
-        -- Count, but do not reject, a position outside the authored lane.
-        -- Rescued positions are explicitly consumed first, so a four-to-six
-        -- expansion that produced two safe interior points finishes before an
-        -- untouched staging-strip position can become a destination.
-        --
-        -- Rejecting here as well would cost more than it saves. Cold Metal's
-        -- second overflow operator stages 605 uu outside its quadrilateral,
-        -- next to the map's own skirmish-intro capsule, and has never been
-        -- reported as stuck -- four authored points understate that map's
-        -- real deployment area. Refusing it a destination would take away a
-        -- working position and give nothing back. The count makes the case
-        -- visible in a log instead of guessing at it.
+        -- Count, but don't reject, positions outside the authored lane: four
+        -- points can understate a map's real deployment area (Cold Metal), and
+        -- the count makes the case visible in the log.
         if lane ~= nil and inside_deployment(lane, candidate.location) == false then
             local trusted = false
             for _, placed in ipairs(rescued_positions or {}) do
@@ -1757,10 +1483,8 @@ local function ensure_player_destinations(area)
                 if team ~= nil then
                     pcall(function() point[PLAYER_TEAM_PROPERTY] = team end)
                 end
-                -- 1.0.5 accepted any call that did not throw. A teleport the
-                -- engine declines returns false silently, leaving the point
-                -- at the origin it was spawned at -- which is where
-                -- EvilPoptart1987's fifth operator was found, at 0/0/261.
+                -- Check the return value: a declined teleport returns false
+                -- without an error and leaves the point at the origin.
                 local moved, accepted = pcall(function()
                     return point:K2_SetActorLocationAndRotation(
                         candidate.location, candidate.rotation or {}, false, {}, true)
@@ -1827,12 +1551,8 @@ local function placement_state(area)
     return member_count, raw_count, valid_count
 end
 
--- Read-only. A second reporter hit an out-of-bounds spawn on an ordinary
--- mission, so the auto-assign guard alone does not explain every case. This
--- records the numbers needed to decide the real fix: how many units the squad
--- actually has, how many destinations the deployment area authored, and where
--- each unit ended up. It writes nothing and hooks nothing; the gate is a
--- single FindFirstOf so it costs almost nothing outside a mission.
+-- Read-only: logs the squad size, the authored destinations and where each unit
+-- ended up, for diagnosing placement reports.
 local function report_mission_placement()
     local gate_ok, squad = pcall(function() return FindFirstOf(SQUAD_CLASS) end)
     if not gate_ok or not valid(squad) then return end
@@ -1941,12 +1661,9 @@ local function prepare_new_area(area)
     end
 end
 
--- A synchronous, deliberately narrow escape hatch for a player who can see
--- that deployment has failed. A complete snapshot uses the normal repair but
--- ignores the automatic two-attempt budget: explicit player confirmation is
--- the safeguard that budget otherwise substitutes for. If the bad operators
--- spawned at the origin and could never be staged, the tightly gated peer
--- fallback above reproduces Sambuco's proven live workaround.
+-- squadsixrescue: a synchronous escape hatch for a deployment the player can
+-- see has failed. Runs the normal repair without the two-attempt budget, then
+-- the hard-signature pass, then the peer fallback.
 local function register_rescue_command()
     if registered_rescue_command then return end
     local ok = pcall(function()
@@ -1969,28 +1686,14 @@ local function register_rescue_command()
                 if staged_positions[unit.key] ~= nil then staged = staged + 1 end
             end
 
-            -- Run the repair whatever the snapshot looks like. An incomplete
-            -- snapshot used to skip straight to the peer fallback and, when
-            -- that did not match, refuse -- which is what Darkened0Sky got:
-            -- `staged=4 fallback=shape hard=0 good=6`, twice, with two
-            -- operators still off the map. The repair now has a lane-derived
-            -- target for exactly the operators a snapshot could never cover,
-            -- so the case that most needs this command is no longer the one
-            -- case that never reaches it.
+            -- Run the repair whatever the snapshot looks like: the lane
+            -- fallback covers operators a snapshot could never include.
             local restored, stranded = repair_stranded_units(
                 area, "console", false, true)
-            -- strand_reason answers "off_lane" before it asks the tactical
-            -- volume, so an operator that is both off-lane and outside the
-            -- volume gets the softer label and the lane fallback declines it.
-            -- That is the ordinary rungs behaving correctly -- an off-lane
-            -- operator may simply have walked there -- but this is an explicit
-            -- command, and the hard signatures are what the peer fallback
-            -- below already runs on. Darkened0Sky's log shows the difference
-            -- exactly: `off_lane:unstaged` on every early rung, then
-            -- `outside_volume:unstaged` once the late watchdog asked.
-            -- The soft pass keeps the last word on `stranded`: it is the
-            -- wider question, and a deployment it still calls broken must not
-            -- be reported as having had nothing wrong with it.
+            -- strand_reason gives an operator that is both off-lane and outside
+            -- the volume the soft label, which the lane fallback declines. This
+            -- is an explicit command, so try the hard signatures too; the soft
+            -- pass keeps the last word on `stranded`.
             if restored == 0 and stranded > 0 then
                 restored = repair_stranded_units(
                     area, "console_hard", true, true)
@@ -2044,18 +1747,14 @@ local function on_relocation_starting(context, name)
         begin_deployment(area)
     end
 
-    -- Report every invocation, including a name already seen in this
-    -- deployment. The repeated name is the important case: a genuinely later
-    -- relocation can use the same Blueprint entry point as the first one.
-    -- `ladder` and `coalesced` distinguish that event from the companion hook
-    -- name that fires within the 250 ms gate.
+    -- Log every invocation, including a repeated name: a later relocation can
+    -- use the same entry point. `ladder` and `coalesced` tell it apart from the
+    -- companion name within the 250 ms gate.
     local short = (string.find(name, "^/Script/") and "script:" or "bp:")
         .. (string.match(name, ":([^:]+)$") or name)
     if key ~= "" and active_deployment_key ~= key then
-        -- A relocation callback for some other preparation area must not
-        -- replace the live deployment's staged snapshot. The normal placement
-        -- trigger activates a new area; without that boundary this firing is
-        -- observable but deliberately receives no repair ladder.
+        -- A relocation for some other preparation area must not replace the
+        -- live deployment's snapshot; it is logged but gets no repair ladder.
         relocation_firing_count = relocation_firing_count + 1
         log("relocation_fired=" .. short
             .. " event=" .. tostring(relocation_firing_count)
@@ -2077,19 +1776,11 @@ local function on_relocation_starting(context, name)
         local members, raw_destinations, usable_destinations = placement_state(area)
         staging_window_open = false
 
-        -- One line saying whether the mod is in a position to help this
-        -- mission at all, emitted once per deployment.
-        --
-        -- Xywzel's operators ended up off the map after what their log
-        -- suggested was a mid-session UE4SS reload, and the session could not
-        -- be reconstructed afterwards: a runtime that has lost its staged
-        -- snapshot repairs nothing and, until now, said nothing about it
-        -- either. Every automatic repair moves a unit only to its own staged
-        -- position, so `staged` short of `squad` is the whole story -- those
-        -- operators cannot be recovered no matter what goes wrong next.
-        -- `deployment=adopted` is the matching cause: no placement trigger
-        -- opened this deployment, which is what a reset mid-mission looks
-        -- like from here.
+        -- One line per deployment saying whether the mod can help. Every
+        -- automatic repair needs a staged position, so `staged` short of
+        -- `squad` means those operators can't be recovered; `adopted` means no
+        -- placement trigger opened the deployment, as after a mid-mission UE4SS
+        -- reload.
         local staged = 0
         for _ in pairs(staged_positions) do staged = staged + 1 end
         log("deployment_state=" .. (adopted and "adopted" or "tracked")
@@ -2151,11 +1842,9 @@ local function on_relocation_starting(context, name)
     end
 end
 
--- No early return on "one of them registered". The native name resolves at
--- startup and the Blueprint names only once a mission level loads, so exiting
--- as soon as anything was registered meant the Blueprint override -- the one
--- that actually runs -- was never attempted. A verified run logged
--- relocation_hook for the native name and relocation_fired=none.
+-- No early return once one name registers: the native name resolves at startup,
+-- but the Blueprint names, the ones that actually run, only once a mission
+-- level loads.
 local function register_relocation_hook()
     local count = 0
     for _, function_name in ipairs(MOVE_UNITS_FUNCTIONS) do
@@ -2237,11 +1926,9 @@ local function register_placement_triggers()
                             -- rather than a guess.
                             if first_trigger then
                                 placement_attempts[area_key] = true
-                                -- A verified run read no squad members at
-                                -- any point inside two seconds, so the ladder
-                                -- reaches further. Each rung is a cheap
-                                -- property read and stops mattering as soon
-                                -- as the expansion succeeds.
+                                -- The squad can take seconds to become
+                                -- readable, so the retries reach eight seconds.
+                                -- Each rung is a cheap read.
                                 local delays = {0, 50, 100, 250, 500, 1000,
                                     2000, 3000, 5000, 8000}
                                 for attempt = 1, #delays do
@@ -2259,28 +1946,19 @@ local function register_placement_triggers()
                                             end
                                             ensure_player_destinations(area)
                                             local retry_members, _, retry_valid = placement_state(area)
-                                            -- The relocation has run by the
-                                            -- time the squad has been readable
-                                            -- for a second, so from here on
-                                            -- every rung checks the result and
-                                            -- puts back anyone it stranded.
-                                            -- Fallback only. When the
-                                            -- relocation pre-hook fires it
-                                            -- schedules its own repairs off
-                                            -- the relocation itself, and
-                                            -- repeating them this late risks
-                                            -- moving an operator the player
-                                            -- has already taken control of.
+                                            -- After a second the relocation has run,
+                                            -- so later rungs repair what it stranded:
+                                            -- only as a fallback when the relocation
+                                            -- pre-hook never fired, since repairing
+                                            -- this late could move an operator the
+                                            -- player already controls.
                                             if retry_delay >= 1000
                                                 and not relocation_prehook_ran then
                                                 repair_stranded_units(area, "rung" .. tostring(retry_delay))
                                             end
-                                            -- Report how the last rung ended
-                                            -- whatever the outcome. 1.0.4
-                                            -- only warned when it had already
-                                            -- read a squad, so the case that
-                                            -- actually happens -- never
-                                            -- reading one -- logged nothing.
+                                            -- Report how the last rung ended whatever
+                                            -- the outcome, including never reading a
+                                            -- squad.
                                             if retry_index == #delays
                                                 and not placement_failure_reported then
                                                 placement_failure_reported = true

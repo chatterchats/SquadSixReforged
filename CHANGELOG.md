@@ -44,6 +44,9 @@ unchanged from 1.1.4, now split across modules. The Core container is now built 
   `cameras source=` lines), kept to diagnose a camera bug fixed in 1.0.6, is gone. The `lineup`
   line drops `post_hook_id=`; its before-pass positions and scales are now formatted only when the
   line is logged.
+- arctco's long comments, which recorded the player reports and measurements behind each rule,
+  moved word for word to `docs/runtime-notes.md`; the code keeps a short summary of each. Code
+  unchanged.
 - The runtime is split into `main.lua` (loading and hook registration), `limits.lua`,
   `lineup.lua`, `placement.lua` and `common.lua`. The code is moved unchanged; 1.1.4's single file
   had reached Lua's limit of 200 top-level locals, so any addition would have stopped it loading.

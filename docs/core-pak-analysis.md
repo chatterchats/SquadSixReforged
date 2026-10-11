@@ -45,7 +45,7 @@ squad limits, read with `tools/zen.py` (every package parses to its last byte):
 | 3 | `MM_01_030_NotYourTurf`, `MM_05_010_UmbaraRescue`, `SK_Dantooine_025`, `SK_Kaller_030` | No; three-operator missions, left alone |
 | default (1) | `MM_03_010_Bespin` | No; solo mission. The value isn't serialized, so it's `BitReactorMissionData`'s default of 1 |
 
-The runtime's comments (`limits.lua`) say ten definitions "declare nothing at all: no MaxSquadSize, and no
+arctco's notes ([`runtime-notes.md`](runtime-notes.md), under `RESWEEP_CAP` and `SCRIPTED_COMPANION_MISSION_NAMES`) say ten definitions "declare nothing at all: no MaxSquadSize, and no
 requirements". That's what UAssetAPI showed arctco (it parsed them as `RawExport`), not what the
 packages hold. Nine of the ten serialize 4/4 and their character requirements; only Bespin omits
 the value. The guard decisions still hold: the requirement census reads the same as arctco's

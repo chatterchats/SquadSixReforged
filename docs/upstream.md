@@ -15,7 +15,7 @@ The per-file hashes are in [`upstream-1.1.4.sha256`](upstream-1.1.4.sha256), and
 The runtime builds the six activity-slot view models, the six-model lineup diorama, the six-entry
 squad-select layout, and the placement of operators 5 and 6 inside each map's authored deployment
 area. It also guards missions that inject scripted characters. The mission lists, the measurements
-behind them and the bug reports that led to them are documented in the runtime's comments.
+behind them and the bug reports that led to them are documented in [`runtime-notes.md`](runtime-notes.md).
 
 ## What the Core pak overrides
 
@@ -33,7 +33,7 @@ including the 20 missions left out and why: [`core-pak-analysis.md`](core-pak-an
   `tools/inspect_core.py` after each patch.
 - **Release history:** arctco's notes for 1.1.0–1.1.4 are on their Nexus page, saved in
   [`upstream-nexus-page-1.1.4.md`](upstream-nexus-page-1.1.4.md). Earlier versions are only
-  described in the runtime's comments.
+  described in [`runtime-notes.md`](runtime-notes.md).
 - **Only the Zero Mod Manager bundle was imported.** arctco also shipped a Manual archive with
   `ZCOMSquadSix/enabled.txt` (loads the mod without a `mods.txt` edit) and checksum-guarded
   `install.sh`/`uninstall.sh` for Linux. Those files aren't in this repository.

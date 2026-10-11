@@ -45,16 +45,10 @@ local status_reported = false
 local status_complete_reported = false
 local container_warning_reported = false
 local slot_notify_reported = false
--- One line that answers "is Squad Six actually running, and is it complete?"
--- Support triage reads this from UE4SS.log; nothing else in the log is needed.
---
--- Reported twice: once as soon as the data limits are known, so a log pasted
--- before the mission screen is opened still proves the mod is running, and
--- again when every hook is up. 1.0.4 reported only the early line, and
--- VM_ActivitySlotList does not exist until the mission screen opens, so that
--- line permanently recorded slot_hook=false on healthy installs. Every 1.0.4
--- report carries that false negative in the one line meant to settle whether
--- the install is sound.
+-- One line that answers whether Squad Six is running and complete. Logged as
+-- soon as the squad limits are known, so an early log still proves the mod
+-- loaded, and again once every hook is up (the slot hook only registers when
+-- the mission screen opens).
 local function report_status()
     local limits, lineup, placement = Limits.state(), Lineup.state(), Placement.state()
     if not limits.limit_reported then return end

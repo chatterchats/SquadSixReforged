@@ -1,6 +1,6 @@
 -- Shared by every Squad Six module: the target size, asset paths, logging, and the
 -- reflection and vector helpers.
--- Moved verbatim from main.lua (1.1.4); main.lua loads this module.
+-- Why each rule exists, with the reports behind it: docs/runtime-notes.md.
 
 local TARGET_SIZE = 6
 local SLOT_LIST_ASSET = "/Game/Game/UI/Strategy/GalaxyMap/BPs/VM_ActivitySlotList"

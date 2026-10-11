@@ -31,7 +31,7 @@ src/Runtime/    UE4SS mod ZCOMSquadSix + zcom-mod.json        -> ue4ss/Mods
     selfcheck.lua   logs whether every game name the other modules use still resolves
     common.lua      shared constants and reflection/vector helpers
 data/           missions.tsv: the squad limit for every mission (what the Core pak changes)
-docs/           upstream notes, file hashes, pak analysis
+docs/           upstream notes, file hashes, pak analysis, runtime-notes.md (why each rule exists)
 tests/          runtime tests under a UE4SS stand-in (ue4ss_mock.lua): startup, self-check,
                 lineup, rescue
 tools/          build_core.py, inspect_core.py, package.py, run-tests.sh, and their helpers

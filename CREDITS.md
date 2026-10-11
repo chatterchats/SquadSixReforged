@@ -14,7 +14,7 @@ arctco discontinued the mod and gave permission for others to continue it:
 > If you want to experiment with it or improve it yourself, go ahead, I'd appreciate credit for
 > the manual work and hand picked missions that went into it.
 
-Players who reported the bugs that shaped the mission guards (named in the runtime's comments): MortisVenunum,
+Players who reported the bugs that shaped the mission guards (named in [docs/runtime-notes.md](docs/runtime-notes.md)): MortisVenunum,
 Tesel, FoxFlight.
 
 ## Continued by

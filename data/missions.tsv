@@ -6,20 +6,20 @@
 # squad    the value Squad Six ships. Rows where it differs from game go into the Core pak.
 # note     why a mission is not raised to 6
 #
-# main.lua also writes 6 at runtime to any loaded mission still at 4, except the ones it guards
+# The runtime (limits.lua) also writes 6 to any loaded mission still at 4, except the ones it guards
 # (GUARDED_MISSION_NAMES, SCRIPTED_COMPANION_MISSION_NAMES), so keep those lists in step with this file.
 mission	game	squad	note
-AuthoredHero/HM_Cly_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
-AuthoredHero/HM_Cly_020	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
-AuthoredHero/HM_Jae_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
-AuthoredHero/HM_Jae_020	4	4	Jae joins through mission logic, so six becomes seven and the save hangs; main.lua guards it at 4 (1.1.4 also packed it at 6)
-AuthoredHero/HM_Kabb_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
-AuthoredHero/HM_Kabb_020	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
-AuthoredHero/HM_Luco_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
-AuthoredHero/HM_Telrea_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
-AuthoredHero/HM_Telrea_020	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
-AuthoredHero/HM_TrickLuco_020	4	4	hero mission: auto-assigns Hawks plus two companions; main.lua guards it at 4
-AuthoredHero/HM_Trick_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
+AuthoredHero/HM_Cly_010	4	4	hero mission: auto-assigns Hawks plus a companion; limits.lua guards it at 4
+AuthoredHero/HM_Cly_020	4	4	hero mission: auto-assigns Hawks plus a companion; limits.lua guards it at 4
+AuthoredHero/HM_Jae_010	4	4	hero mission: auto-assigns Hawks plus a companion; limits.lua guards it at 4
+AuthoredHero/HM_Jae_020	4	4	Jae joins through mission logic, so six becomes seven and the save hangs; limits.lua guards it at 4 (1.1.4 also packed it at 6)
+AuthoredHero/HM_Kabb_010	4	4	hero mission: auto-assigns Hawks plus a companion; limits.lua guards it at 4
+AuthoredHero/HM_Kabb_020	4	4	hero mission: auto-assigns Hawks plus a companion; limits.lua guards it at 4
+AuthoredHero/HM_Luco_010	4	4	hero mission: auto-assigns Hawks plus a companion; limits.lua guards it at 4
+AuthoredHero/HM_Telrea_010	4	4	hero mission: auto-assigns Hawks plus a companion; limits.lua guards it at 4
+AuthoredHero/HM_Telrea_020	4	4	hero mission: auto-assigns Hawks plus a companion; limits.lua guards it at 4
+AuthoredHero/HM_TrickLuco_020	4	4	hero mission: auto-assigns Hawks plus two companions; limits.lua guards it at 4
+AuthoredHero/HM_Trick_010	4	4	hero mission: auto-assigns Hawks plus a companion; limits.lua guards it at 4
 Story_Main/MM_01_010_SerolonisJob	4	6	
 Story_Main/MM_01_030_NotYourTurf	3	3	three-operator mission
 Story_Main/MM_02_010_CoilReunion	4	6	
@@ -33,7 +33,7 @@ Story_Main/MM_05_002_ImperialSkirmish	4	6
 Story_Main/MM_05_010_UmbaraRescue	3	3	three-operator mission
 Story_Main/MM_05_030_BellyBeast	4	6	
 Story_Main/MM_06_090_FathomFinale	4	6	
-Story_Main/Mission_MainStory_Placeholder	4	6	placeholder, not a playable mission; packed so main.lua has nothing left to raise at runtime
+Story_Main/Mission_MainStory_Placeholder	4	6	placeholder, not a playable mission; packed so the runtime has nothing left to raise
 Test/OM_Cin_Testing	4	6	
 Optional/CrisisMissions/OM_Crisis_B1_A	4	6	
 Optional/CrisisMissions/OM_Crisis_B1_B	4	6	

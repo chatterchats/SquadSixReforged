@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Adopted from arctco, the original author, after they discontinued the mod. `main.lua` is unchanged
-from 1.1.4. The Core container is now built from the game's own packages by
+Adopted from arctco, the original author, after they discontinued the mod. The runtime's code is
+unchanged from 1.1.4, now split across modules. The Core container is now built from the game's own packages by
 `tools/build_core.py`, from the squad limits in `data/missions.tsv`.
 
 ### Changed
@@ -20,6 +20,10 @@ from 1.1.4. The Core container is now built from the game's own packages by
   depended on the mission being loaded when the runtime checked; these definitions do store a
   squad limit, but UAssetAPI couldn't read them. With them in the container, the runtime has
   nothing left to raise, so a correct install should log `data_container=loaded`.
+
+- The runtime is split into `main.lua` (loading and hook registration), `limits.lua`,
+  `lineup.lua`, `placement.lua` and `common.lua`. The code is moved unchanged; 1.1.4's single file
+  had reached Lua's limit of 200 top-level locals, so any addition would have stopped it loading.
 
 Not yet tested in game.
 

@@ -39,25 +39,25 @@ squad limits, read with `tools/zen.py` (every package parses to its last byte):
 | MaxSquadSize | Missions | In the 1.1.4 pak |
 |--------------|----------|------------------|
 | 4 | 105 skirmishes, crises and story missions | Yes, raised to 6 |
-| 4 | 10 hero missions `HM_*` other than `HM_Jae_020` | No; they auto-assign Hawks plus 1–2 companions, and `main.lua` guards them at 4 |
-| 4 | `MM_02_050_SlugHQ` | No; Tal Rea joins through mission logic, and `main.lua` guards it at 4 |
-| 4 | `SK_Serolonis_020`, `SK_Vandor_015`, `MM_02_010_CoilReunion`, `Mission_MainStory_Placeholder` | No; UAssetAPI couldn't read them, so `main.lua` raises them at runtime |
+| 4 | 10 hero missions `HM_*` other than `HM_Jae_020` | No; they auto-assign Hawks plus 1–2 companions, and the runtime (`limits.lua`) guards them at 4 |
+| 4 | `MM_02_050_SlugHQ` | No; Tal Rea joins through mission logic, and the runtime guards it at 4 |
+| 4 | `SK_Serolonis_020`, `SK_Vandor_015`, `MM_02_010_CoilReunion`, `Mission_MainStory_Placeholder` | No; UAssetAPI couldn't read them, so the runtime raises them |
 | 3 | `MM_01_030_NotYourTurf`, `MM_05_010_UmbaraRescue`, `SK_Dantooine_025`, `SK_Kaller_030` | No; three-operator missions, left alone |
 | default (1) | `MM_03_010_Bespin` | No; solo mission. The value isn't serialized, so it's `BitReactorMissionData`'s default of 1 |
 
-`main.lua`'s comments say ten definitions "declare nothing at all: no MaxSquadSize, and no
+The runtime's comments (`limits.lua`) say ten definitions "declare nothing at all: no MaxSquadSize, and no
 requirements". That's what UAssetAPI showed arctco (it parsed them as `RawExport`), not what the
 packages hold. Nine of the ten serialize 4/4 and their character requirements; only Bespin omits
 the value. The guard decisions still hold: the requirement census reads the same as arctco's
 (every hero mission except `HM_Jae_020` auto-assigns two or three characters).
 
-`HM_Jae_020` **is** in the pak at 6, but since 1.1.4 `main.lua` guards it and writes 4 back at
+`HM_Jae_020` **is** in the pak at 6, but since 1.1.4 the runtime guards it and writes 4 back at
 runtime (Jae joining mid-mission made seven units and hung saves). The pak entry is left over from
 before that fix and is harmless while the guard runs.
 
 ### The pak and the Lua overlap
 
-`main.lua`'s `sweep_data_limits` writes `MaxSquadSize = 6` at runtime to every loaded mission
+The runtime's `sweep_data_limits` (`limits.lua`) writes `MaxSquadSize = 6` at runtime to every loaded mission
 definition that is at 4 and not guarded. The pak does the same thing earlier and more reliably,
 because the sweep only reaches definitions that are already in memory. The log line
 `data_container=loaded|partial|missing` reports which of the two did the work.

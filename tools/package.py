@@ -3,7 +3,7 @@
 The ZIP keeps the layout of the original author's releases, which Zero Mod Manager installs as
 two entries:
   Core/       the IoStore override (pakchunk99-ZCOMSquadSix_P.pak/.ucas/.utoc), Content/Paks/~mods
-  Runtime/    the UE4SS mod (ZCOMSquadSix/Scripts/main.lua), ue4ss/Mods
+  Runtime/    the UE4SS mod (ZCOMSquadSix/Scripts/*.lua), ue4ss/Mods
 Each half carries its zcom-mod.json. The Core paks are built by tools/build_core.py, which records
 them and the inputs they came from in data/core-build.sha256; packaging refuses paks that don't
 match that record, or a record whose inputs have changed since (rebuild first).

@@ -23,10 +23,20 @@ Adopted from arctco's final release, **1.1.4** (2026-09-03), which is imported u
 ```
 src/Core/       cooked IoStore override + zcom-mod.json      -> Content/Paks/~mods
 src/Runtime/    UE4SS mod ZCOMSquadSix + zcom-mod.json        -> ue4ss/Mods
+  ZCOMSquadSix/Scripts/
+    main.lua        loads the modules, registers hooks until every target exists, logs status
+    limits.lua      mission squad limits at runtime, and the scripted-cast guards
+    lineup.lua      squad selection: six slots, extra proxies, six-model lineup, nameplates
+    placement.lua   tactical deployment: extra destinations, rescue, repair, squadsixrescue
+    common.lua      shared constants and reflection/vector helpers
 data/           missions.tsv: the squad limit for every mission (what the Core pak changes)
 docs/           upstream notes, file hashes, pak analysis
-tools/          build_core.py, inspect_core.py, package.py, and their helpers
+tests/          bootstrap_test.lua: loads the runtime under a UE4SS stand-in
+tools/          build_core.py, inspect_core.py, package.py, run-tests.sh, and their helpers
 ```
+
+`tools/run-tests.sh` runs the tests with LuaJIT. `bootstrap_test.lua ... --print` writes the
+startup transcript instead, so two versions of the runtime can be diffed.
 
 `src/` mirrors the release ZIP, which Zero Mod Manager installs as "Squad Six - Core" and
 "Squad Six - Runtime". The mod IDs (`community.squad-six.core` / `.runtime`) and the UE4SS folder

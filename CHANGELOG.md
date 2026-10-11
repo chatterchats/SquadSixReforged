@@ -7,12 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Adopted from arctco, the original author, after they discontinued the mod. `main.lua` is unchanged
+from 1.1.4. The Core container is now built from the game's own packages by
+`tools/build_core.py`, from the squad limits in `data/missions.tsv`.
+
 ### Changed
 
-- Adopted from arctco, the original author, after they discontinued the mod. The code is
-  unchanged from 1.1.4; this repository only adds packaging and documentation.
+- Rescue Jae Mordant (HM_Jae_020) is no longer raised to six by the container. 1.1.4 already kept
+  it at four at runtime; the container now agrees, as 1.1.3 intended for every guarded mission.
+- SK_Serolonis_020, SK_Vandor_015, Coil Reunion (MM_02_010_CoilReunion) and the main-story
+  placeholder are now raised to six by the container. Before, only the runtime raised them, which
+  depended on the mission being loaded when the runtime checked; these definitions do store a
+  squad limit, but UAssetAPI couldn't read them. With them in the container, the runtime has
+  nothing left to raise, so a correct install should log `data_container=loaded`.
+
+Not yet tested in game.
 
 ## [1.1.4] - 2026-09-03
 
-arctco's final release, imported unmodified (git tag `upstream-1.1.4`). Its history before this
-point is only recorded in the comments in `main.lua`.
+arctco's final release, imported unmodified (git tag `upstream-1.1.4`). arctco's release notes for
+1.1.0–1.1.4 are kept in [docs/upstream-nexus-page-1.1.4.md](docs/upstream-nexus-page-1.1.4.md).

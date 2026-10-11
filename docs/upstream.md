@@ -31,4 +31,9 @@ including the 20 missions left out and why: [`core-pak-analysis.md`](core-pak-an
 - **The game build is pinned.** Both manifests list `testedBuilds: ["24874058"]` with
   `"strict": true`, so a game patch may need re-patched overrides and a manifest bump. Run
   `tools/inspect_core.py` after each patch.
-- **There's no history before 1.1.4.** Only the comments in `main.lua` record earlier versions.
+- **Release history:** arctco's notes for 1.1.0–1.1.4 are on their Nexus page, saved in
+  [`upstream-nexus-page-1.1.4.md`](upstream-nexus-page-1.1.4.md). Earlier versions are only
+  described in `main.lua`'s comments.
+- **Only the Zero Mod Manager bundle was imported.** arctco also shipped a Manual archive with
+  `ZCOMSquadSix/enabled.txt` (loads the mod without a `mods.txt` edit) and checksum-guarded
+  `install.sh`/`uninstall.sh` for Linux. Those files aren't in this repository.

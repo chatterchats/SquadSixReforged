@@ -30,7 +30,8 @@ class Retoc:
         self.run("to-legacy", "--no-shaders", "--no-script-objects", "-f", filter, source, output)
 
     def to_zen(self, source, utoc):
-        self.run("to-zen", "--version", "UE5_6", source, utoc)
+        # Serial, so the same input always gives the same container bytes.
+        self.run("to-zen", "--no-parallel", "--version", "UE5_6", source, utoc)
 
 
 def game_path(listed):

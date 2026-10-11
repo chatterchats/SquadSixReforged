@@ -12,7 +12,7 @@ mission	game	squad	note
 AuthoredHero/HM_Cly_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
 AuthoredHero/HM_Cly_020	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
 AuthoredHero/HM_Jae_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
-AuthoredHero/HM_Jae_020	4	6	1.1.4 ships it at 6, but main.lua guards it back to 4: Jae joins through mission logic, so six becomes seven and the save hangs
+AuthoredHero/HM_Jae_020	4	4	Jae joins through mission logic, so six becomes seven and the save hangs; main.lua guards it at 4 (1.1.4 also packed it at 6)
 AuthoredHero/HM_Kabb_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
 AuthoredHero/HM_Kabb_020	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
 AuthoredHero/HM_Luco_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
@@ -22,7 +22,7 @@ AuthoredHero/HM_TrickLuco_020	4	4	hero mission: auto-assigns Hawks plus two comp
 AuthoredHero/HM_Trick_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
 Story_Main/MM_01_010_SerolonisJob	4	6	
 Story_Main/MM_01_030_NotYourTurf	3	3	three-operator mission
-Story_Main/MM_02_010_CoilReunion	4	4	UAssetAPI couldn't read it, so 1.1.4 leaves it to main.lua's runtime write
+Story_Main/MM_02_010_CoilReunion	4	6	
 Story_Main/MM_02_030_DarkGrotto	4	6	
 Story_Main/MM_02_050_SlugHQ	4	4	Tal Rea joins through mission logic; six became eight units with two Tal Reas (1.1.1 report)
 Story_Main/MM_03_010_Bespin	default	default	solo mission: MaxSquadSize isn't serialized, so it's the class default of 1
@@ -33,7 +33,7 @@ Story_Main/MM_05_002_ImperialSkirmish	4	6
 Story_Main/MM_05_010_UmbaraRescue	3	3	three-operator mission
 Story_Main/MM_05_030_BellyBeast	4	6	
 Story_Main/MM_06_090_FathomFinale	4	6	
-Story_Main/Mission_MainStory_Placeholder	4	4	placeholder, not a playable mission
+Story_Main/Mission_MainStory_Placeholder	4	6	placeholder, not a playable mission; packed so main.lua has nothing left to raise at runtime
 Test/OM_Cin_Testing	4	6	
 Optional/CrisisMissions/OM_Crisis_B1_A	4	6	
 Optional/CrisisMissions/OM_Crisis_B1_B	4	6	
@@ -119,7 +119,7 @@ Optional/CrisisMissions/SK_Ryloth_035_Crisis	4	6
 Optional/SK_Serolonis_010	4	6	
 Optional/CrisisMissions/SK_Serolonis_010_Crisis	4	6	
 Optional/SK_Serolonis_015	4	6	
-Optional/SK_Serolonis_020	4	4	UAssetAPI couldn't read it, so 1.1.4 leaves it to main.lua's runtime write
+Optional/SK_Serolonis_020	4	6	
 Optional/CrisisMissions/SK_Serolonis_020_Crisis	4	6	
 Optional/SK_Serolonis_030	4	6	
 Optional/SK_Serolonis_035	4	6	
@@ -130,7 +130,7 @@ Optional/SK_Sullust_020	4	6
 Optional/CrisisMissions/SK_Sullust_020_Crisis	4	6	
 Optional/SK_Vandor_010	4	6	
 Optional/CrisisMissions/SK_Vandor_010_Crisis	4	6	
-Optional/SK_Vandor_015	4	4	UAssetAPI couldn't read it, so 1.1.4 leaves it to main.lua's runtime write
+Optional/SK_Vandor_015	4	6	
 Optional/CrisisMissions/SK_Vandor_015_Crisis	4	6	
 Optional/SK_Vandor_020	4	6	
 Optional/CrisisMissions/SK_Vandor_020_Crisis	4	6	

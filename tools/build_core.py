@@ -45,7 +45,8 @@ HOLOGRAM = "/Game/Game/UI/AC_HologramManager"
 INT_CONST = 0x1D  # EX_IntConst, followed by an int32
 LINEUP_LAST_INDEX = (3, 5)
 # Inputs whose change means the pak must be rebuilt.
-RECORDED_INPUTS = ["data/missions.tsv", "tools/build_core.py", "tools/zen.py", "tools/data/schema.json"]
+RECORDED_INPUTS = ["data/missions.tsv", "tools/build_core.py", "tools/zen.py", "tools/retoc.py",
+                   "tools/data/schema.json"]
 
 
 def read_missions():

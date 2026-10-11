@@ -4,8 +4,9 @@ The ZIP keeps the layout of the original author's releases, which Zero Mod Manag
 two entries:
   Core/       the IoStore override (pakchunk99-ZCOMSquadSix_P.pak/.ucas/.utoc), Content/Paks/~mods
   Runtime/    the UE4SS mod (ZCOMSquadSix/Scripts/main.lua), ue4ss/Mods
-Each half carries its zcom-mod.json. The cooked Core paks have no source in this repo (see
-docs/upstream.md), so they are checked against docs/upstream-1.1.4.sha256 until they're rebuilt.
+Each half carries its zcom-mod.json. The Core paks are built by tools/build_core.py, which records
+them and the inputs they came from in data/core-build.sha256; packaging refuses paks that don't
+match that record, or a record whose inputs have changed since (rebuild first).
 
   python3 tools/package.py            build dist/SquadSix-<version>.zip
   python3 tools/package.py --verify   also compare src/ with the upstream 1.1.4 hashes
@@ -22,6 +23,7 @@ SOURCE = ROOT / "src"
 MAIN = SOURCE / "Runtime" / "ZCOMSquadSix" / "Scripts" / "main.lua"
 MANIFESTS = [SOURCE / "Core" / "zcom-mod.json", SOURCE / "Runtime" / "zcom-mod.json"]
 UPSTREAM = ROOT / "docs" / "upstream-1.1.4.sha256"
+CORE_RECORD = ROOT / "data" / "core-build.sha256"
 
 
 def sha(path):
@@ -44,6 +46,16 @@ def verify_upstream():
         path = SOURCE / name
         state = "missing" if not path.is_file() else "unchanged" if sha(path) == digest else "changed"
         print(f"  {state:9} {name[2:] if name.startswith('./') else name}")
+
+
+def check_core():
+    """The committed paks are the last build_core.py output, built from the current inputs."""
+    for line in CORE_RECORD.read_text().splitlines():
+        digest, name = line.split()
+        path = SOURCE / "Core" / name if name.endswith((".pak", ".ucas", ".utoc")) else ROOT / name
+        assert path.is_file(), f"{name} is missing"
+        assert sha(path) == digest, (f"{name} doesn't match data/core-build.sha256: "
+                                     "run tools/build_core.py")
 
 
 def build(value):
@@ -77,4 +89,5 @@ def build(value):
 if "--verify" in sys.argv[1:]:
     print("src/ against the original 1.1.4 release:")
     verify_upstream()
+check_core()
 build(version())

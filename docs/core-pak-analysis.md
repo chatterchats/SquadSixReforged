@@ -1,5 +1,9 @@
 # What the Core pak actually changes (1.1.4)
 
+This describes arctco's 1.1.4 container. The container this repository builds differs only as
+listed in the changelog (HM_Jae_020 out; SK_Serolonis_020, SK_Vandor_015, MM_02_010_CoilReunion and
+the main-story placeholder in), as set in `data/missions.tsv`.
+
 Inspected 2026-10-11 with retoc 0.1.5 against the installed game (the Windows build in
 `Games/STAR WARS Zero Company (2026)`). Re-run with `tools/inspect_core.py` after any game patch.
 

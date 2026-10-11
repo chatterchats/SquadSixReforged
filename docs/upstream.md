@@ -10,7 +10,7 @@ The per-file hashes are in [`upstream-1.1.4.sha256`](upstream-1.1.4.sha256), and
 | Part | Files | Has source here? |
 |------|-------|------------------|
 | **Runtime** (UE4SS) | `src/Runtime/ZCOMSquadSix/Scripts/main.lua` (about 3,600 lines) | Yes. The Lua is the source. |
-| **Core** (IoStore) | `src/Core/pakchunk99-ZCOMSquadSix_P.{pak,ucas,utoc}` | **No.** These are cooked binaries. |
+| **Core** (IoStore) | `src/Core/pakchunk99-ZCOMSquadSix_P.{pak,ucas,utoc}` | Cooked binaries; now built from `data/missions.tsv` by `tools/build_core.py`. |
 
 The runtime builds the six activity-slot view models, the six-model lineup diorama, the six-entry
 squad-select layout, and the placement of operators 5 and 6 inside each map's authored deployment
@@ -26,8 +26,8 @@ including the 20 missions left out and why: [`core-pak-analysis.md`](core-pak-an
 
 ## Known gaps after adoption
 
-- **The cooked overrides have no build script yet.** They can be regenerated from the game's own
-  packages with retoc (see the analysis), but that tool isn't written yet.
+- **The cooked overrides had no build script.** `tools/build_core.py` now rebuilds them from the
+  game's own packages and reproduces all 106 of 1.1.4's packages byte for byte.
 - **The game build is pinned.** Both manifests list `testedBuilds: ["24874058"]` with
   `"strict": true`, so a game patch may need re-patched overrides and a manifest bump. Run
   `tools/inspect_core.py` after each patch.

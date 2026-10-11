@@ -1,0 +1,136 @@
+# Squad Six: the squad limit (MaxSquadSize) for every mission definition in the game.
+#
+# mission  path under /Game/Game/GameData/MissionData/
+# game     MaxSquadSize the game ships ("default" = not serialized; the class default is 1).
+#          tools/build_core.py fails if the game's value has changed, so a patch can't slip by.
+# squad    the value Squad Six ships. Rows where it differs from game go into the Core pak.
+# note     why a mission is not raised to 6
+#
+# main.lua also writes 6 at runtime to any loaded mission still at 4, except the ones it guards
+# (GUARDED_MISSION_NAMES, SCRIPTED_COMPANION_MISSION_NAMES), so keep those lists in step with this file.
+mission	game	squad	note
+AuthoredHero/HM_Cly_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
+AuthoredHero/HM_Cly_020	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
+AuthoredHero/HM_Jae_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
+AuthoredHero/HM_Jae_020	4	6	1.1.4 ships it at 6, but main.lua guards it back to 4: Jae joins through mission logic, so six becomes seven and the save hangs
+AuthoredHero/HM_Kabb_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
+AuthoredHero/HM_Kabb_020	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
+AuthoredHero/HM_Luco_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
+AuthoredHero/HM_Telrea_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
+AuthoredHero/HM_Telrea_020	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
+AuthoredHero/HM_TrickLuco_020	4	4	hero mission: auto-assigns Hawks plus two companions; main.lua guards it at 4
+AuthoredHero/HM_Trick_010	4	4	hero mission: auto-assigns Hawks plus a companion; main.lua guards it at 4
+Story_Main/MM_01_010_SerolonisJob	4	6	
+Story_Main/MM_01_030_NotYourTurf	3	3	three-operator mission
+Story_Main/MM_02_010_CoilReunion	4	4	UAssetAPI couldn't read it, so 1.1.4 leaves it to main.lua's runtime write
+Story_Main/MM_02_030_DarkGrotto	4	6	
+Story_Main/MM_02_050_SlugHQ	4	4	Tal Rea joins through mission logic; six became eight units with two Tal Reas (1.1.1 report)
+Story_Main/MM_03_010_Bespin	default	default	solo mission: MaxSquadSize isn't serialized, so it's the class default of 1
+Story_Main/MM_04_010_CoilStrikesBack	4	6	
+Story_Main/MM_04_030_RetakeLuunata	4	6	
+Story_Main/MM_04_050_ANewOrder	4	6	
+Story_Main/MM_05_002_ImperialSkirmish	4	6	
+Story_Main/MM_05_010_UmbaraRescue	3	3	three-operator mission
+Story_Main/MM_05_030_BellyBeast	4	6	
+Story_Main/MM_06_090_FathomFinale	4	6	
+Story_Main/Mission_MainStory_Placeholder	4	4	placeholder, not a playable mission
+Test/OM_Cin_Testing	4	6	
+Optional/CrisisMissions/OM_Crisis_B1_A	4	6	
+Optional/CrisisMissions/OM_Crisis_B1_B	4	6	
+Optional/CrisisMissions/OM_Crisis_B2_A	4	6	
+Optional/CrisisMissions/OM_Crisis_B2_B	4	6	
+Optional/CrisisMissions/OM_Crisis_BXM_A	4	6	
+Optional/CrisisMissions/OM_Crisis_BXM_B	4	6	
+Optional/CrisisMissions/OM_Crisis_BXS_A	4	6	
+Optional/CrisisMissions/OM_Crisis_BXS_B	4	6	
+Optional/CrisisMissions/OM_Crisis_Brute_A	4	6	
+Optional/CrisisMissions/OM_Crisis_Brute_B	4	6	
+Optional/CrisisMissions/OM_Crisis_Captain_A	4	6	
+Optional/CrisisMissions/OM_Crisis_Captain_B	4	6	
+Optional/CrisisMissions/OM_Crisis_Enforcer_A	4	6	
+Optional/CrisisMissions/OM_Crisis_Enforcer_B	4	6	
+Optional/CrisisMissions/OM_Crisis_Guardian_A	4	6	
+Optional/CrisisMissions/OM_Crisis_Guardian_B	4	6	
+Optional/CrisisMissions/OM_Crisis_Seer_A	4	6	
+Optional/CrisisMissions/OM_Crisis_Seer_B	4	6	
+Optional/CrisisMissions/OM_Crisis_Striker_A	4	6	
+Optional/CrisisMissions/OM_Crisis_Striker_B	4	6	
+Optional/OM_Placeholder_Repeatable	4	6	
+Optional/SK_Anaxes_020	4	6	
+Optional/SK_Anaxes_030	4	6	
+Optional/SK_Anaxes_035	4	6	
+Optional/SK_Anaxes_040	4	6	
+Optional/SK_Anaxes_045	4	6	
+Optional/SK_Brentaal_010	4	6	
+Optional/CrisisMissions/SK_Brentaal_010_Crisis	4	6	
+Optional/SK_Brentaal_015	4	6	
+Optional/CrisisMissions/SK_Brentaal_015_Crisis	4	6	
+Optional/SK_Brentaal_020	4	6	
+Optional/CrisisMissions/SK_Brentaal_020_Crisis	4	6	
+Optional/SK_Brentaal_030	4	6	
+Optional/SK_Brentaal_035	4	6	
+Optional/CrisisMissions/SK_Brentaal_035_Crisis	4	6	
+Optional/SK_Courtsilius_010	4	6	
+Optional/SK_Courtsilius_015	4	6	
+Optional/SK_Courtsilius_020	4	6	
+Optional/SK_Courtsilius_025	4	6	
+Optional/SK_Dantooine_010	4	6	
+Optional/SK_Dantooine_015	4	6	
+Optional/CrisisMissions/SK_Dantooine_015_Crisis	4	6	
+Optional/SK_Dantooine_020	4	6	
+Optional/SK_Dantooine_025	3	3	three-operator mission
+Optional/SK_Florrum_010	4	6	
+Optional/CrisisMissions/SK_Florrum_010_Crisis	4	6	
+Optional/SK_Florrum_015	4	6	
+Optional/CrisisMissions/SK_Florrum_015_Crisis	4	6	
+Optional/SK_Florrum_020	4	6	
+Optional/CrisisMissions/SK_Florrum_020_Crisis	4	6	
+Optional/SK_Florrum_030	4	6	
+Optional/CrisisMissions/SK_Florrum_030_Crisis	4	6	
+Optional/SK_Florrum_035	4	6	
+Optional/CrisisMissions/SK_Florrum_035_Crisis	4	6	
+Optional/SK_Kaller_020	4	6	
+Optional/SK_Kaller_025	4	6	
+Optional/CrisisMissions/SK_Kaller_025_Crisis	4	6	
+Optional/SK_Kaller_030	3	3	three-operator mission
+Optional/SK_Kaller_035	4	6	
+Optional/SK_Kaller_040	4	6	
+Optional/SK_Kaller_045	4	6	
+Optional/SK_Lothal_030	4	6	
+Optional/SK_Lothal_035	4	6	
+Optional/CrisisMissions/SK_Lothal_035_Crisis	4	6	
+Optional/SK_Lothal_050	4	6	
+Optional/SK_Lothal_055	4	6	
+Optional/CrisisMissions/SK_Lothal_055_Crisis	4	6	
+Optional/SK_Mapuzo_010	4	6	
+Optional/CrisisMissions/SK_Mapuzo_010_Crisis	4	6	
+Optional/SK_Mapuzo_015	4	6	
+Optional/CrisisMissions/SK_Mapuzo_015_Crisis	4	6	
+Optional/SK_Mapuzo_020	4	6	
+Optional/CrisisMissions/SK_Mapuzo_020_Crisis	4	6	
+Optional/SK_Ryloth_010	4	6	
+Optional/SK_Ryloth_015	4	6	
+Optional/CrisisMissions/SK_Ryloth_015_Crisis	4	6	
+Optional/SK_Ryloth_020	4	6	
+Optional/CrisisMissions/SK_Ryloth_020_Crisis	4	6	
+Optional/SK_Ryloth_030	4	6	
+Optional/SK_Ryloth_035	4	6	
+Optional/CrisisMissions/SK_Ryloth_035_Crisis	4	6	
+Optional/SK_Serolonis_010	4	6	
+Optional/CrisisMissions/SK_Serolonis_010_Crisis	4	6	
+Optional/SK_Serolonis_015	4	6	
+Optional/SK_Serolonis_020	4	4	UAssetAPI couldn't read it, so 1.1.4 leaves it to main.lua's runtime write
+Optional/CrisisMissions/SK_Serolonis_020_Crisis	4	6	
+Optional/SK_Serolonis_030	4	6	
+Optional/SK_Serolonis_035	4	6	
+Optional/CrisisMissions/SK_Serolonis_035_Crisis	4	6	
+Optional/SK_Sullust_010	4	6	
+Optional/SK_Sullust_015	4	6	
+Optional/SK_Sullust_020	4	6	
+Optional/CrisisMissions/SK_Sullust_020_Crisis	4	6	
+Optional/SK_Vandor_010	4	6	
+Optional/CrisisMissions/SK_Vandor_010_Crisis	4	6	
+Optional/SK_Vandor_015	4	4	UAssetAPI couldn't read it, so 1.1.4 leaves it to main.lua's runtime write
+Optional/CrisisMissions/SK_Vandor_015_Crisis	4	6	
+Optional/SK_Vandor_020	4	6	
+Optional/CrisisMissions/SK_Vandor_020_Crisis	4	6	

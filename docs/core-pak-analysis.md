@@ -14,9 +14,13 @@ cooked package with a single value changed.** Nothing was added, removed or re-a
 | `/Game/Game/UI/AC_HologramManager` | one Blueprint integer literal 3 → 5 |
 
 Method: each package was fetched by chunk ID from both containers (`retoc get`) and compared byte
-for byte. All 105 mission packages differ from the game's in exactly one byte, 4 → 6. Converting
-them to legacy `.uasset/.uexp` (`retoc to-legacy`, with the game containers alongside so imports
-resolve) gives identical headers and the same single byte in `.uexp`.
+for byte. All 105 mission packages differ from the game's in exactly one byte, 4 → 6.
+`tools/zen.py` parses the packages' properties, and the byte it finds for `MaxSquadSize` is
+arctco's patched byte in all 105.
+
+arctco built the pak with retoc: to-legacy, patch, to-zen. That round trip reproduces the game's
+mission packages byte for byte, and `tools/build_core.py` produces all 106 of 1.1.4's packages
+byte for byte from the mission table in `data/missions.tsv`.
 
 ## Mission definitions
 
@@ -25,18 +29,23 @@ The changed byte is the first of an adjacent int32 pair, `MaxSquadSize` then `Mi
 these missions the player can bring 4–6 operators, but not fewer than 4.
 
 Of the game's 131 mission-data packages, 6 are tables (`MissionTables/SK_Table_*`,
-`MissionTable_Crisis_Pool1`), leaving 125 definitions. 105 are in the pak. The other 20 are:
+`MissionTable_Crisis_Pool1`), leaving 125 definitions, all of class `BrunoMissionData`. Their
+squad limits, read with `tools/zen.py` (every package parses to its last byte):
 
-| Missions | Why they aren't in the pak |
-|----------|----------------------------|
-| `HM_Kabb_010`, `HM_Telrea_010`, `HM_Telrea_020`, `HM_TrickLuco_020`, `MM_02_050_SlugHQ` | Scripted extra characters; `main.lua` guards them at 4 |
-| `HM_Cly_010`, `HM_Cly_020`, `HM_Jae_010`, `HM_Kabb_020`, `HM_Luco_010`, `HM_Trick_010` | Hero missions with no squad-size override; guarded at 4 by name |
-| `SK_Serolonis_020`, `SK_Vandor_015`, `MM_02_010_CoilReunion`, `Mission_MainStory_Placeholder` | arctco's tool (UAssetAPI) read them as `RawExport` and couldn't edit them; `main.lua` raises them at runtime |
-| `MM_01_030_NotYourTurf`, `MM_05_010_UmbaraRescue`, `SK_Dantooine_025`, `SK_Kaller_030` | Appear to be **three-operator** missions (a 3/3 pair where the others have 4/4)*; left alone |
-| `MM_03_010_Bespin` | No max/min pair found by the scan*; unknown |
+| MaxSquadSize | Missions | In the 1.1.4 pak |
+|--------------|----------|------------------|
+| 4 | 105 skirmishes, crises and story missions | Yes, raised to 6 |
+| 4 | 10 hero missions `HM_*` other than `HM_Jae_020` | No; they auto-assign Hawks plus 1–2 companions, and `main.lua` guards them at 4 |
+| 4 | `MM_02_050_SlugHQ` | No; Tal Rea joins through mission logic, and `main.lua` guards it at 4 |
+| 4 | `SK_Serolonis_020`, `SK_Vandor_015`, `MM_02_010_CoilReunion`, `Mission_MainStory_Placeholder` | No; UAssetAPI couldn't read them, so `main.lua` raises them at runtime |
+| 3 | `MM_01_030_NotYourTurf`, `MM_05_010_UmbaraRescue`, `SK_Dantooine_025`, `SK_Kaller_030` | No; three-operator missions, left alone |
+| default (1) | `MM_03_010_Bespin` | No; solo mission. The value isn't serialized, so it's `BitReactorMissionData`'s default of 1 |
 
-\* Found by a byte-pattern scan, not a property parser, so treat these as likely, not certain. The
-runtime sweep only raises values that are exactly 4, so these missions keep their limit either way.
+`main.lua`'s comments say ten definitions "declare nothing at all: no MaxSquadSize, and no
+requirements". That's what UAssetAPI showed arctco (it parsed them as `RawExport`), not what the
+packages hold. Nine of the ten serialize 4/4 and their character requirements; only Bespin omits
+the value. The guard decisions still hold: the requirement census reads the same as arctco's
+(every hero mission except `HM_Jae_020` auto-assigns two or three characters).
 
 `HM_Jae_020` **is** in the pak at 6, but since 1.1.4 `main.lua` guards it and writes 4 back at
 runtime (Jae joining mid-mission made seven units and hung saves). The pak entry is left over from
@@ -58,18 +67,16 @@ of the inclusive loop that spawns the lineup's customization proxies (0..3 → 0
 instead of four). Which function holds the literal hasn't been checked with a bytecode
 disassembler.
 
-The Zen package is 24 bytes smaller than the game's even though the legacy forms match apart from
-that byte. The difference is in the Zen header that the repacking tool wrote, not in the asset.
+The Zen package is 24 bytes smaller than the game's. retoc's round trip drops 6 preload-dependency
+entries from this Blueprint's header (in legacy form the export map's dependency counts differ
+too); the export data is the game's apart from the literal. 1.1.4 shipped that way, and
+`tools/build_core.py` reproduces it exactly.
 
 ## Rebuilding
 
-Because every change is a single value in a package the game already ships, the overrides can be
-rebuilt on Linux without the editor or a cook:
-
-1. `retoc to-legacy` the needed packages out of the game's containers.
-2. Patch the bytes (located by the `MaxSquadSize`/`MinSquadSize` pair, or by a proper parser).
-3. `retoc to-zen --version UE5_6` into `pakchunk99-ZCOMSquadSix_P`.
-
-The same route could also patch the four `RawExport` missions that UAssetAPI couldn't edit. A game
-patch that changes any of these 106 packages needs a rebuild, because the shipped copies would
-otherwise undo the patch's changes to them; `tools/inspect_core.py` catches that.
+`tools/build_core.py` rebuilds the pak from the installed game: it reads `data/missions.tsv`, finds
+each `MaxSquadSize` by parsing the package, patches the legacy `.uexp`, packs with
+`retoc to-zen --version UE5_6`, and verifies the result before writing `src/Core`. It refuses to
+build if the game's missions or their limits no longer match the table, so a game patch has to be
+reviewed rather than slipping through. `tools/schema.py` regenerates the property layouts from a
+new `.usmap` if a patch changes the mission classes.

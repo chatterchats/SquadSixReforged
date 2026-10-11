@@ -1,0 +1,1373 @@
+{
+ "roots": [
+  "BrunoMissionData"
+ ],
+ "schemas": {
+  "BitReactorAssetDefinitionBase": {
+   "super": "PrimaryDataAsset",
+   "flags": 819003553,
+   "module": "/Script/BitReactorCore",
+   "properties": [
+    {
+     "index": 0,
+     "name": "Fragments",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    }
+   ]
+  },
+  "BitReactorMissionData": {
+   "super": "BitReactorAssetDefinitionBase",
+   "flags": 819003552,
+   "module": "/Script/BitReactorGame",
+   "properties": [
+    {
+     "index": 0,
+     "name": "ObjectivesText",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "TextProperty"
+      }
+     }
+    },
+    {
+     "index": 1,
+     "name": "bUseCustomMissionEndObjectivesText",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 2,
+     "name": "CustomMissionEndObjectivesText",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "TextProperty"
+      }
+     }
+    },
+    {
+     "index": 3,
+     "name": "FailureObjectivesText",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "TextProperty"
+      }
+     }
+    },
+    {
+     "index": 4,
+     "name": "MissionTypeTag",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTag"
+     }
+    },
+    {
+     "index": 5,
+     "name": "MissionTags",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagContainer"
+     }
+    },
+    {
+     "index": 6,
+     "name": "bIsNarrativeMission",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 7,
+     "name": "NarrativeMissionRequirements",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagRequirements"
+     }
+    },
+    {
+     "index": 8,
+     "name": "bRepeatOnFail",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 9,
+     "name": "BriefingStagePayloadClassSoftRef",
+     "array_dim": 1,
+     "type": {
+      "type": "SoftObjectProperty"
+     }
+    },
+    {
+     "index": 10,
+     "name": "HubToMission_DepartureStagePayloadClassOverrideSoftRef",
+     "array_dim": 1,
+     "type": {
+      "type": "SoftObjectProperty"
+     }
+    },
+    {
+     "index": 11,
+     "name": "bSkipHubToMissionLoopingTransition",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 12,
+     "name": "HolotableBlueprintClassSoftRef",
+     "array_dim": 1,
+     "type": {
+      "type": "SoftObjectProperty"
+     }
+    },
+    {
+     "index": 13,
+     "name": "HubToMission_ArrivalStagePayloadClassOverrideSoftRef",
+     "array_dim": 1,
+     "type": {
+      "type": "SoftObjectProperty"
+     }
+    },
+    {
+     "index": 14,
+     "name": "MissionToHub_DepartureStagePayloadClassOverrideSoftRef",
+     "array_dim": 1,
+     "type": {
+      "type": "SoftObjectProperty"
+     }
+    },
+    {
+     "index": 15,
+     "name": "MissionToHub_ArrivalStagePayloadClassOverrideSoftRef",
+     "array_dim": 1,
+     "type": {
+      "type": "SoftObjectProperty"
+     }
+    },
+    {
+     "index": 16,
+     "name": "TransitionWorldGroupOverride",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 17,
+     "name": "bSkipHubToMissionWorldOrchestration",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 18,
+     "name": "bSkipMissionToHubWorldOrchestration",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 19,
+     "name": "MaxSquadSize",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 20,
+     "name": "MinSquadSize",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 21,
+     "name": "CharacterTagRequirements",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagRequirements"
+     }
+    },
+    {
+     "index": 22,
+     "name": "CharacterRequirements",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "StructProperty",
+       "struct": "CharacterRequirement"
+      }
+     }
+    },
+    {
+     "index": 23,
+     "name": "AddMissionTurnDelay",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 24,
+     "name": "EarlyUnqueueChance",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 25,
+     "name": "FactTagRequirements",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagRequirements"
+     }
+    },
+    {
+     "index": 26,
+     "name": "FactValueRequirements",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "StructProperty",
+       "struct": "FactValueRequirement"
+      }
+     }
+    },
+    {
+     "index": 27,
+     "name": "bQueueUntilFactTagsMet",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 28,
+     "name": "HideFactTagRequirements",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagRequirements"
+     }
+    },
+    {
+     "index": 29,
+     "name": "Level",
+     "array_dim": 1,
+     "type": {
+      "type": "SoftObjectProperty"
+     }
+    },
+    {
+     "index": 30,
+     "name": "GameSubPhaseSettings",
+     "array_dim": 1,
+     "type": {
+      "type": "SoftObjectProperty"
+     }
+    },
+    {
+     "index": 31,
+     "name": "EnemyFactionTag",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTag"
+     }
+    },
+    {
+     "index": 32,
+     "name": "OverriddenEnemySpawnSet",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    }
+   ]
+  },
+  "BondDataID": {
+   "super": "Guid",
+   "flags": 4113,
+   "module": "/Script/Bruno",
+   "properties": []
+  },
+  "BrunoMissionData": {
+   "super": "BitReactorMissionData",
+   "flags": 819003552,
+   "module": "/Script/Bruno",
+   "properties": [
+    {
+     "index": 0,
+     "name": "RegionAssetId",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "PrimaryAssetId"
+     }
+    },
+    {
+     "index": 1,
+     "name": "RegionTag",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTag"
+     }
+    },
+    {
+     "index": 2,
+     "name": "Location",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "DataTableRowHandle"
+     }
+    },
+    {
+     "index": 3,
+     "name": "AvailableFactTags",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagContainer"
+     }
+    },
+    {
+     "index": 4,
+     "name": "InProgressFactTags",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagContainer"
+     }
+    },
+    {
+     "index": 5,
+     "name": "SucceededFactTags",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagContainer"
+     }
+    },
+    {
+     "index": 6,
+     "name": "FailedFactTags",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagContainer"
+     }
+    },
+    {
+     "index": 7,
+     "name": "ExpiredFactTags",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagContainer"
+     }
+    },
+    {
+     "index": 8,
+     "name": "LifeSpan",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 9,
+     "name": "bBlockActiveDuplicates",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 10,
+     "name": "bBlockCompletedDuplicates",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 11,
+     "name": "bBlockExpiredDuplicates",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 12,
+     "name": "MapConfiguration",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 13,
+     "name": "HelperFieldTasks",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 14,
+     "name": "CustomRewarads",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 15,
+     "name": "Rewards",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 16,
+     "name": "AdditionCustomRewards",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 17,
+     "name": "AdditionRewards",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 18,
+     "name": "FailureCustomRewards",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 19,
+     "name": "FailureRewards",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 20,
+     "name": "LaunchCustomRewards",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 21,
+     "name": "LaunchRewards",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    },
+    {
+     "index": 22,
+     "name": "ItemRewards",
+     "array_dim": 1,
+     "type": {
+      "type": "MapProperty",
+      "key": {
+       "type": "ObjectProperty"
+      },
+      "value": {
+       "type": "IntProperty"
+      }
+     }
+    },
+    {
+     "index": 23,
+     "name": "RecipeRewards",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "StructProperty",
+       "struct": "RecipePayload"
+      }
+     }
+    },
+    {
+     "index": 24,
+     "name": "bUseAlternatePostMissionSummary",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    }
+   ]
+  },
+  "CharacterRequirement": {
+   "super": null,
+   "flags": 4097,
+   "module": "/Script/BitReactorGame",
+   "properties": [
+    {
+     "index": 0,
+     "name": "RequirementDescription",
+     "array_dim": 1,
+     "type": {
+      "type": "TextProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "TagRequirements",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagRequirements"
+     }
+    },
+    {
+     "index": 2,
+     "name": "bAutoAssign",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 3,
+     "name": "bBlockingRequirement",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 4,
+     "name": "bPlayerFacing",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    }
+   ]
+  },
+  "CustomRewardPreProcessData": {
+   "super": null,
+   "flags": 4613,
+   "module": "/Script/Bruno",
+   "properties": [
+    {
+     "index": 0,
+     "name": "AdditionalRewards",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "SoftObjectProperty"
+      }
+     }
+    }
+   ]
+  },
+  "DataAsset": {
+   "super": "Object",
+   "flags": 810025121,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "NativeClass",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    }
+   ]
+  },
+  "DataTableRowHandle": {
+   "super": null,
+   "flags": 266241,
+   "module": "/Script/Engine",
+   "properties": [
+    {
+     "index": 0,
+     "name": "DataTable",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "RowName",
+     "array_dim": 1,
+     "type": {
+      "type": "NameProperty"
+     }
+    }
+   ]
+  },
+  "FactValueRequirement": {
+   "super": null,
+   "flags": 4609,
+   "module": "/Script/BitReactorGame",
+   "properties": [
+    {
+     "index": 0,
+     "name": "FactValueTag",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTag"
+     }
+    },
+    {
+     "index": 1,
+     "name": "bTreatMissingFactAsZero",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 2,
+     "name": "ComparisonOperation",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "EConditionalOperator"
+     }
+    },
+    {
+     "index": 3,
+     "name": "Value",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 4,
+     "name": "OtherFactValueTag",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTag"
+     }
+    },
+    {
+     "index": 5,
+     "name": "bTreatMissingOtherFactAsZero",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 6,
+     "name": "Min",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 7,
+     "name": "MinFactValueTag",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTag"
+     }
+    },
+    {
+     "index": 8,
+     "name": "bInclusiveMin",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 9,
+     "name": "Max",
+     "array_dim": 1,
+     "type": {
+      "type": "FloatProperty"
+     }
+    },
+    {
+     "index": 10,
+     "name": "MaxFactValueTag",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTag"
+     }
+    },
+    {
+     "index": 11,
+     "name": "bInclusiveMax",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    }
+   ]
+  },
+  "GameplayTag": {
+   "super": null,
+   "flags": 5116929,
+   "module": "/Script/GameplayTags",
+   "properties": [
+    {
+     "index": 0,
+     "name": "TagName",
+     "array_dim": 1,
+     "type": {
+      "type": "NameProperty"
+     }
+    }
+   ]
+  },
+  "GameplayTagContainer": {
+   "super": null,
+   "flags": 6429699,
+   "module": "/Script/GameplayTags",
+   "properties": [
+    {
+     "index": 0,
+     "name": "GameplayTags",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "StructProperty",
+       "struct": "GameplayTag"
+      }
+     }
+    },
+    {
+     "index": 1,
+     "name": "ParentTags",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "StructProperty",
+       "struct": "GameplayTag"
+      }
+     }
+    }
+   ]
+  },
+  "GameplayTagQuery": {
+   "super": null,
+   "flags": 4097,
+   "module": "/Script/GameplayTags",
+   "properties": [
+    {
+     "index": 0,
+     "name": "TokenStreamVersion",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "TagDictionary",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "StructProperty",
+       "struct": "GameplayTag"
+      }
+     }
+    },
+    {
+     "index": 2,
+     "name": "QueryTokenStream",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ByteProperty"
+      }
+     }
+    },
+    {
+     "index": 3,
+     "name": "UserDescription",
+     "array_dim": 1,
+     "type": {
+      "type": "StrProperty"
+     }
+    },
+    {
+     "index": 4,
+     "name": "AutoDescription",
+     "array_dim": 1,
+     "type": {
+      "type": "StrProperty"
+     }
+    }
+   ]
+  },
+  "GameplayTagRequirements": {
+   "super": null,
+   "flags": 4097,
+   "module": "/Script/GameplayAbilities",
+   "properties": [
+    {
+     "index": 0,
+     "name": "RequireTags",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagContainer"
+     }
+    },
+    {
+     "index": 1,
+     "name": "IgnoreTags",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagContainer"
+     }
+    },
+    {
+     "index": 2,
+     "name": "TagQuery",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagQuery"
+     }
+    }
+   ]
+  },
+  "Guid": {
+   "super": null,
+   "flags": 256059,
+   "module": "/Script/CoreUObject",
+   "properties": [
+    {
+     "index": 0,
+     "name": "A",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "B",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 2,
+     "name": "C",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 3,
+     "name": "D",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    }
+   ]
+  },
+  "Object": {
+   "super": null,
+   "flags": 809500833,
+   "module": "/Script/CoreUObject",
+   "properties": []
+  },
+  "PrimaryAssetId": {
+   "super": null,
+   "flags": 757771,
+   "module": "/Script/CoreUObject",
+   "properties": [
+    {
+     "index": 0,
+     "name": "PrimaryAssetType",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "PrimaryAssetType"
+     }
+    },
+    {
+     "index": 1,
+     "name": "PrimaryAssetName",
+     "array_dim": 1,
+     "type": {
+      "type": "NameProperty"
+     }
+    }
+   ]
+  },
+  "PrimaryAssetType": {
+   "super": null,
+   "flags": 757771,
+   "module": "/Script/CoreUObject",
+   "properties": [
+    {
+     "index": 0,
+     "name": "Name",
+     "array_dim": 1,
+     "type": {
+      "type": "NameProperty"
+     }
+    }
+   ]
+  },
+  "PrimaryDataAsset": {
+   "super": "DataAsset",
+   "flags": 810025121,
+   "module": "/Script/Engine",
+   "properties": []
+  },
+  "RecipeContext": {
+   "super": null,
+   "flags": 4609,
+   "module": "/Script/Bruno",
+   "properties": [
+    {
+     "index": 0,
+     "name": "AssignedCharacterIDs",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "StructProperty",
+       "struct": "Guid"
+      }
+     }
+    },
+    {
+     "index": 1,
+     "name": "FacilityTag",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTag"
+     }
+    },
+    {
+     "index": 2,
+     "name": "RegionTag",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTag"
+     }
+    },
+    {
+     "index": 3,
+     "name": "LocationTag",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTag"
+     }
+    },
+    {
+     "index": 4,
+     "name": "bDebugIgnoreFactRequirements",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 5,
+     "name": "PlayerChoices",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagContainer"
+     }
+    },
+    {
+     "index": 6,
+     "name": "bOwnedByAMission",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 7,
+     "name": "bConsumeInitialCosts",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    }
+   ]
+  },
+  "RecipeID": {
+   "super": "Guid",
+   "flags": 4113,
+   "module": "/Script/Bruno",
+   "properties": []
+  },
+  "RecipePayload": {
+   "super": null,
+   "flags": 4613,
+   "module": "/Script/Bruno",
+   "properties": [
+    {
+     "index": 0,
+     "name": "TitleProperty",
+     "array_dim": 1,
+     "type": {
+      "type": "StrProperty"
+     }
+    },
+    {
+     "index": 1,
+     "name": "Status",
+     "array_dim": 1,
+     "type": {
+      "type": "EnumProperty",
+      "inner": {
+       "type": "ByteProperty"
+      },
+      "enum": "ERecipeStatus"
+     }
+    },
+    {
+     "index": 2,
+     "name": "RecipeID",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "RecipeID"
+     }
+    },
+    {
+     "index": 3,
+     "name": "RecipeClass",
+     "array_dim": 1,
+     "type": {
+      "type": "ObjectProperty"
+     }
+    },
+    {
+     "index": 4,
+     "name": "SoftRecipeClass",
+     "array_dim": 1,
+     "type": {
+      "type": "SoftObjectProperty"
+     }
+    },
+    {
+     "index": 5,
+     "name": "Origin",
+     "array_dim": 1,
+     "type": {
+      "type": "SoftObjectProperty"
+     }
+    },
+    {
+     "index": 6,
+     "name": "bRepeat",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 7,
+     "name": "bAutoStart",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 8,
+     "name": "bAutoDebugComplete",
+     "array_dim": 1,
+     "type": {
+      "type": "BoolProperty"
+     }
+    },
+    {
+     "index": 9,
+     "name": "AutoDebugCompleteTiers",
+     "array_dim": 1,
+     "type": {
+      "type": "SetProperty",
+      "inner": {
+       "type": "IntProperty"
+      }
+     }
+    },
+    {
+     "index": 10,
+     "name": "DefaultRecipeContext",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "RecipeContext"
+     }
+    },
+    {
+     "index": 11,
+     "name": "InProgressRecipeContext",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "RecipeContext"
+     }
+    },
+    {
+     "index": 12,
+     "name": "FulfilledRewardTiers",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "IntProperty"
+      }
+     }
+    },
+    {
+     "index": 13,
+     "name": "AvailableTurns",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 14,
+     "name": "InProgressTurns",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 15,
+     "name": "TurnAdded",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 16,
+     "name": "TurnStarted",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 17,
+     "name": "TurnEnded",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 18,
+     "name": "TurnQueued",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 19,
+     "name": "TurnUnqueued",
+     "array_dim": 1,
+     "type": {
+      "type": "IntProperty"
+     }
+    },
+    {
+     "index": 20,
+     "name": "BondGains",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "StructProperty",
+       "struct": "BondDataID"
+      }
+     }
+    },
+    {
+     "index": 21,
+     "name": "RewardTierPreProcessContexts",
+     "array_dim": 1,
+     "type": {
+      "type": "MapProperty",
+      "key": {
+       "type": "IntProperty"
+      },
+      "value": {
+       "type": "StructProperty",
+       "struct": "RewardPreProcessContext"
+      }
+     }
+    },
+    {
+     "index": 22,
+     "name": "TieredAdditionalRewards",
+     "array_dim": 1,
+     "type": {
+      "type": "MapProperty",
+      "key": {
+       "type": "IntProperty"
+      },
+      "value": {
+       "type": "StructProperty",
+       "struct": "TieredAdditionalReward"
+      }
+     }
+    },
+    {
+     "index": 23,
+     "name": "AdditionalTags",
+     "array_dim": 1,
+     "type": {
+      "type": "StructProperty",
+      "struct": "GameplayTagContainer"
+     }
+    }
+   ]
+  },
+  "RewardPreProcessContext": {
+   "super": null,
+   "flags": 4613,
+   "module": "/Script/Bruno",
+   "properties": [
+    {
+     "index": 0,
+     "name": "RewardPreProcessData",
+     "array_dim": 1,
+     "type": {
+      "type": "MapProperty",
+      "key": {
+       "type": "SoftObjectProperty"
+      },
+      "value": {
+       "type": "StructProperty",
+       "struct": "CustomRewardPreProcessData"
+      }
+     }
+    }
+   ]
+  },
+  "TieredAdditionalReward": {
+   "super": null,
+   "flags": 4613,
+   "module": "/Script/Bruno",
+   "properties": [
+    {
+     "index": 0,
+     "name": "AdditionalRewards",
+     "array_dim": 1,
+     "type": {
+      "type": "ArrayProperty",
+      "inner": {
+       "type": "ObjectProperty"
+      }
+     }
+    }
+   ]
+  }
+ }
+}

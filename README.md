@@ -23,13 +23,30 @@ Adopted from arctco's final release, **1.1.4** (2026-09-03), which is imported u
 ```
 src/Core/       cooked IoStore override + zcom-mod.json      -> Content/Paks/~mods
 src/Runtime/    UE4SS mod ZCOMSquadSix + zcom-mod.json        -> ue4ss/Mods
-docs/           upstream notes, file hashes, pak contents
-tools/          package.py (release ZIP), inspect_core.py (diff the pak against the game)
+data/           missions.tsv: the squad limit for every mission (what the Core pak changes)
+docs/           upstream notes, file hashes, pak analysis
+tools/          build_core.py, inspect_core.py, package.py, and their helpers
 ```
 
 `src/` mirrors the release ZIP, which Zero Mod Manager installs as "Squad Six - Core" and
 "Squad Six - Runtime". The mod IDs (`community.squad-six.core` / `.runtime`) and the UE4SS folder
 name `ZCOMSquadSix` are kept, so existing installs upgrade in place.
+
+## Building the Core pak
+
+The pak is built from the installed game's own packages with
+[retoc](https://github.com/trumank/retoc) 0.1.5; no editor or cook is needed. Edit
+`data/missions.tsv`, then:
+
+```sh
+PAKS=".../SWZeroCompany/Content/Paks"
+python3 tools/build_core.py --retoc /path/to/retoc --paks "$PAKS"           # writes src/Core
+python3 tools/build_core.py --retoc /path/to/retoc --paks "$PAKS" --check   # compare only
+python3 tools/inspect_core.py --retoc /path/to/retoc --paks "$PAKS"         # diff src/Core vs the game
+```
+
+After a game patch, run `--check` first: the build stops if the game's missions or their limits
+changed, and lists what to review. See [docs/core-pak-analysis.md](docs/core-pak-analysis.md).
 
 ## Building a release
 

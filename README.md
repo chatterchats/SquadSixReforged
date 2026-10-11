@@ -28,10 +28,11 @@ src/Runtime/    UE4SS mod ZCOMSquadSix + zcom-mod.json        -> ue4ss/Mods
     limits.lua      mission squad limits at runtime, and the scripted-cast guards
     lineup.lua      squad selection: six slots, extra proxies, six-model lineup, nameplates
     placement.lua   tactical deployment: extra destinations, rescue, repair, squadsixrescue
+    selfcheck.lua   logs whether every game name the other modules use still resolves
     common.lua      shared constants and reflection/vector helpers
 data/           missions.tsv: the squad limit for every mission (what the Core pak changes)
 docs/           upstream notes, file hashes, pak analysis
-tests/          bootstrap_test.lua: loads the runtime under a UE4SS stand-in
+tests/          runtime tests under a UE4SS stand-in (ue4ss_mock.lua)
 tools/          build_core.py, inspect_core.py, package.py, run-tests.sh, and their helpers
 ```
 
@@ -57,6 +58,20 @@ python3 tools/inspect_core.py --retoc /path/to/retoc --paks "$PAKS"         # di
 
 After a game patch, run `--check` first: the build stops if the game's missions or their limits
 changed, and lists what to review. See [docs/core-pak-analysis.md](docs/core-pak-analysis.md).
+
+## After a game update
+
+1. `python3 tools/build_core.py ... --check`: stops if the game's missions or squad limits changed.
+2. Start the game and open squad select, then start a mission. In `UE4SS.log`, look for:
+   ```
+   [ZCOM_SQUAD_SIX] selfcheck phase=startup ok=21 missing=none unchecked=none
+   [ZCOM_SQUAD_SIX] selfcheck phase=mission ok=3 missing=none unchecked=none
+   ```
+   `missing=` names each function, class or property that no longer exists (for example a
+   Blueprint struct field whose GUID suffix changed). `unchecked=` means UE4SS couldn't inspect
+   it, which says nothing either way.
+3. The three hard-coded map layouts in `placement.lua` can't be checked this way; they only match
+   their own maps and fall back to the generic placement when they don't.
 
 ## Building a release
 

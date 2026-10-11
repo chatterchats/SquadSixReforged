@@ -2327,6 +2327,22 @@ local function register_placement_triggers()
 end
 
 return {
+    -- Every game name this module depends on, for selfcheck.lua.
+    game_names = {
+        {"function", PLACEMENT_TRIGGER_FUNCTIONS[1]},
+        {"function", PLACEMENT_TRIGGER_FUNCTIONS[2]},
+        {"function", MOVE_UNITS_FUNCTIONS[3]},
+        {"function", "/Script/BitReactorGame.CombatPreparationArea:" .. LINKED_AREA_FUNCTION},
+        {"function", "/Script/BitReactorGame.TacticalAreaVolume:" .. INSIDE_AREA_FUNCTION},
+        {"property", "/Script/BitReactorGame.CombatPreparationArea", DESTINATIONS_PROPERTY},
+        {"property", "/Script/BitReactorGame.TacticalPoint", PLAYER_TEAM_PROPERTY},
+        {"property", "/Script/BitReactorGame." .. SQUAD_CLASS, SQUAD_MEMBERS_PROPERTY},
+        {"property", "/Script/BitReactorGame." .. TACTICAL_GAME_STATE_CLASS, PLAYER_SQUAD_PROPERTY},
+        -- The Blueprint override only loads with a mission level.
+        {"class", PREPARATION_AREA_CLASS_PATH, when = "mission"},
+        {"function", MOVE_UNITS_FUNCTIONS[1], when = "mission"},
+        {"function", MOVE_UNITS_FUNCTIONS[2], when = "mission"},
+    },
     register_rescue_command = register_rescue_command,
     register_relocation_hook = register_relocation_hook,
     register_area_notification = register_area_notification,

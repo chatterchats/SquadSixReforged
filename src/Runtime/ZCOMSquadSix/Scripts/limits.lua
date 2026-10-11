@@ -306,6 +306,12 @@ local function resweep_data_limits()
 end
 
 return {
+    -- Every game name this module depends on, for selfcheck.lua.
+    game_names = {
+        {"property", "/Script/BitReactorGame.BitReactorMissionData", MAXIMUM_PROPERTY},
+        {"property", "/Script/BitReactorGame.BitReactorMissionData", REQUIREMENTS_PROPERTY},
+        {"property", "/Script/BitReactorGame.CharacterRequirement", AUTO_ASSIGN_PROPERTY},
+    },
     guard_summary = guard_summary,
     apply_data_limits = apply_data_limits,
     resweep_data_limits = resweep_data_limits,

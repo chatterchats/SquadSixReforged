@@ -795,6 +795,23 @@ local function register_lineup_hook()
 end
 
 return {
+    -- Every game name this module depends on, for selfcheck.lua.
+    game_names = {
+        {"function", SLOT_LIST_FUNCTION},
+        {"function", GENERATE_PROXIES_FUNCTION},
+        {"function", SHOW_LINEUP_FUNCTION},
+        {"class", SLOT_BOX_CLASS_PATH},
+        {"property", HOLOGRAM_MANAGER_CLASS, PROXY_ARRAY_PROPERTY},
+        -- The slot-definition struct that CreateActivitySlotVMs takes. Its field names carry a
+        -- GUID suffix, which changes whenever the struct is edited.
+        {"property", "/Game/Game/UI/Strategy/GalaxyMap/BPs/BrunoActivitySlotData.BrunoActivitySlotData",
+            SLOT_INDEX_PROPERTY},
+        {"property", "/Game/Game/UI/Strategy/GalaxyMap/BPs/VM_ActivitySlot.VM_ActivitySlot_C",
+            ACTIVITY_CHARACTER_PROPERTY},
+        {"property", string.match(SLOT_LIST_FUNCTION, "^(.-):"), "ActivitySlots"},
+        -- No SetEntrySpacing exists on this class, so the property is what fit_squad_screen sets.
+        {"property", "/Script/UMG.DynamicEntryBoxBase", "EntrySpacing"},
+    },
     squad_slot_box = squad_slot_box,
     fit_squad_screen = fit_squad_screen,
     report_slot_widget_state = report_slot_widget_state,

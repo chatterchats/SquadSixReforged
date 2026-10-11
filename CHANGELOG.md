@@ -11,6 +11,13 @@ Adopted from arctco, the original author, after they discontinued the mod. The r
 unchanged from 1.1.4, now split across modules. The Core container is now built from the game's own packages by
 `tools/build_core.py`, from the squad limits in `data/missions.tsv`.
 
+### Added
+
+- A startup self-check. The log now says whether every game name the runtime depends on still
+  resolves: `selfcheck phase=startup ...` once the squad-selection assets load, and
+  `selfcheck phase=mission ...` in the first mission. After a game update, `missing=` lists
+  exactly what was renamed or removed.
+
 ### Changed
 
 - Rescue Jae Mordant (HM_Jae_020) is no longer raised to six by the container. 1.1.4 already kept

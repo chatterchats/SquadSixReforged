@@ -2,19 +2,21 @@ local VERSION = "1.1.4"
 -- Squad Six's runtime. This file loads the modules and keeps registering hooks until every
 -- target exists; the work itself is in limits.lua (mission squad limits), lineup.lua (squad
 -- selection) and placement.lua (tactical deployment), with shared helpers in common.lua.
+-- selfcheck.lua logs whether every game name those modules use still resolves.
 --
 -- Explicit path: never resolve another mod's module of the same name. Clearing the cache makes
 -- a UE4SS mod reload pick up the current files.
 local source = debug.getinfo(1, "S").source:gsub("^@", "")
 local directory = assert(source:match("^(.*[/\\])"), "Scripts directory unavailable")
 package.path = directory .. "?.lua;" .. package.path
-for _, module in ipairs({"common", "limits", "lineup", "placement"}) do
+for _, module in ipairs({"common", "limits", "lineup", "placement", "selfcheck"}) do
     package.loaded[module] = nil
 end
 local Common = require("common")
 local Limits = require("limits")
 local Lineup = require("lineup")
 local Placement = require("placement")
+local Selfcheck = require("selfcheck")
 local TARGET_SIZE = Common.TARGET_SIZE
 local SLOT_LIST_ASSET = Common.SLOT_LIST_ASSET
 local HOLOGRAM_MANAGER_ASSET = Common.HOLOGRAM_MANAGER_ASSET
@@ -37,6 +39,7 @@ local register_placement_triggers = Placement.register_placement_triggers
 
 local SLOT_LIST_CLASS = SLOT_LIST_ASSET .. ".VM_ActivitySlotList_C"
 local target_assets_loaded = false
+local maintenance_passes = 0
 local maintenance_complete = false
 local status_reported = false
 local status_complete_reported = false
@@ -112,6 +115,10 @@ end
 local function maintain_runtime_state()
     apply_data_limits()
     load_target_assets()
+    -- The Blueprint names exist once those assets are loaded. If loading keeps failing, check
+    -- anyway after a few passes so the log says what is missing.
+    maintenance_passes = maintenance_passes + 1
+    if target_assets_loaded or maintenance_passes >= 6 then Selfcheck.check_startup() end
     register_manager_notification()
     register_hooks()
     register_rescue_command()
@@ -147,6 +154,10 @@ register_early_slot_notification()
 register_layout_notification()
 register_area_notification()
 register_rescue_command()
+Selfcheck.add(Limits.game_names)
+Selfcheck.add(Lineup.game_names)
+Selfcheck.add(Placement.game_names)
+Selfcheck.register_mission_check()
 
 ExecuteWithDelay(1000, function()
     ExecuteInGameThread(maintain_runtime_state)

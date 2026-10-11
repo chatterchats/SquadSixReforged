@@ -20,7 +20,7 @@ AuthoredHero/HM_Telrea_010	4	4	hero mission: auto-assigns Hawks plus a companion
 AuthoredHero/HM_Telrea_020	4	4	hero mission: auto-assigns Hawks plus a companion; limits.lua guards it at 4
 AuthoredHero/HM_TrickLuco_020	4	4	hero mission: auto-assigns Hawks plus two companions; limits.lua guards it at 4
 AuthoredHero/HM_Trick_010	4	4	hero mission: auto-assigns Hawks plus a companion; limits.lua guards it at 4
-Story_Main/MM_01_010_SerolonisJob	4	6	
+Story_Main/MM_01_010_SerolonisJob	4	4	opening tutorial: the game sets the squad, so the player can't pick operators; limits.lua guards it at 4
 Story_Main/MM_01_030_NotYourTurf	3	3	three-operator mission
 Story_Main/MM_02_010_CoilReunion	4	6	
 Story_Main/MM_02_030_DarkGrotto	4	6	

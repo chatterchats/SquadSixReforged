@@ -18,6 +18,7 @@ mock.install({missions = {
     m("MM_02_050_SlugHQ", 4, 1),         -- guarded by name
     m("SK_Dantooine_025", 3, 0),         -- three-operator mission, untouched
     m("MM_03_010_Bespin", 1, 1),         -- solo mission, untouched
+    m("MM_01_010_SerolonisJob", 6, 1),   -- tutorial with a fixed squad: put back to 4
     m("SK_Filler_01", 6, 0), m("SK_Filler_02", 6, 0), m("SK_Filler_03", 6, 0), m("SK_Filler_04", 6, 0),
 }})
 mock.load(scripts)
@@ -52,5 +53,6 @@ expect("HM_Jae_020=4", "a guarded mission is put back to 4")
 expect("HM_Kabb_010=4", "a reflection-guarded mission stays at 4")
 expect("SK_Dantooine_025=3", "a three-operator mission is untouched")
 expect("MM_03_010_Bespin=1", "a solo mission is untouched")
+expect("MM_01_010_SerolonisJob=4", "the tutorial keeps its authored four")
 expect("loops_stopped=true", "the maintenance loop stops once everything is registered")
 io.stdout:write("ok\n")

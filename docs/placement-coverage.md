@@ -32,7 +32,7 @@ serve are untouched: the derived points for the other 85 lanes are byte-identica
 |------|----------|-----------------|
 | `SK_Lothal_035_Gameplay` | SK_Lothal_035, SK_Lothal_035_Crisis | 0 → 2 |
 | `SK_Lothal_050_GameplayNew` | SK_Lothal_050, OM_Crisis_Guardian_A (and MM_01_030_NotYourTurf, three operators) | 1 → 2 |
-| `MM_01_010_TheSerolonisJob_Gameplay` area 1 | MM_01_010_SerolonisJob | 1 → 2 |
+| `MM_01_010_TheSerolonisJob_Gameplay` area 1 | MM_01_010_SerolonisJob (now kept at four: tutorial, fixed squad) | 1 → 2 |
 | `SK_Dantooine_025_gameplay` area 1 | SK_Dantooine_025 (three operators) | 1 → 1 |
 
 `tests/data/derived_points.txt` pins the exact points for every lane (for the destination
@@ -40,9 +40,9 @@ expansion, the repair pool, and with nobody standing on a destination), so a fut
 geometry shows up as a diff of that file; regenerate it with `placement_maps_test.lua <Scripts>
 --write-golden` after a deliberate change and review the diff.
 
-Still to check in game: SerolonisJob area 1 is a corridor about 28 uu wide, so its two points are
-101 uu apart; SK_Lothal_035's destinations range from Z 7 to 150, so its points' heights are
-interpolated across that rise.
+Still to check in game: SK_Lothal_035's destinations range from Z 7 to 150, so its points' heights
+are interpolated across that rise. (SerolonisJob area 1, a corridor about 28 uu wide, now gets two
+points 101 uu apart, but the mission keeps four operators, so they aren't used.)
 
 Some maps author two destinations closer than a tile (both Bespin lanes repeat a point exactly,
 and `HM_TrickLuco_020` has a pair 99 uu apart). Neither mission deploys six.

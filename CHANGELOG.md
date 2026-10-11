@@ -28,8 +28,8 @@ unchanged from 1.1.4, now split across modules. The Core container is now built 
 ### Fixed
 
 - Operators 5 and 6 could be left outside the deployment lane on narrow lanes, where the
-  fallback found no room: SK_Lothal_035 and its crisis variant (no interior point at all),
-  SK_Lothal_050 and OM_Crisis_Guardian_A, and Serolonis Job's second deployment. The fallback now
+  fallback found no room: SK_Lothal_035 and its crisis variant (no interior point at all), and
+  SK_Lothal_050 and OM_Crisis_Guardian_A. The fallback now
   also tries points between pairs of authored destinations when the lane's edges can't hold
   everyone. Other maps are unchanged.
 - `squadsixrescue` could leave an operator stranded. When placing two stuck operators on their
@@ -39,6 +39,9 @@ unchanged from 1.1.4, now split across modules. The Core container is now built 
 
 ### Changed
 
+- The Serolonis Job (MM_01_010_SerolonisJob) keeps its authored four operators. It's the opening
+  tutorial and the game sets its squad, so the player can't pick operators; 1.1.4 raised it to six
+  anyway. It's out of the container and the runtime guards it by name.
 - Rescue Jae Mordant (HM_Jae_020) is no longer raised to six by the container. 1.1.4 already kept
   it at four at runtime; the container now agrees, as 1.1.3 intended for every guarded mission.
 - SK_Serolonis_020, SK_Vandor_015, Coil Reunion (MM_02_010_CoilReunion) and the main-story

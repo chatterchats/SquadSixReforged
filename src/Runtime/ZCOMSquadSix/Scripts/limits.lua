@@ -40,6 +40,12 @@ local SCRIPTED_COMPANION_MISSION_NAMES = {
     "HM_Cly_010", "HM_Cly_020", "HM_Jae_010", "HM_Jae_020",
     "HM_Kabb_020", "HM_Luco_010", "HM_Trick_010",
 }
+-- Missions whose squad the player doesn't choose. The Serolonis Job is the
+-- opening tutorial: its squad is set by the game, so six slots add nothing
+-- and only risk the scripted roster setup. Kept at the authored four.
+local FIXED_SQUAD_MISSION_NAMES = {
+    "MM_01_010_SerolonisJob",
+}
 
 local limit_reported = false
 local data_container = "unknown"
@@ -57,10 +63,12 @@ end
 -- elements cannot be read.
 local function guards_authored_maximum(object)
     local name = full_name(object)
-    for _, mission in ipairs(SCRIPTED_COMPANION_MISSION_NAMES) do
-        if string.find(name, mission, 1, true) then
-            guard_name_hits = guard_name_hits + 1
-            return true
+    for _, list in ipairs({SCRIPTED_COMPANION_MISSION_NAMES, FIXED_SQUAD_MISSION_NAMES}) do
+        for _, mission in ipairs(list) do
+            if string.find(name, mission, 1, true) then
+                guard_name_hits = guard_name_hits + 1
+                return true
+            end
         end
     end
 

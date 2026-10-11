@@ -13,10 +13,9 @@ unchanged from 1.1.4, now split across modules. The Core container is now built 
 
 ### Added
 
-- `tests/placement_maps_test.lua` runs the placement rules over all 89 deployment areas: on 81 the
+- `tests/placement_maps_test.lua` runs the placement rules over all 89 deployment areas: on 84 the
   two overflow operators end up inside the lane even when staged outside it and then stranded by
-  the relocation. Four lanes (including SK_Lothal_035, which gets none) are too narrow for the
-  fallback to place both; see `docs/placement-coverage.md`.
+  the relocation. See `docs/placement-coverage.md`.
 - `tools/map_scan.py` reads every deployment area and its destination points straight from the
   game's levels into `data/mapscan.json`, and checks that `placement.lua`'s hard-coded map layouts
   each still match exactly one area. It reproduces arctco's published figures: 89 areas, a median
@@ -28,6 +27,11 @@ unchanged from 1.1.4, now split across modules. The Core container is now built 
 
 ### Fixed
 
+- Operators 5 and 6 could be left outside the deployment lane on narrow lanes, where the
+  fallback found no room: SK_Lothal_035 and its crisis variant (no interior point at all),
+  SK_Lothal_050 and OM_Crisis_Guardian_A, and Serolonis Job's second deployment. The fallback now
+  also tries points between pairs of authored destinations when the lane's edges can't hold
+  everyone. Other maps are unchanged.
 - `squadsixrescue` could leave an operator stranded. When placing two stuck operators on their
   squadmates failed because the engine accepted a teleport but put the operator somewhere else,
   the command undid the first move but left that operator wherever it landed. Both are now put

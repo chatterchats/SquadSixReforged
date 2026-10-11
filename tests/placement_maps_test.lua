@@ -16,23 +16,26 @@
 --     the lane as before.
 -- Some maps author two destinations closer than a tile (Bespin, HM_TrickLuco_020; neither
 -- deploys six), so only pairs involving something the runtime added or moved are checked.
---   luajit tests/placement_maps_test.lua <Scripts dir> [--print]
--- With --print, writes one line per area instead of asserting.
-local scripts = assert(arg[1], "usage: placement_maps_test.lua <Scripts dir> [--print]")
+-- The exact points derive_rescue_points returns for every lane (for the destination expansion, for
+-- the repair pool, and with nobody standing on a destination) are pinned in tests/data/derived_points.txt, so any change to the geometry
+-- shows up as a diff of that file, not just as a changed count.
+--   luajit tests/placement_maps_test.lua <Scripts dir> [--print | --write-golden]
+-- With --print, writes one line per area instead of asserting. With --write-golden, rewrites
+-- tests/data/derived_points.txt from the current code (review the diff before committing it).
+local scripts = assert(arg[1], "usage: placement_maps_test.lua <Scripts dir> [--print | --write-golden]")
 local print_only = arg[2] == "--print"
+local write_golden = arg[2] == "--write-golden"
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
 local mock = dofile(here .. "ue4ss_mock.lua")
 local json = dofile(here .. "json.lua")
 
 -- Lanes where the generic fallback finds fewer than two interior points, with how many it finds.
--- Their destinations sit close to a line, so the inset edge midpoints it tries land within a
--- tactical tile of a destination. Overflow operators staged off-lane on these maps keep off-lane
--- destinations. Change this list only together with derive_rescue_points.
+-- Change this list only together with derive_rescue_points. Until the pair candidates were added
+-- (docs/placement-coverage.md), SK_Lothal_035 found 0 and SK_Lothal_050 and SerolonisJob area 1
+-- found 1.
 local SHORT_LANES = {
-    ["SK_Dantooine_025_gameplay:BP_CombatPreparationArea_C_1"] = 1,  -- a three-operator mission
-    ["SK_Lothal_035_Gameplay:BP_CombatPreparationArea_C_0"] = 0,
-    ["SK_Lothal_050_GameplayNew:BP_CombatPreparationArea_C_0"] = 1,
-    ["MM_01_010_TheSerolonisJob_Gameplay:BP_CombatPreparationArea_C_1"] = 1,
+    -- Three destinations 100 uu apart in a row: no room for two more. A three-operator mission.
+    ["SK_Dantooine_025_gameplay:BP_CombatPreparationArea_C_1"] = 1,
     ["Blank_Gameplay:BP_CombatPreparationArea_C_0"] = 0,             -- collinear: no lane at all
 }
 local PROFILE_AREAS = {
@@ -57,7 +60,14 @@ local file = assert(io.open(here .. "../data/mapscan.json"))
 local scan = json.decode(file:read("*a"))
 file:close()
 
-local failures, lines = {}, {}
+local failures, lines, golden = {}, {}, {}
+local function points_text(points)
+    local text = {}
+    for _, point in ipairs(points) do
+        text[#text + 1] = string.format("%.3f/%.3f/%.3f", point.X, point.Y, point.Z)
+    end
+    return table.concat(text, " ")
+end
 local function fail(message) failures[#failures + 1] = message end
 local function vector(location) return {X = location[1], Y = location[2], Z = location[3]} end
 local function xy(a, b) return math.sqrt((a.X - b.X) ^ 2 + (a.Y - b.Y) ^ 2) end
@@ -105,6 +115,12 @@ for _, area in ipairs(scan.areas) do
             standing[index] = {location = {X = point.X, Y = point.Y, Z = point.Z + CAPSULE}}
         end
         local derived = lane and P.derive_rescue_points(lane, points, standing, 2) or {}
+        if lane then
+            -- unsampled: nobody stands on a destination, so heights use RESCUE.capsule_height.
+            golden[#golden + 1] = name .. " expansion=[" .. points_text(derived) .. "] repair=["
+                .. points_text(P.derive_rescue_points(lane, points, standing, 6, true)) .. "] unsampled=["
+                .. points_text(P.derive_rescue_points(lane, points, {}, 2)) .. "]"
+        end
         local expected = SHORT_LANES[name] or 2
         if #derived ~= expected then
             fail(string.format("%s: derive_rescue_points found %d points, expected %d", name, #derived, expected))
@@ -205,6 +221,23 @@ for _, area in ipairs(scan.areas) do
         else
             lines[#lines + 1] = string.format("%-70s dest=%d no lane", name, #points)
         end
+    end
+end
+
+local golden_path = here .. "data/derived_points.txt"
+if write_golden then
+    local out = assert(io.open(golden_path, "w"))
+    out:write(table.concat(golden, "\n"), "\n")
+    out:close()
+    io.stdout:write("wrote ", golden_path, " (", #golden, " lanes)\n")
+    os.exit(0)
+end
+local pinned = {}
+for line in assert(io.open(golden_path)):lines() do pinned[#pinned + 1] = line end
+for index = 1, math.max(#pinned, #golden) do
+    if pinned[index] ~= golden[index] then
+        fail("derived points differ from tests/data/derived_points.txt:\n  pinned: "
+            .. tostring(pinned[index]) .. "\n  now:    " .. tostring(golden[index]))
     end
 end
 

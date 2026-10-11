@@ -121,6 +121,10 @@ RESCUE.level_tolerance = 250.0
 -- this deployment stands on one to measure from. Erring high is safe: a point
 -- slightly above the floor drops onto it, one below it is inside geometry.
 RESCUE.capsule_height = 100.0
+-- Where a lane is too narrow for its inset edge midpoints (they land within a
+-- tile of a destination), derive_rescue_points also tries these points along
+-- the segment between every pair of authored destinations.
+RESCUE.pair_fractions = {1 / 3, 0.5, 2 / 3}
 local PLACEMENT_PROFILES = {
     {
         name = "ColdMetal",
@@ -548,6 +552,42 @@ local function inside_deployment(polygon, point)
     return false
 end
 
+-- Pick up to `wanted` points from `pool`, none within a tile of another,
+-- fitting as many as possible: repeatedly take the point that blocks the fewest
+-- others, then the most open one. (Taking the most open point first can block
+-- two that would both have fit, as in a corridor.)
+local function spread_points(pool, wanted)
+    local chosen, remaining = {}, {}
+    for index, point in ipairs(pool) do remaining[index] = point end
+    while #chosen < wanted and #remaining > 0 do
+        local best, best_conflicts = nil, nil
+        for _, point in ipairs(remaining) do
+            local conflicts = 0
+            for _, other in ipairs(remaining) do
+                if other ~= point
+                    and xy_distance_squared(point, other) < MIN_DESTINATION_SEPARATION_SQ then
+                    conflicts = conflicts + 1
+                end
+            end
+            local better = best == nil or conflicts < best_conflicts
+                or (conflicts == best_conflicts and (point.clearance > best.clearance
+                    or (point.clearance == best.clearance and (point.X < best.X
+                        or (point.X == best.X and point.Y < best.Y)))))
+            if better then best, best_conflicts = point, conflicts end
+        end
+        chosen[#chosen + 1] = best
+        local kept = {}
+        for _, point in ipairs(remaining) do
+            if point ~= best
+                and xy_distance_squared(point, best) >= MIN_DESTINATION_SEPARATION_SQ then
+                kept[#kept + 1] = point
+            end
+        end
+        remaining = kept
+    end
+    return chosen
+end
+
 -- Rescue points for a map without a profile: inset midpoints of the authored
 -- lane's edges. Height is the median offset of operators already standing on
 -- destinations, else RESCUE.capsule_height.
@@ -555,6 +595,11 @@ end
 -- `ignore_units` keeps occupied points in the pool, for the repair, which
 -- checks occupancy itself; the destination expansion leaves it off, since a
 -- destination on a standing operator is worse.
+--
+-- A lane whose edge points can't hold the operators past its authored
+-- destinations also gets points between pairs of destinations
+-- (RESCUE.pair_fractions), chosen by spread_points. Lanes the edge points
+-- already serve get exactly the edge points, as before.
 local function derive_rescue_points(polygon, destinations, units, wanted, ignore_units)
     if polygon == nil or wanted < 1 then return {} end
 
@@ -579,6 +624,23 @@ local function derive_rescue_points(polygon, destinations, units, wanted, ignore
         offset = offsets[math.floor((#offsets + 1) / 2)]
     end
 
+    -- Squared clearance from the destinations and units, and whether a point is
+    -- at least a tile from every destination (and unit, unless ignored).
+    local function clearance_of(point)
+        local clearance = math.huge
+        for _, destination in ipairs(destinations) do
+            clearance = math.min(clearance, xy_distance_squared(point, destination))
+        end
+        local separated = clearance >= MIN_DESTINATION_SEPARATION_SQ
+        for _, unit in ipairs(units) do
+            clearance = math.min(clearance, xy_distance_squared(point, unit.location))
+        end
+        if not ignore_units then
+            separated = separated and clearance >= MIN_DESTINATION_SEPARATION_SQ
+        end
+        return clearance, separated
+    end
+
     -- One candidate per authored edge, drawn in off the boundary exactly as
     -- the profiles are. A boundary point is where a strict inside test or a
     -- tile snap can round back out of the lane.
@@ -595,17 +657,7 @@ local function derive_rescue_points(polygon, destinations, units, wanted, ignore
         -- destination's: on a lane with corners at two heights the nearest can
         -- be on the other level.
         local rise = math.abs((first.Z or 0) - (second.Z or 0))
-        local clearance = math.huge
-        for _, destination in ipairs(destinations) do
-            clearance = math.min(clearance, xy_distance_squared(point, destination))
-        end
-        local separated = clearance >= MIN_DESTINATION_SEPARATION_SQ
-        for _, unit in ipairs(units) do
-            clearance = math.min(clearance, xy_distance_squared(point, unit.location))
-        end
-        if not ignore_units then
-            separated = separated and clearance >= MIN_DESTINATION_SEPARATION_SQ
-        end
+        local clearance, separated = clearance_of(point)
         if separated and rise <= RESCUE.level_tolerance then
             point.Z = ((first.Z or 0) + (second.Z or 0)) / 2 + offset
             point.clearance = clearance
@@ -635,6 +687,34 @@ local function derive_rescue_points(polygon, destinations, units, wanted, ignore
         end
         if clear then chosen[#chosen + 1] = point end
     end
+
+    -- Narrow lanes: enough for the operators past the authored destinations?
+    local needed = math.min(wanted, TARGET_SIZE - #destinations)
+    if #chosen >= needed then return chosen end
+    local pool = {}
+    for _, point in ipairs(candidates) do pool[#pool + 1] = point end
+    for i = 1, #destinations do
+        for j = i + 1, #destinations do
+            local first, second = destinations[i], destinations[j]
+            local rise = (second.Z or 0) - (first.Z or 0)
+            if math.abs(rise) <= RESCUE.level_tolerance then
+                for _, fraction in ipairs(RESCUE.pair_fractions) do
+                    local point = {
+                        X = first.X + (second.X - first.X) * fraction,
+                        Y = first.Y + (second.Y - first.Y) * fraction,
+                    }
+                    local clearance, separated = clearance_of(point)
+                    if separated and inside_deployment(polygon, point) ~= false then
+                        point.Z = (first.Z or 0) + rise * fraction + offset
+                        point.clearance = clearance
+                        pool[#pool + 1] = point
+                    end
+                end
+            end
+        end
+    end
+    local spread = spread_points(pool, wanted)
+    if #spread > #chosen then return spread end
     return chosen
 end
 

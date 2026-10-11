@@ -1,38 +1,48 @@
 # Placement against the game's maps
 
 `tests/placement_maps_test.lua` runs `placement.lua` over all 89 playable deployment areas in
-`data/mapscan.json` (from `tools/map_scan.py`). Results with the 1.1.4 placement rules, game build
-24874058:
+`data/mapscan.json` (from `tools/map_scan.py`). Results on game build 24874058, with the pair
+candidates described below:
 
 | Outcome | Areas |
 |---------|-------|
-| Overflow operators 5 and 6, staged outside the lane, are moved into it; both new destinations are inside the lane; after a relocation strands them at the origin, repair puts both back inside | 81 |
-| Only one interior point available: one operator moved into the lane, the other keeps an off-lane destination | 3 |
-| No interior point available: both keep off-lane destinations (`SK_Lothal_035`, used by `SK_Lothal_035` and `SK_Lothal_035_Crisis`) | 1 |
+| Overflow operators 5 and 6, staged outside the lane, are moved into it; both new destinations are inside the lane; after a relocation strands them at the origin, repair puts both back inside | 84 |
+| Only one interior point available: one operator moved into the lane, the other keeps an off-lane destination (`SK_Dantooine_025`, a three-operator mission) | 1 |
 | Cold Metal: its profile only rescues operators the tactical volume rejects, so the test (which has no volume) expects none moved | 1 |
 | Five or six authored destinations (one or no overflow operator) | 2 |
 | Collinear destinations, no lane (`Blank_Gameplay`) | 1 |
 
 In every case no operator is left at the world origin and none shares a tile after the repair.
 
-## Lanes the fallback can't fill
+## Narrow lanes
 
-`derive_rescue_points` only tries the inset midpoint of each lane edge. Where the authored
-destinations sit close to a line, those midpoints land within a tactical tile (100 uu) of a
-destination and are rejected:
+Up to 1.1.4, `derive_rescue_points` only tried the inset midpoint of each lane edge. Where the
+authored destinations sit close to a line, those midpoints land within a tactical tile (100 uu) of
+a destination and are rejected, so an overflow operator the game stages outside the lane kept an
+off-lane destination: the failure arctco's notes describe for "Darkened0Sky's Lothal crisis" (they
+don't say which Lothal crisis).
 
-| Area | Missions | Interior points |
+When the edge points can't hold the operators past the authored destinations, the fallback now also
+tries points a third, half and two thirds of the way between every pair of authored destinations
+(same rules: a tile from every destination, inside the lane, heights interpolated within
+RESCUE.level_tolerance), and picks the set that fits the most points. Lanes the edge points already
+serve are untouched: the derived points for the other 85 lanes are byte-identical.
+
+| Area | Missions | Interior points, before → after |
 |------|----------|-----------------|
-| `SK_Lothal_035_Gameplay` | SK_Lothal_035, SK_Lothal_035_Crisis | 0 |
-| `SK_Lothal_050_GameplayNew` | SK_Lothal_050, MM_01_030_NotYourTurf, OM_Crisis_Guardian_A | 1 |
-| `MM_01_010_TheSerolonisJob_Gameplay` area 1 | MM_01_010_SerolonisJob | 1 |
-| `SK_Dantooine_025_gameplay` area 1 | SK_Dantooine_025 (a three-operator mission) | 1 |
+| `SK_Lothal_035_Gameplay` | SK_Lothal_035, SK_Lothal_035_Crisis | 0 → 2 |
+| `SK_Lothal_050_GameplayNew` | SK_Lothal_050, OM_Crisis_Guardian_A (and MM_01_030_NotYourTurf, three operators) | 1 → 2 |
+| `MM_01_010_TheSerolonisJob_Gameplay` area 1 | MM_01_010_SerolonisJob | 1 → 2 |
+| `SK_Dantooine_025_gameplay` area 1 | SK_Dantooine_025 (three operators) | 1 → 1 |
 
-On these, an overflow operator the game stages outside the lane keeps an off-lane destination,
-which is the failure arctco's notes describe for "Darkened0Sky's Lothal crisis" (the notes don't
-say which Lothal crisis that was). MM_01_030_NotYourTurf is a three-operator mission. A wider
-candidate set (for example points along the lane's interior diagonals) would cover them; the test
-lists the current counts in `SHORT_LANES`, so changing the fallback shows up there.
+`tests/data/derived_points.txt` pins the exact points for every lane (for the destination
+expansion, the repair pool, and with nobody standing on a destination), so a future change to the
+geometry shows up as a diff of that file; regenerate it with `placement_maps_test.lua <Scripts>
+--write-golden` after a deliberate change and review the diff.
+
+Still to check in game: SerolonisJob area 1 is a corridor about 28 uu wide, so its two points are
+101 uu apart; SK_Lothal_035's destinations range from Z 7 to 150, so its points' heights are
+interpolated across that rise.
 
 Some maps author two destinations closer than a tile (both Bespin lanes repeat a point exactly,
 and `HM_TrickLuco_020` has a pair 99 uu apart). Neither mission deploys six.

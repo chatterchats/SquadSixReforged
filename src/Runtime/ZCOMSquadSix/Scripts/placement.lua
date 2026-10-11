@@ -2100,8 +2100,10 @@ return {
     register_area_notification = register_area_notification,
     register_placement_triggers = register_placement_triggers,
     -- The lane geometry, for tests/placement_maps_test.lua, which runs it over every
-    -- deployment area in the game (data/mapscan.json). Not used by the runtime.
+    -- deployment area in the game (data/mapscan.json), and for the dev probe
+    -- (dev/ZCOMSquadSixProbe). Not used by the runtime.
     internals = {
+        RESCUE = RESCUE,
         PLACEMENT_PROFILES = PLACEMENT_PROFILES,
         deployment_polygon = deployment_polygon,
         inside_deployment = inside_deployment,

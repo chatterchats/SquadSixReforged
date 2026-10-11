@@ -32,10 +32,11 @@ src/Runtime/    UE4SS mod ZCOMSquadSix + zcom-mod.json        -> ue4ss/Mods
     common.lua      shared constants and reflection/vector helpers
 data/           missions.tsv: the squad limit for every mission (what the Core pak changes)
                 mapscan.json: every deployment area and its destination points (tools/map_scan.py)
+dev/            ZCOMSquadSixProbe: in-game checks of placement spots and staging (never shipped)
 docs/           upstream notes, file hashes, pak analysis, runtime-notes.md (why each rule exists),
                 placement-coverage.md (how placement does on every map)
 tests/          runtime tests under a UE4SS stand-in (ue4ss_mock.lua): startup, self-check,
-                lineup, rescue,
+                lineup, rescue, probe,
                 placement_maps (placement.lua over every deployment area in data/mapscan.json)
 tools/          build_core.py, inspect_core.py, package.py, run-tests.sh, and their helpers
 ```

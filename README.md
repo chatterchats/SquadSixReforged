@@ -15,8 +15,8 @@ Missions that inject scripted characters keep their authored limit of four.
 ## Status
 
 Adopted from arctco's final release, **1.1.4** (2026-09-03), which is imported unmodified at tag
-`upstream-1.1.4`. See [docs/upstream.md](docs/upstream.md) for what that release contains and what
-can't be rebuilt from source yet.
+`upstream-1.1.4`. See [docs/upstream.md](docs/upstream.md) for what that release contains and
+[docs/core-pak-analysis.md](docs/core-pak-analysis.md) for exactly what the cooked pak changes.
 
 ## Layout
 
@@ -24,7 +24,7 @@ can't be rebuilt from source yet.
 src/Core/       cooked IoStore override + zcom-mod.json      -> Content/Paks/~mods
 src/Runtime/    UE4SS mod ZCOMSquadSix + zcom-mod.json        -> ue4ss/Mods
 docs/           upstream notes, file hashes, pak contents
-tools/          package.py (release ZIP)
+tools/          package.py (release ZIP), inspect_core.py (diff the pak against the game)
 ```
 
 `src/` mirrors the release ZIP, which Zero Mod Manager installs as "Squad Six - Core" and

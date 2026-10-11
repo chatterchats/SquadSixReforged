@@ -19,18 +19,16 @@ behind them and the bug reports that led to them are documented in the comments 
 
 ## What the Core pak overrides
 
-The pak has 106 cooked assets ([`pak-contents-1.1.4.txt`](pak-contents-1.1.4.txt)):
-`AC_HologramManager` and 105 mission definitions under `/Game/Game/GameData/MissionData/`
-(skirmishes `SK_*`, crisis missions `*_Crisis` and `OM_Crisis_*`, story missions `MM_*`, and
-`HM_Jae_020`). These appear to be the hand-picked missions whose `MaxSquadSize` was raised to six;
-this hasn't been confirmed by unpacking them yet.
+The pak has 106 cooked assets ([`pak-contents-1.1.4.txt`](pak-contents-1.1.4.txt)): 105 mission
+definitions with `MaxSquadSize` raised from 4 to 6, and `AC_HologramManager` with its lineup loop
+widened from four proxies to six. Each is the game's own package with one value changed. Details,
+including the 20 missions left out and why: [`core-pak-analysis.md`](core-pak-analysis.md).
 
 ## Known gaps after adoption
 
-- **The cooked overrides can't be rebuilt yet.** No uncooked assets or build script came with the
-  release. To change a mission's limit, the overrides need to be unpacked (for example with
-  `retoc`) and either edited as cooked assets or rebuilt as data-only assets in the SWZC Merged Kit.
-  Shader-free data assets cooked on Linux load in the Windows game.
+- **The cooked overrides have no build script yet.** They can be regenerated from the game's own
+  packages with retoc (see the analysis), but that tool isn't written yet.
 - **The game build is pinned.** Both manifests list `testedBuilds: ["24874058"]` with
-  `"strict": true`, so a game patch may need re-cooked overrides and a manifest bump.
+  `"strict": true`, so a game patch may need re-patched overrides and a manifest bump. Run
+  `tools/inspect_core.py` after each patch.
 - **There's no history before 1.1.4.** Only the comments in `main.lua` record earlier versions.

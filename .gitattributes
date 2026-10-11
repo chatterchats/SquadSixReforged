@@ -1,0 +1,15 @@
+* text=auto eol=lf
+
+*.lua text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.py text eol=lf
+*.sh text eol=lf
+
+*.png binary
+*.zip binary
+*.uasset binary
+*.uexp binary
+*.pak binary
+*.ucas binary
+*.utoc binary

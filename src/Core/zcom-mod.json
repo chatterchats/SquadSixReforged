@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "community.squad-six.core",
+  "name": "Squad Six - Core",
+  "version": "1.1.4",
+  "description": "Raises Zero Company deployment limits from four to six.",
+  "game": {
+    "appId": 2075800,
+    "testedBuilds": [
+      "24874058"
+    ],
+    "strict": true
+  },
+  "type": [
+    "iostore"
+  ],
+  "requires": {
+    "ue4ss": true
+  }
+}

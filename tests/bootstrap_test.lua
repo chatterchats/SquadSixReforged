@@ -41,7 +41,7 @@ end
 local expect = mock.expect
 expect("log %[ZCOM_SQUAD_SIX%] loaded version=[%d.]+ target_size=6", "load line")
 expect("hook /Game/Game/UI/Strategy/GalaxyMap/BPs/VM_ActivitySlotList%.VM_ActivitySlotList_C:CreateActivitySlotVMs", "slot hook")
-expect("hook /Game/Game/UI/AC_HologramManager%.AC_HologramManager_C:ShowLineupHologramActors %+post", "lineup hook")
+expect("hook /Game/Game/UI/AC_HologramManager%.AC_HologramManager_C:ShowLineupHologramActors\n", "lineup hook (pre-hook only)")
 expect("hook /Script/BitReactorGame%.CombatPreparationArea:TriggerPreCombat", "placement trigger")
 expect("command squadsixrescue", "rescue command")
 expect("status version=[%d.]+ complete=true data_container=partial", "status line")

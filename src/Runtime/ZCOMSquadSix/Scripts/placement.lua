@@ -22,8 +22,8 @@ local PLACEMENT_TRIGGER_FUNCTIONS = {
 }
 -- The relocation itself. ACombatPreparationArea::MovePlayerUnitsIntoPosition
 -- is the native function that reads PlayerDestinations and moves the squad, so
--- its pre-hook is the exact instant before the squad is disturbed and its
--- post-hook the exact instant after. That beats guessing from a delay ladder.
+-- its pre-hook is the exact instant before the squad is disturbed. That beats
+-- guessing from a delay ladder.
 -- BP_CombatPreparationArea overrides it, so the UFunction that actually runs
 -- belongs to the Blueprint class, not to the native base. Hooking the base
 -- registered cleanly and never fired once: a verified run logged
@@ -254,7 +254,6 @@ local registered_placement_hook = false
 local registered_relocation_hook = false
 local registered_area_notification = false
 local registered_rescue_command = false
-local relocation_posthook_ran = false
 local relocation_prehook_ran = false
 local registered_relocation_names = {}
 local relocation_fired_name = ""
@@ -1883,13 +1882,10 @@ local function report_mission_placement()
         .. " unit_positions=" .. table.concat(positions, ","))
 end
 
--- MovePlayerUnitsIntoPosition is the relocation. Bracketing it removes the
--- guesswork the delay ladder was standing in for: the pre-hook fires with the
--- squad still staged, the post-hook with the damage already done.
---
--- The ladder still runs the same two steps on a timer. This codebase already
--- found that a post-hook id can come back without the callback ever being
--- called, so nothing here is allowed to be the only path.
+-- MovePlayerUnitsIntoPosition is the relocation, and its pre-hook fires with
+-- the squad still staged. The repairs after it run on timers measured from
+-- that instant: UE4SS never calls post-hooks on Blueprint functions, and the
+-- native name never runs because the Blueprint overrides it.
 local function relocation_ladder_total()
     local total = 0
     for _, count in pairs(relocation_ladders) do total = total + count end
@@ -1911,7 +1907,6 @@ local function begin_deployment(area)
     repair_counts = {}
     observed_positions = {}
     staging_window_open = true
-    relocation_posthook_ran = false
     relocation_prehook_ran = false
     relocation_fired_name = ""
     relocation_fired_names = {}
@@ -2169,13 +2164,7 @@ local function register_relocation_hook()
                 local name = function_name
                 local ok, pre_id = pcall(function()
                     return RegisterHook(name,
-                        function(context) on_relocation_starting(context, name) end,
-                        function(context)
-                            local area = unwrap(context)
-                            if not valid(area) then return end
-                            relocation_posthook_ran = true
-                            repair_stranded_units(area, "relocation_post")
-                        end)
+                        function(context) on_relocation_starting(context, name) end)
                 end)
                 registered_relocation_names[function_name] = ok and pre_id ~= nil
                 if registered_relocation_names[function_name] then
@@ -2302,7 +2291,6 @@ local function register_placement_triggers()
                                                     .. " relocation_pre=" .. tostring(relocation_prehook_ran)
                                                     .. " relocation_fired=" .. (relocation_fired_name == "" and "none" or relocation_fired_name)
                                                     .. " relocation_ladders=" .. tostring(relocation_ladder_total())
-                                                    .. " relocation_post=" .. tostring(relocation_posthook_ran)
                                                     .. " repair_passes=" .. tostring(repair_passes)
                                                     .. " repair_units=" .. tostring(repair_units_seen)
                                                     .. " repair_restored=" .. tostring(repair_restored_total)

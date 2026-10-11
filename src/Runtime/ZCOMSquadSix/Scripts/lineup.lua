@@ -37,10 +37,6 @@ local AUTHORED_SLOTS = 4
 -- cached exactly that and scattered the models. This is the only condition
 -- the reports actually evidence, so it is the only one enforced.
 local MIN_SLOT_SEPARATION_SQ = 100.0
--- A menu world holds plenty of cameras. The census exists to identify the
--- diorama rig, not to inventory the level, so it stops well short of a line
--- no one can read.
-local CAMERA_CENSUS_LIMIT = 8
 local ACTIVITY_CHARACTER_PROPERTY = "characterVM"
 local registered_slot_hook = false
 local registered_proxy_hook = false
@@ -54,7 +50,6 @@ local reported_layout_results = {}
 local lineup_widths = {}
 local layout_reported = false
 local slot_widget_reported = false
-local camera_census_reported = {}
 -- Per proxy actor: the scale the fit was derived from, and the scale the
 -- fit wrote. Keeping both is what lets a pass tell its own last write
 -- apart from a scale the Blueprint has since put there for a different
@@ -398,12 +393,13 @@ local function trim_lineup_proxies(activity_slots, proxies, owner_key, used)
 end
 
 -- One lineup pass: lay the models out and hide the ones this lineup does not
--- use. Idempotent, so it is safe to run from the pre-hook, the post-hook and a
+-- use. Idempotent, so it is safe to run from the pre-hook and again from a
 -- deferred tick, and it needs to be: 1.0.4 did this work only in the pre-hook,
--- and moving it to the post-hook alone left operators 5 and 6 unplaced.
+-- and moving it to the post-hook alone left operators 5 and 6 unplaced (UE4SS
+-- never calls post-hooks on Blueprint functions).
 --
 -- `source` and the deduplicated result line are what make a report decisive
--- about which of those three paths actually did the work.
+-- about which of those two paths actually did the work.
 -- Describes the pool as it stands before this pass touches it. This used to
 -- live in the post-hook, which meant it was never logged at all: UE4SS
 -- registers script hooks with one id for both halves and only calls the
@@ -437,17 +433,23 @@ local function describe_proxies(proxies, proxy_count)
             counts.valid = counts.valid + 1
             local hidden_ok, hidden = pcall(function() return actor:IsHidden() end)
             if hidden_ok and hidden then counts.hidden = counts.hidden + 1 end
+            -- Copies, read now: the pass is about to move these actors. They
+            -- are only turned into text if the line is logged.
             local location = actor_location(actor)
-            positions[#positions + 1] = location ~= nil
-                and string.format("%.0f/%.0f/%.0f", location.X, location.Y, location.Z)
-                or "?/?/?"
+            positions[#positions + 1] = location ~= nil and copy_vector(location) or false
             local scale = actor_scale(actor)
-            scales[#scales + 1] = scale ~= nil
-                and string.format("%.3f/%.3f/%.3f", scale.X, scale.Y, scale.Z)
-                or "?/?/?"
+            scales[#scales + 1] = scale ~= nil and copy_vector(scale) or false
         end
     end
     return counts, positions, scales
+end
+
+local function vectors_text(vectors, format)
+    local text = {}
+    for index, vector in ipairs(vectors) do
+        text[index] = vector and string.format(format, vector.X, vector.Y, vector.Z) or "?/?/?"
+    end
+    return table.concat(text, ",")
 end
 
 local function run_lineup_pass(owner, activity_slots_param, used, source)
@@ -484,8 +486,8 @@ local function run_lineup_pass(owner, activity_slots_param, used, source)
             .. " proxies=" .. tostring(proxy_count)
             .. " valid_proxies=" .. tostring(counts.valid)
             .. " hidden_proxies=" .. tostring(counts.hidden)
-            .. " before_positions=" .. table.concat(positions, ",")
-            .. " before_scales=" .. table.concat(scales, ","))
+            .. " before_positions=" .. vectors_text(positions, "%.0f/%.0f/%.0f")
+            .. " before_scales=" .. vectors_text(scales, "%.3f/%.3f/%.3f"))
     end
 end
 
@@ -513,9 +515,8 @@ local function lineup_prehook(context, activity_slots_param, clear_previous_para
         return
     end
 
-    -- Read the width here and remember it. The pre-hook parameter is the one
-    -- 1.0.4 read successfully on every report; the post-hook's copy is not
-    -- proven, and a width of -1 there would silently skip the whole pass.
+    -- Read the width here and remember it for the deferred pass, which cannot
+    -- read this hook's parameter after the hook returns.
     local used = array_count(activity_slots_param)
     if used >= 0 then lineup_widths[owner_key] = used end
 
@@ -527,8 +528,8 @@ local function lineup_prehook(context, activity_slots_param, clear_previous_para
     run_lineup_pass(owner, activity_slots_snapshot, used, "pre")
 
     -- The Blueprint places the authored slots during the call this hook
-    -- precedes. Running once more on the next tick captures that fresh row
-    -- even if the post-hook never fires or arrives with an unusable parameter.
+    -- precedes. Running once more on the next tick captures that fresh row;
+    -- it stands in for the post-hook, which UE4SS never calls here.
     ExecuteWithDelay(0, function()
         ExecuteInGameThread(function()
             if not valid(owner) then return end
@@ -536,24 +537,6 @@ local function lineup_prehook(context, activity_slots_param, clear_previous_para
                 lineup_widths[owner_key], "deferred")
         end)
     end)
-end
-
--- Post-hook. UE4SS registers script hooks with a single id for both halves
--- and, on the build this mod targets, never calls this one -- a verified run
--- logs source=pre and source=deferred and no source=post. It is kept because
--- it is the correct place for the work and costs nothing when it does not
--- fire; the pre-hook and the deferred tick are what carry the layout.
-local function lineup_posthook(context, activity_slots_param, clear_previous_param)
-    local owner = unwrap(context)
-    if not valid(owner) then return end
-
-    local owner_key = object_key(owner)
-    if lineup_reentry[owner_key] then return end
-
-    -- Fall back to the width the pre-hook read if this parameter is unusable.
-    local used = array_count(activity_slots_param)
-    if used < 1 then used = lineup_widths[owner_key] or 0 end
-    run_lineup_pass(owner, snapshot_array(activity_slots_param, used), used, "post")
 end
 
 local function squad_slot_box()
@@ -567,43 +550,6 @@ local function squad_slot_box()
         end
     end
     return nil
-end
-
--- Read-only. Up to 1.0.6 the mod widened the field of view of every active
--- CameraComponent in the world and logged nothing about it, so the log that
--- was meant to settle a camera report could not: the report of a broken
--- Appearance/Outfits zoom had to be diagnosed from the source instead. This
--- writes nothing and only records what the cameras are. Logged once per tag,
--- so comparing the squad_select line against the customization line says
--- whether the two screens share one camera object or hold their own.
-local function camera_census(tag)
-    if camera_census_reported[tag] then return end
-    local cameras = FindAllOf("CameraComponent")
-    if cameras == nil then return end
-
-    local seen = {}
-    for _, camera in pairs(cameras) do
-        local active_ok, active = pcall(function() return camera:IsActive() end)
-        if active_ok and active and #seen < CAMERA_CENSUS_LIMIT then
-            local read_ok, fov = pcall(function()
-                return unwrap(camera:GetPropertyValue("FieldOfView"))
-            end)
-            -- The short name identifies the rig, the address identifies the
-            -- object; both are needed to tell one rig reused from two rigs
-            -- that happen to be named alike.
-            local name = full_name(camera)
-            local short = string.match(name, "([^%.:/]+)$") or "?"
-            seen[#seen + 1] = short
-                .. "@" .. object_key(camera)
-                .. "=" .. (read_ok and type(fov) == "number"
-                    and string.format("%.1f", fov) or "?")
-        end
-    end
-
-    if #seen < 1 then return end
-    camera_census_reported[tag] = true
-    log("cameras source=" .. tag .. " active=" .. tostring(#seen)
-        .. " " .. table.concat(seen, ","))
 end
 
 local function fit_squad_screen(box)
@@ -635,8 +581,6 @@ local function fit_squad_screen(box)
             end
         end
     end
-
-    camera_census("squad_select")
 end
 
 local function report_slot_widget_state()
@@ -764,10 +708,6 @@ local function register_proxy_hook()
             local ok, first_id = pcall(function()
                 return RegisterHook(GENERATE_PROXIES_FUNCTION, function(context)
                     ensure_proxy_pool(unwrap(context))
-                    -- This is the customization screen opening. Reading the
-                    -- cameras here and at squad select is what will settle
-                    -- whether the two screens share one camera object.
-                    camera_census("customization")
                 end)
             end)
             registered_proxy_hook = ok and first_id ~= nil
@@ -780,16 +720,14 @@ local function register_lineup_hook()
     if not registered_lineup_hook then
         local function_object = StaticFindObject(SHOW_LINEUP_FUNCTION)
         if valid(function_object) then
-            local ok, pre_id, post_id = pcall(function()
-                return RegisterHook(SHOW_LINEUP_FUNCTION, lineup_prehook, lineup_posthook)
+            -- Pre-hook only: UE4SS never calls post-hooks on Blueprint
+            -- functions, so the deferred pass the pre-hook schedules does the
+            -- work that would belong there.
+            local ok, pre_id = pcall(function()
+                return RegisterHook(SHOW_LINEUP_FUNCTION, lineup_prehook)
             end)
-            -- Only the pre-hook id is required. The post-hook is a bonus that
-            -- this UE4SS build never calls, and demanding its id would leave
-            -- maintenance_complete false forever, so the five-second
-            -- maintenance loop would never stop.
             registered_lineup_hook = ok and pre_id ~= nil
-            log("lineup_hook=" .. tostring(registered_lineup_hook)
-                .. " post_hook_id=" .. tostring(post_id ~= nil))
+            log("lineup_hook=" .. tostring(registered_lineup_hook))
         end
     end
 end

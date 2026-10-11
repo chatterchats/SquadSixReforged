@@ -90,8 +90,14 @@ function mock.actor(name, location)
             self.at = {X = landed.X, Y = landed.Y, Z = landed.Z}
             return result
         end,
+        GetActorScale3D = function() return {X = self.scale.X, Y = self.scale.Y, Z = self.scale.Z} end,
+        SetActorScale3D = function(_, scale) self.scale = {X = scale.X, Y = scale.Y, Z = scale.Z} end,
+        IsHidden = function() return self.hidden end,
+        SetActorHiddenInGame = function(_, hidden) self.hidden = hidden end,
     })
     rawset(self, "at", {X = location.X, Y = location.Y, Z = location.Z})
+    rawset(self, "scale", {X = 1, Y = 1, Z = 1})
+    rawset(self, "hidden", false)
     return self
 end
 

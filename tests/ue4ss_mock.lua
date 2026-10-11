@@ -43,11 +43,16 @@ local invalid = setmetatable({}, {__index = function(_, key)
     error("invalid object accessed: " .. key)
 end})
 
+-- A TArray: indexed from 1, and writing one past the end appends, as UE4SS allows.
 function mock.array(items)
     return setmetatable({}, {
         __index = function(_, key)
             if key == "GetArrayNum" then return function() return #items end end
             return items[key]
+        end,
+        __newindex = function(_, key, value)
+            assert(key >= 1 and key <= #items + 1, "array write out of range")
+            items[key] = value
         end,
     })
 end
@@ -77,11 +82,23 @@ mock.game_properties = {
     ["/Script/BitReactorGame.TacticalGameState"] = {"PlayerSquad"},
 }
 
+-- A world that can spawn actors (SpawnActor(class, location, rotation)).
+mock.world = object("World /Game/Maps/Test.Test", {}, {
+    SpawnActor = function(_, class, location)
+        local at = location or {}
+        return mock.actor("Spawned " .. class:GetFullName(), {X = at.X or 0, Y = at.Y or 0, Z = at.Z or 0})
+    end,
+})
+
 -- An actor with a location. `move` decides where a teleport lands and what it returns; by
 -- default the actor goes exactly where it was asked to and the call reports success.
 function mock.actor(name, location)
     local self
+    local class = object("Class " .. name:gsub("%s.*", ""))
     self = object(name, {}, {
+        GetClass = function() return class end,
+        GetWorld = function() return mock.world end,
+        K2_DestroyActor = function() self.destroyed = true end,
         K2_GetActorLocation = function() return {X = self.at.X, Y = self.at.Y, Z = self.at.Z} end,
         K2_GetActorRotation = function() return {Pitch = 0, Yaw = 0, Roll = 0} end,
         K2_SetActorLocationAndRotation = function(_, target)

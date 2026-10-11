@@ -2019,6 +2019,15 @@ return {
     register_relocation_hook = register_relocation_hook,
     register_area_notification = register_area_notification,
     register_placement_triggers = register_placement_triggers,
+    -- The lane geometry, for tests/placement_maps_test.lua, which runs it over every
+    -- deployment area in the game (data/mapscan.json). Not used by the runtime.
+    internals = {
+        PLACEMENT_PROFILES = PLACEMENT_PROFILES,
+        deployment_polygon = deployment_polygon,
+        inside_deployment = inside_deployment,
+        derive_rescue_points = derive_rescue_points,
+        match_placement_profile = match_placement_profile,
+    },
     -- Read-only view of the flags main.lua reports and waits on.
     state = function()
         return {

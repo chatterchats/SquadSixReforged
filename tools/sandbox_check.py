@@ -277,9 +277,21 @@ def parse_spec(spec):
     return name, advance
 
 
+def log_entries(text):
+    """UE4SS.log entries. This game's log doesn't always end an entry with a newline, so entries
+    are split at their "[YYYY-MM-DD hh:mm:ss.fff]" stamps rather than at line ends."""
+    return [entry.strip() for entry in re.split(r"(?=\[20\d\d-\d\d-\d\d \d\d:\d\d:\d\d\.\d+\])", text)
+            if entry.strip()]
+
+
 def probe_summary(records):
-    """Problems among the probe's area checks, and the squad sizes it saw."""
-    lines, squads = [], set()
+    """Problems among the probe's area checks (the latest check of each area), and the squad
+    sizes it saw."""
+    lines, squads, latest = [], set(), {}
+    for record in records:
+        if record.get("type") == "area":
+            latest[record.get("key")] = record
+    records = [r for r in records if r.get("type") != "area"] + list(latest.values())
     for record in records:
         if record.get("type") == "squad":
             squads.add(len(record.get("members", [])))
@@ -405,7 +417,7 @@ def cmd_check(args):
             stopped = stopped or "crash"
 
         text, _ = read_from(instance.ue4ss_log, log_offset)
-        ours = [line.strip() for line in text.splitlines() if any(tag in line for tag in TAGS)]
+        ours = [entry for entry in log_entries(text) if any(tag in entry for tag in TAGS)]
         probe_text, _ = read_from(probe_results, probe_offset)
         records = []
         for line in probe_text.splitlines():
@@ -416,9 +428,11 @@ def cmd_check(args):
         lines, squads = probe_summary(records)
         section.append("- squad sizes the probe saw: %s" % (", ".join(map(str, sorted(squads))) or "none"))
         section += ["", "Probe:", ""] + (lines or ["  (no area checks)"])
-        key = [l for l in ours if re.search(r"selfcheck|status version|player_destinations|placement_rescue|"
-                                              r"placement_repair|placement_final|deployment_state|limits|"
-                                              r"WARNING|ERROR|manual_rescue", l)]
+        key = [l for l in ours if "[ZCOM_SQUAD_SIX]" in l and re.search(
+            r"selfcheck|status version|player_destinations|placement_rescue|placement_trigger|"
+            r"placement_repair|placement_final|deployment_state|limits|WARNING|ERROR|manual_rescue", l)]
+        if not any("placement_trigger" in l for l in key):
+            section.append("- no combat preparation in this window (story missions start in exploration)")
         section += ["", "Squad Six:", "", "```"] + (key or ["(no lines)"]) + ["```", ""]
         (out / ("%s.log" % name)).write_text("\n".join(ours) + "\n")
         report += section

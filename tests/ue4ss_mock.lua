@@ -4,7 +4,7 @@
 --   mock.install({missing = {[path] = true}, properties = {[owner] = {...}}})
 --   mock.load(scripts_dir)      -- runs main.lua
 --   mock.run_until(ms)          -- fires delayed actions due by then (simulated time)
---   mock.notify(class_path)     -- constructs an object of that class (NotifyOnNewObject)
+--   mock.notify(class_path[, o]) -- constructs an object of that class, or announces o (NotifyOnNewObject)
 --   mock.hooks[path].pre(...)   -- calls a registered hook; mock.commands[name]() a console command
 --   mock.actor(name, location)  -- an actor that can be moved; mock.first_of[class] = object
 --   mock.transcript             -- log lines and registrations, in order
@@ -203,9 +203,9 @@ function mock.run_loops(times)
     return stopped
 end
 
-function mock.notify(class)
+function mock.notify(class, constructed)
     for _, callback in ipairs(notifications[class] or {}) do
-        callback(object(class))
+        callback(constructed or object(class))
     end
 end
 

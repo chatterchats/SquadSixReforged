@@ -1,21 +1,26 @@
--- Squad Six probe v0.1.0: a development tool, never shipped (it lives outside src/).
+-- Squad Six probe v0.2.0: a development tool, never shipped (it lives outside src/).
 --
 -- In a mission it checks, against the game's own data, the spots Squad Six would put operators 5
 -- and 6 on, and records how a deployment unfolds:
 --   - every deployment area's authored destinations (a control: these are known-good), the
 --     fallback spots placement.lua derives for its lane, and any destinations the runtime adds,
---     each checked against the tactical grid (AutoGridVolume), the navmesh, and a floor trace;
+--     each checked against the navmesh and a floor trace;
 --   - where the squad's operators stand during the first seconds of the mission (the staging
 --     positions the relocation starts from);
---   - a timeline of when areas, grid volumes, destinations and squad members appear.
+--   - a timeline of when areas, destinations and squad members appear.
+-- It runs while missions load, so it keeps object searches rare: deployment areas are searched for
+-- every AREA_SCAN_SECONDS, and the squad is read from the mission's own game state. (0.1.0 also
+-- searched for grid volumes, once per destination every second; no mission ever had one.)
 -- Read-only: it registers no hooks (only one mod's hook on a Blueprint function survives, so it
 -- must not compete with Squad Six's) and writes nothing to the game. Output goes to UE4SS.log,
 -- squadsix_probe.log and squadsix_probe.jsonl in the mod folder. `squadsixprobe` in the UE4SS
 -- console checks every area immediately.
-local VERSION = "0.1.0"
+local VERSION = "0.2.0"
 local TAG = "[SQUADSIX_PROBE]"
 local WATCH_INTERVAL_MS = 1000
 local WATCH_SECONDS = 120          -- per mission
+local AREA_SCAN_SECONDS = 5        -- how often to search for deployment areas
+local CHECK_AFTER_SECONDS = 10     -- an area's spots are checked this long after it appears
 local STAGING_SECONDS = 30         -- how long squad positions are recorded
 local MOVED = 50                   -- uu; smaller position changes aren't logged again
 local TRACE_ABOVE, TRACE_BELOW = 300, 1000
@@ -105,28 +110,6 @@ end
 ------------------------------------------------------------------------------------------------
 -- The game's answers about one point (at floor level).
 
-local function grid_check(point)
-    local volumes = FindAllOf("AutoGridVolume")
-    if volumes == nil then return {grid = "no_volume"} end
-    local answered = false
-    for _, volume in pairs(volumes) do
-        local index_ok, index = pcall(function() return volume:GetGridIndex(point) end)
-        if index_ok and type(index) == "number" then
-            answered = true
-            local valid_ok, is_valid = pcall(function() return volume:IsValidGridIndex(index) end)
-            if valid_ok and is_valid == true then
-                local tile_ok, tile = pcall(function() return volume:GetGridLocation(index) end)
-                if tile_ok and tile ~= nil and type(tile.X) == "number" then
-                    return {grid = "tile", tile = vector(tile),
-                            tile_dxy = math.sqrt((tile.X - point.X) ^ 2 + (tile.Y - point.Y) ^ 2),
-                            tile_dz = tile.Z - point.Z}
-                end
-            end
-        end
-    end
-    return {grid = answered and "none" or "unchecked"}
-end
-
 local function nav_check(context, point)
     local navigation = StaticFindObject("/Script/NavigationSystem.Default__NavigationSystemV1")
     if not valid(navigation) then return {nav = "unchecked"} end
@@ -165,7 +148,7 @@ end
 
 local function check_point(context, label, point)
     local result = {label = label, point = vector(point)}
-    for _, part in ipairs({grid_check(point), nav_check(context, point), floor_check(context, point)}) do
+    for _, part in ipairs({nav_check(context, point), floor_check(context, point)}) do
         for key, value in pairs(part) do result[key] = value end
     end
     return result
@@ -173,11 +156,6 @@ end
 
 local function describe(result)
     local parts = {result.label .. " " .. xyz(result.point)}
-    if result.grid == "tile" then
-        parts[#parts + 1] = "tile d=" .. whole(result.tile_dxy) .. " dz=" .. whole(result.tile_dz)
-    else
-        parts[#parts + 1] = "tile=" .. result.grid
-    end
     parts[#parts + 1] = "nav=" .. result.nav .. (result.nav_d and " d=" .. whole(result.nav_d) or "")
     parts[#parts + 1] = "floor=" .. result.floor .. (result.floor_dz and " dz=" .. whole(result.floor_dz) or "")
     return table.concat(parts, " ")
@@ -200,14 +178,6 @@ local function destinations_of(area)
     return points
 end
 
--- Does the grid know this area yet? True once any authored destination is on a valid tile.
-local function grid_ready(authored)
-    for _, point in ipairs(authored) do
-        if grid_check(point).grid == "tile" then return true end
-    end
-    return false
-end
-
 local function check_area(state, reason)
     local area = state.area
     if not valid(area) then return end
@@ -217,10 +187,9 @@ local function check_area(state, reason)
     local function add(kind, label, point)
         local result = check_point(area, label, point)
         table.insert(results[kind], result)
-        counts[kind] = counts[kind] or {total = 0, tile = 0, nav = 0, floor = 0}
+        counts[kind] = counts[kind] or {total = 0, nav = 0, floor = 0}
         local c = counts[kind]
         c.total = c.total + 1
-        if result.grid == "tile" then c.tile = c.tile + 1 end
         if result.nav == "ok" then c.nav = c.nav + 1 end
         if result.floor_dz and math.abs(result.floor_dz) <= 50 then c.floor = c.floor + 1 end
         log("    " .. kind .. " " .. describe(result))
@@ -244,8 +213,8 @@ local function check_area(state, reason)
     for _, kind in ipairs({"authored", "derived", "added"}) do
         local c = counts[kind]
         if c then
-            summary[#summary + 1] = string.format("%s %d: tile %d, nav %d, floor within 50 uu %d",
-                kind, c.total, c.tile, c.nav, c.floor)
+            summary[#summary + 1] = string.format("%s %d: nav %d, floor within 50 uu %d",
+                kind, c.total, c.nav, c.floor)
         end
     end
     log("    summary: " .. table.concat(summary, "; "))
@@ -254,7 +223,7 @@ local function check_area(state, reason)
 end
 
 local function squad_members()
-    local state = FindFirstOf("TacticalGameState")
+    local state = session.game_state
     if not valid(state) then return {} end
     local squad_ok, squad = pcall(function() return unwrap(state:GetPropertyValue("PlayerSquad")) end)
     if not squad_ok or not valid(squad) then return {} end
@@ -303,24 +272,27 @@ local function tick()
     session.elapsed = session.elapsed + WATCH_INTERVAL_MS / 1000
     local final = session.elapsed >= WATCH_SECONDS
 
-    local areas = FindAllOf("BP_CombatPreparationArea_C") or {}
-    local volumes = FindAllOf("AutoGridVolume") or {}
-    local area_count, volume_count = 0, 0
-    for _ in pairs(areas) do area_count = area_count + 1 end
-    for _ in pairs(volumes) do volume_count = volume_count + 1 end
-    if area_count ~= session.area_count or volume_count ~= session.volume_count then
-        session.area_count, session.volume_count = area_count, volume_count
-        log(string.format("timeline t=%ds areas=%d grid_volumes=%d", session.elapsed, area_count, volume_count))
+    if session.elapsed >= session.next_scan or final then
+        session.next_scan = session.elapsed + AREA_SCAN_SECONDS
+        local found = {}
+        for _, area in pairs(FindAllOf("BP_CombatPreparationArea_C") or {}) do
+            if valid(area) then found[#found + 1] = area end
+        end
+        if #found ~= #session.found then
+            log(string.format("timeline t=%ds areas=%d", session.elapsed, #found))
+        end
+        session.found = found
     end
 
-    for _, area in pairs(areas) do
+    for _, area in ipairs(session.found) do
         if valid(area) then
             local key = area_key(area)
             local state = session.areas[key]
             local points = destinations_of(area)
             if state == nil and points ~= nil and #points > 0 then
                 -- First sight, before combat preparation: these are the authored destinations.
-                state = {key = key, area = area, authored = points, added = {}, checked = false}
+                state = {key = key, area = area, authored = points, added = {}, checked = false,
+                         seen = session.elapsed}
                 session.areas[key] = state
                 log(string.format("timeline t=%ds area %s destinations=%d", session.elapsed, key, #points))
             elseif state ~= nil and points ~= nil and #points > #state.authored + #state.added then
@@ -333,9 +305,10 @@ local function tick()
             end
             if state ~= nil then
                 state.area = area
-                if not state.checked and (grid_ready(state.authored) or final) then
+                -- Give the navmesh time to stream in with the level before asking it.
+                if not state.checked and (session.elapsed - state.seen >= CHECK_AFTER_SECONDS or final) then
                     state.checked = true
-                    check_area(state, final and "timeout_no_grid" or "grid_ready")
+                    check_area(state, "settled")
                 end
             end
         end
@@ -349,8 +322,8 @@ local function tick()
 end
 
 local function start_session(game_state)
-    session = {mission = full_name(game_state), elapsed = 0, areas = {}, positions = {},
-               area_count = -1, volume_count = -1}
+    session = {mission = full_name(game_state), game_state = game_state, elapsed = 0, areas = {},
+               positions = {}, found = {}, next_scan = 0}
     log("mission start: " .. session.mission)
     local current = session
     LoopAsync(WATCH_INTERVAL_MS, function()
@@ -390,7 +363,8 @@ RegisterConsoleCommandHandler("squadsixprobe", function()
         if state == nil then
             local points = destinations_of(area)
             if points ~= nil and #points > 0 then
-                state = {key = key, area = area, authored = points, added = {}, checked = false}
+                state = {key = key, area = area, authored = points, added = {}, checked = false,
+                         seen = session.elapsed}
                 session.areas[key] = state
             end
         end

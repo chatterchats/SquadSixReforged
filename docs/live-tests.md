@@ -149,6 +149,21 @@ stand close but on separate tiles. The probe's checks after the rescue said the 
 no navmesh nearby, against Squad Six's check just before: the navmesh appears to be cut around
 standing units, so, like the floor trace, the probe's checks of occupied spots can't be trusted.
 
+## MM_05_030_BellyBeast ("Unfinished Business"), six (bdda677, 2026-10-12)
+
+From the user's campaign (reached normally). Squad Expansion keeps this mission at four.
+
+The probe at 11 s: both areas flat; all authored and derived spots on the navmesh.
+
+| Encounter | Result |
+|-----------|--------|
+| 1 (area C_0) | Tel Rea and Trick still standing at the start, ~1,300 uu back, while the rest walked: moved onto the derived spots, `floor_settled=2/2`. The relocation reshuffled (Trick to an authored spot, Luco onto the derived one Trick left). All six distinct, nothing restored |
+| 2 (area C_1, ~62,000 uu away) | two overflow operators moved onto the derived spots, `floor_settled=2/2`. One operator was still ~58,000 uu back at the trigger (`outside_volume`): the watchdog put them on the lane at 3.5 s and 5 s, and both times they were back on their route 1.5 s later, further along; then `outside_volume:exhausted`. At 20 s they stood on an authored spot (the game placed them). The user saw nothing wrong |
+
+The second area seems to be reached by something scripted that overrides teleports, and the game
+places stragglers itself. Squad Six's two teleports there were wasted. If another map shows the
+same, operators that far away (say more than 20,000 uu) could be left to the game.
+
 ## Squad select (12ffd3a, 2026-10-11)
 
 All six models show in the lineup: `proxies=6 valid_proxies=6 hidden_proxies=0`, layout applied

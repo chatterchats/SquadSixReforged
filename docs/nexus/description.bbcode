@@ -1,0 +1,114 @@
+[b]Squad Six Reforged[/b] lets you take [b]six operators[/b] into a mission instead of four.
+
+It continues [url=https://www.nexusmods.com/starwarszerocompany/mods/44][b]Squad Six[/b][/url] by [b]arctco[/b], who created the mod, discontinued it, and allowed others to carry it on with credit. Most of the mod is still arctco's work, including the manual testing and the hand-picked list of missions that can safely take six. See [b]Credits[/b] below.
+
+[heading]What It Does[/heading]
+[list]
+[*][b]Squad select holds six[/b]: six slots, all six operators in the lineup, and six nameplates.[/*]
+[*][b]Missions take six[/b] wherever the game can handle it.[/*]
+[*][b]Operators 5 and 6 are placed properly.[/b] The game only marks four deployment spots per encounter. Squad Six Reforged adds two more inside the deployment area and on the floor, and moves the extra operators there if the game leaves them stuck or outside it.[/*]
+[*]It doesn't change classes, progression, abilities, equipment, enemies or your saves.[/*]
+[/list]
+
+[heading]What's New Since Squad Six 1.1.4[/heading]
+[list]
+[*][b]No more floating or sunken spots.[/b] Added deployment spots now sit on the floor under them, even where the authored spots are at different heights, such as staircases.[/*]
+[*][b]No more spots inside scenery.[/b] A spot with no floor under it (Dark Waters had one under a prop, and The Infinite Coil's staircase had the one behind the old "operator in a crate" report) is skipped for the next one.[/*]
+[*][b]Narrow deployment areas fit six.[/b] On a few Lothal maps and a crisis mission, operators 5 and 6 could be left outside the area. Squad Six Reforged now finds room for them.[/*]
+[*][b]Stuck at the start.[/b] On some maps (Retake Luunata, Brentaal, Coil Strikes Back, The Infinite Coil), an extra operator can start somewhere it can't walk from. It's now moved beside a squadmate when the mission starts.[/*]
+[*][b]Less fighting the game.[/b] An operator who crosses a squadmate's spot while walking in is no longer teleported, and a normal squad of four is left entirely to the game.[/*]
+[*][b]The Serolonis Job[/b] (the opening tutorial, where the game picks the squad) keeps its four.[/*]
+[*][b]Self-check after game updates[/b]: the log says whether everything the mod relies on is still in the game.[/*]
+[*][b]Vortex support[/b], and a download that installs by hand with one extract.[/*]
+[/list]
+
+[heading]Tested[/heading]
+Played at six on game build [b]25134257[/b]: Retake Luunata, Dark Waters, Unfinished Business, The Infinite Coil (the finale), a crisis mission and a range of skirmishes, plus hero missions at their usual four. Not every mission has been played at six yet. If one goes wrong, please report it (see [b]Troubleshooting[/b]).
+
+[heading]Missions That Stay at Four[/heading]
+These missions bring story characters in through their own scripting. Deploying six would duplicate operators or stop the mission from saving, so they keep their usual four:
+[list]
+[*]The Serolonis Job (the opening tutorial)[/*]
+[*]Smugglers' Den[/*]
+[*]Buy Cheap, Never Sleep; Best Served Cold; Origin of Infection; Sisters; No Kings, No Masters; Rescue Jae Mordant[/*]
+[*]Five more hero missions, by mission ID: HM_Cly_020, HM_Jae_010, HM_Kabb_020, HM_Luco_010 and HM_Trick_010[/*]
+[/list]
+
+[heading]Requirements[/heading]
+[list]
+[*][b]Star Wars: Zero Company[/b][/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/9]UE4SS for Star Wars Zero Company[/url][/*]
+[/list]
+
+[heading]Compatibility[/heading]
+Don't use it together with another squad-size mod, such as arctco's original [b]Squad Six[/b] or [b]Squad Expansion[/b]: they change the same things. Squad Six Reforged writes a warning to the log if it finds one of them installed.
+
+[heading]Switching From Squad Six[/heading]
+Squad Six Reforged is a separate mod, so mod managers won't replace the original for you. Remove Squad Six first: in your mod manager, or by hand, delete the [b]ZCOMSquadSix[/b] folder in [b]ue4ss/Mods[/b] and the [b]pakchunk99-ZCOMSquadSix_P.pak[/b], [b].ucas[/b] and [b].utoc[/b] files in [b]Content/Paks/~mods[/b]. Neither mod stores anything in your saves, so your campaigns carry over.
+
+[heading]Installation[/heading]
+The download contains [b]SquadSixReforged[/b] (the UE4SS mod) and [b]SquadSixReforged_Core[/b] (its pak files). [b]Install both[/b]; each needs the other.
+
+[b]Mod manager[/b]
+Install the ZIP with any of these:
+[list]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/29]Zero Mod Manager[/url]: choose [b]Install all components[/b].[/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/121]Zero Company Mod Command[/url]: it adds Squad Six Reforged and Squad Six Reforged - Core as two entries.[/*]
+[*][b]Vortex[/b]: install it like any other mod; both parts are deployed together.[/*]
+[/list]
+Make sure both are enabled.
+
+[b]Manual installation[/b]
+Install UE4SS first, then close the game. The ZIP mirrors the game's folders, so extract it into the folder below (the one holding [b]Binaries[/b] and [b]Content[/b]) and merge folders:
+[code]SWZeroCompany/[/code]
+That puts [b]SquadSixReforged[/b] in [b]Binaries/Win64/ue4ss/Mods/[/b] and [b]SquadSixReforged_Core[/b] in [b]Content/Paks/~mods/[/b].
+
+The package includes [b]enabled.txt[/b]. If your UE4SS setup doesn't pick it up, add this line to [b]ue4ss/Mods/mods.txt[/b]:
+[code]SquadSixReforged : 1[/code]
+[b]Updating:[/b] close the game first, then install the new ZIP the same way.
+
+[b]Uninstalling[/b]
+Disable or remove both parts in your mod manager. For a manual uninstall, delete the [b]SquadSixReforged[/b] folder in [b]ue4ss/Mods[/b] and the [b]SquadSixReforged_Core[/b] folder in [b]Content/Paks/~mods[/b]. Finish or abandon any mission in progress first: a mission saved with six operators expects the mod.
+
+[heading]Known Issues[/heading]
+[list]
+[*]Restart the game after installing or updating. Don't use UE4SS's "Reload All Mods".[/*]
+[*]When an encounter starts, you may see operators 5 or 6 jump into place. That's the mod putting them on their spots.[/*]
+[*]If an operator still ends up somewhere it can't move from, open the UE4SS console and enter [b]squadsixrescue[/b]. It moves stuck operators back into the deployment area.[/*]
+[/list]
+
+[heading]Troubleshooting[/heading]
+If something goes wrong, please include:
+[list]
+[*]The mission name and what happened[/*]
+[*]Your game build and UE4SS version[/*]
+[*]Your other installed mods[/*]
+[*][code]UE4SS.log[/code] (in [b]Binaries/Win64/ue4ss[/b]). Squad Six Reforged's lines start with [b][SQUAD_SIX_REFORGED][/b].[/*]
+[/list]
+After a game update, the log's [b]selfcheck[/b] lines list anything the mod can no longer find. The log records technical details, including folder paths on your PC, so you can look it over before sharing.
+
+[heading]Source Code and Issue Reports[/heading]
+You can find the source and technical docs on [url=https://github.com/chatterchats/SquadSixReforged]GitHub[/url]. Report problems there or in the Bugs tab here on Nexus.
+
+[heading]Credits[/heading]
+[list]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/44][b]arctco[/b][/url] — created Squad Six: the six-slot squad selection and lineup, the deployment placement, the mission overrides, and the manual testing and hand-picked mission list behind them. Squad Six Reforged is built on their work, with their permission.[/*]
+[*][b]MortisVenunum[/b], [b]Tesel[/b] and [b]FoxFlight[/b] — reported the Squad Six bugs that shaped which missions stay at four.[/*]
+[/list]
+
+[heading]Check Out My Other Mods[/heading]
+[list]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/315]Off Duty[/url] — Operators get tired from back-to-back missions and recover while off duty, so the rest of your company gets a turn.[/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/154]Fast Resonance[/url] — Speeds up the Coil's ability presentations, with one speed setting and a switch for each ability.[/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/335]Skip Space Travel[/url] — Skips the ship-travel cutscenes before and after every mission.[/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/176]Character Share[/url] — Share custom characters and Astromechs using copy-and-paste codes in the Character Databank.[/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/209]Enhanced Databank[/url] — Sort your custom characters and Astromechs into folders you can create, rename and delete.[/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/314]Colors+[/url] — Choose colors beyond the preset swatches, with a live preview in the character creator, barracks and armory.[/*]
+[/list]
+
+[heading]Shout-outs[/heading]
+[list]
+[*][url=https://forums.nexusmods.com/profile/1661783-gugarion/]Gugarion[/url] and the [url=https://discord.gg/qpBkjjKSRp][b]ZCom Modding Discord[/b][/url] — thanks for the testing, advice and help figuring out how this game works.[/*]
+[*]The [url=https://github.com/UE4SS-RE/RE-UE4SS][b]UE4SS-RE team[/b][/url] — for the tools Squad Six Reforged is built on.[/*]
+[*][url=https://www.nexusmods.com/profile/Vercadi]Vercadi[/url] — for maintaining the [url=https://www.nexusmods.com/starwarszerocompany/mods/9]UE4SS build for Star Wars Zero Company[/url].[/*]
+[/list]

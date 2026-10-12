@@ -33,8 +33,11 @@ Six gets through, but roughly. Not guarded at four for now: the start and area 3
 placement work, not a reason to cap the mission.
 
 The bellhop soft-lock happens at both sizes, so it isn't squad size. Squad Six never touches
-interactables; likely the Den launch (the station spawns its NPC under
-`Consequence.Characters.Bellhop`) or another mod. Bypass: call
+interactables. Every run so far used the sandbox's `kill foes` in the first encounter, so a run
+fought normally is still needed. Ruled out: the Den launch (it also happens launched from the
+mission board through squad select) and the first encounter's blocking volumes (still enabled at
+the droid, but `DisableBlockingVolumes` doesn't help). The droid's `Interactable.bAllowInteractions`
+is False; the native default is true. Bypass: call
 `BP_TacticalObjective_PlayConversation_C_1:HandleStationActivityCompleted(BP_NarrativeStation_Mission_C_1)`
 (both in `MM_04_030_RetakeLuunata_Gameplay`); objective 050 (move to the lift) activates next.
 `SetStationDialogueEnabled(true)` and setting the flag directly don't help.

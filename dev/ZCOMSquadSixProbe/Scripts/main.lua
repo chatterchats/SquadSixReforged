@@ -298,7 +298,8 @@ local function watch_squad()
 end
 
 local function tick()
-    if session == nil then return end
+    -- Ticks already queued on the game thread when the watch finished must not run it again.
+    if session == nil or session.done then return end
     session.elapsed = session.elapsed + WATCH_INTERVAL_MS / 1000
     local final = session.elapsed >= WATCH_SECONDS
 

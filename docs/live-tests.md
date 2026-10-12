@@ -95,14 +95,25 @@ sandbox campaign), not Squad Six or squad size.
 
 | Mission | Result |
 |---------|--------|
-| MM_04_030_RetakeLuunata (twice) | start: the operator on the off-navmesh spawn (159338/-576078) moved, as before; area 0: `floor_settled=2/2`, one `outside_volume` restore in the first run (then drifted ~330 uu to an authored spot, as in the board run), none in the second |
+| MM_04_030_RetakeLuunata (twice) | start: the operator on the off-navmesh spawn (159338/-576078) moved, as before; area 0: `floor_settled=2/2`, one `outside_volume` restore in the first run (then drifted ~330 uu to an authored spot, as in the board run), none in the second. The second run was played to the end, all four encounters (below) |
 | SK_Brentaal_035 | `spawn_rescue=moved` twice at 7 s (BR-1 from -2863/599, the custom operator from -3061/718: the two rearmost spawns), `on_navmesh=4` |
 | MM_04_010_CoilStrikesBack | `spawn_rescue=moved` twice at 7 s (-12489/8185, -12573/8403), `on_navmesh=4`; the first one walked afterwards |
 | SK_Mapuzo_020 | deployment: two operators moved onto the lane, one restored at rung2000, which the game's relocation then walked ~850 uu to another spot (`placement_drift`); all six distinct |
 | SK_Vandor_020 | no spawn rescue |
 | HM_Cly_010, HM_Luco_010 | four operators, nothing done |
 
-Self-check: startup 23/23, squad_select 2/2, mission 3/3. No crashes.
+Retake Luunata, the second run, played through:
+
+| Encounter | Result |
+|-----------|--------|
+| 1 (area 0) | two operators moved onto the lane, `largest_shift=-4`; no restore |
+| Bellhop | talks |
+| 2 (lower level) | `floor_settled=2/2 largest_shift=-162`; no origin relocation, no restore, no drift |
+| 3 | destinations 4 → 6 already on the floor (`largest_shift=0`); one operator on a squadmate's tile while staged, left to the game, which separated them; no moves |
+| 4 (Z ~56600) | destinations 4 → 6, `largest_shift=-0`; operators off the lane while walking in, none restored; `placement_final near=6` |
+| End | mission complete; the user saw everyone placed properly |
+
+Self-check: startup 23/23, squad_select 2/2, mission 3/3. No crashes, no Squad Six errors.
 
 The spawn watch acts on more maps than Retake: on Brentaal 035 and Coil Strikes Back two of six
 operators started off the navmesh. Not yet checked whether they could have walked from there.

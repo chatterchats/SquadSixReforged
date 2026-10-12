@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Adopted from arctco, the original author, after they discontinued the mod. The runtime's code is
-unchanged from 1.1.4, now split across modules. The Core container is now built from the game's own packages by
-`tools/build_core.py`, from the squad limits in `data/missions.tsv`.
+Adopted from arctco, the original author, after they discontinued the mod. The runtime is now
+split across modules, with the placement fixes below. The Core container is now built from the
+game's own packages by `tools/build_core.py`, from the squad limits in `data/missions.tsv`.
 
 ### Added
 
@@ -32,6 +32,23 @@ unchanged from 1.1.4, now split across modules. The Core container is now built 
   SK_Lothal_050 and OM_Crisis_Guardian_A. The fallback now
   also tries points between pairs of authored destinations when the lane's edges can't hold
   everyone. Other maps are unchanged.
+- Retake Luunata (MM_04_030) at six (see `docs/live-tests.md`):
+  - one of the game's start spots for operators 5 and 6 has no navmesh, so the operator on it
+    couldn't move. Until the first deployment, an operator standing still off the navmesh while
+    the rest of the squad is on it is moved beside a squadmate (squads over four only);
+  - on the lower level the derived spots were 105–155 uu above the floor, and the game's
+    relocation sent two operators to the world origin. Derived spots are now put on the navmesh
+    under them;
+  - operators put back by the repair then walked away: a teleport doesn't cancel the walk the game
+    gave them. Every rescue and repair teleport now stops the operator's movement, and operators
+    who drift more than 300 uu from where they were put are logged (`placement_drift`).
+- A squad of four on an area with four destinations was still repaired while it walked in, and one
+  operator teleported. A stock squad is now left to the game (`placement_repair=skipped
+  reason=stock_squad`), and an operator crossing a squadmate's tile isn't moved until it stops.
+- A derived spot with no navmesh under it was used anyway: in Dark Waters (MM_02_030) one sat
+  under a prop, and the operator only reached the floor because the game walked them off it.
+  Such spots are now skipped for the next candidate (`off_navmesh_skipped=` in the log), whenever
+  the navmesh answers under the area's authored destinations.
 - `squadsixrescue` could leave an operator stranded. When placing two stuck operators on their
   squadmates failed because the engine accepted a teleport but put the operator somewhere else,
   the command undid the first move but left that operator wherever it landed. Both are now put
@@ -66,7 +83,8 @@ unchanged from 1.1.4, now split across modules. The Core container is now built 
   `lineup.lua`, `placement.lua` and `common.lua`. The code is moved unchanged; 1.1.4's single file
   had reached Lua's limit of 200 top-level locals, so any addition would have stopped it loading.
 
-Not yet tested in game.
+Tested in game on Retake Luunata, Dark Waters and several skirmishes at six; see
+`docs/live-tests.md`.
 
 ## [1.1.4] - 2026-09-03
 

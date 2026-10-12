@@ -43,7 +43,9 @@ geometry shows up as a diff of that file; regenerate it with `placement_maps_tes
 SK_Lothal_035's destinations range from Z 7 to 150, so its points' heights are interpolated across
 that rise; in game its derived spot came out about 117 uu above the floor. In game the runtime now
 puts derived points on the navmesh under them (`settle_on_floor`), so the interpolated heights in
-the golden file are only what it falls back to without a navmesh. (SerolonisJob area 1, a corridor about 28 uu wide, now gets two
+the golden file are only what it falls back to without a navmesh. Likewise, in game a derived point
+with no navmesh under it is skipped for another candidate, once the navmesh answers under the
+authored destinations; the test has no navmesh, so the golden file is unaffected. (SerolonisJob area 1, a corridor about 28 uu wide, now gets two
 points 101 uu apart, but the mission keeps four operators, so they aren't used.)
 
 Some maps author two destinations closer than a tile (both Bespin lanes repeat a point exactly,

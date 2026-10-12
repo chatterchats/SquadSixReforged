@@ -136,10 +136,11 @@ The probe's spot checks, 11 s in:
 | 2 (area C_1) | overflow operators ~1,500 uu back and up to 560 uu higher moved onto the derived spots, `floor_settled=2/2`; nothing restored |
 | End | mission complete, no errors |
 
-**Gap:** a derived point the navmesh doesn't cover is still used (at its interpolated height). Here
-the game's relocation recovered; elsewhere it might send the operator to the origin, as Retake's
-floating spots did. Derived points that fail the navmesh projection should be skipped in favour of
-another candidate.
+**Gap, fixed since:** a derived point the navmesh doesn't cover was still used (at its interpolated
+height). Here the game's relocation recovered; elsewhere it might send the operator to the origin,
+as Retake's floating spots did. Derived points with no navmesh under them are now skipped for the
+next candidate (`off_navmesh_skipped=`), covered by `tests/live_fixes_test.lua`. Not yet rerun in
+game.
 
 ## Squad select (12ffd3a, 2026-10-11)
 

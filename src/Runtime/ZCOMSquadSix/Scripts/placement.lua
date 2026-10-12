@@ -539,6 +539,27 @@ local function settle_on_floor(context, points, units)
     return settled, largest
 end
 
+-- A test for derived points: is there navmesh under the floor they assume?
+-- In Dark Waters one derived point sat under a prop with no navmesh; the
+-- operator rescued onto it only reached the floor because the game's
+-- relocation walked them off it. nil, so no test, when the navmesh answers
+-- under none of the authored destinations: then it isn't loaded here, or the
+-- call can't be made, and a missing answer proves nothing.
+local function walkable_test(context, destinations)
+    local answered = false
+    for _, destination in ipairs(destinations) do
+        if navigation_floor(context, destination) ~= nil then
+            answered = true
+            break
+        end
+    end
+    if not answered then return nil end
+    return function(point)
+        return navigation_floor(context,
+            {X = point.X, Y = point.Y, Z = point.Z - (point.lift or 0)}) ~= nil
+    end
+end
+
 -- Cancel the walk the game gave an operator. A teleport moves the actor but
 -- not its controller's path: in Retake Luunata two operators the watchdog put
 -- back on the lane then walked about 3,500 uu to wherever the relocation had
@@ -708,8 +729,18 @@ end
 -- destinations also gets points between pairs of destinations
 -- (RESCUE.pair_fractions), chosen by spread_points. Lanes the edge points
 -- already serve get exactly the edge points, as before.
-local function derive_rescue_points(polygon, destinations, units, wanted, ignore_units)
-    if polygon == nil or wanted < 1 then return {} end
+--
+-- `walkable` (from walkable_test) drops candidates with no navmesh under them,
+-- so the pair points can stand in. Returns the points and how many candidates
+-- it dropped.
+local function derive_rescue_points(polygon, destinations, units, wanted, ignore_units, walkable)
+    if polygon == nil or wanted < 1 then return {}, 0 end
+    local unwalkable = 0
+    local function walkable_point(point)
+        if walkable == nil or walkable(point) then return true end
+        unwalkable = unwalkable + 1
+        return false
+    end
 
     local cx, cy = 0, 0
     for _, corner in ipairs(polygon) do cx, cy = cx + corner.X, cy + corner.Y end
@@ -770,7 +801,7 @@ local function derive_rescue_points(polygon, destinations, units, wanted, ignore
             point.Z = ((first.Z or 0) + (second.Z or 0)) / 2 + offset
             point.lift = offset
             point.clearance = clearance
-            candidates[#candidates + 1] = point
+            if walkable_point(point) then candidates[#candidates + 1] = point end
         end
     end
 
@@ -799,7 +830,7 @@ local function derive_rescue_points(polygon, destinations, units, wanted, ignore
 
     -- Narrow lanes: enough for the operators past the authored destinations?
     local needed = math.min(wanted, TARGET_SIZE - #destinations)
-    if #chosen >= needed then return chosen end
+    if #chosen >= needed then return chosen, unwalkable end
     local pool = {}
     for _, point in ipairs(candidates) do pool[#pool + 1] = point end
     for i = 1, #destinations do
@@ -817,15 +848,15 @@ local function derive_rescue_points(polygon, destinations, units, wanted, ignore
                         point.Z = (first.Z or 0) + rise * fraction + offset
                         point.lift = offset
                         point.clearance = clearance
-                        pool[#pool + 1] = point
+                        if walkable_point(point) then pool[#pool + 1] = point end
                     end
                 end
             end
         end
     end
     local spread = spread_points(pool, wanted)
-    if #spread > #chosen then return spread end
-    return chosen
+    if #spread > #chosen then return spread, unwalkable end
+    return chosen, unwalkable
 end
 
 -- A rescue point in the profile's own coordinates, drawn in towards the
@@ -1030,10 +1061,16 @@ local function rescue_known_staging(destinations, volume)
                 transform, inset_rescue(profile, rescue))
         end
     else
-        targets = derive_rescue_points(polygon, authored, units, missing)
-        local settled, shift = settle_on_floor(destinations[1].actor, targets, units)
+        local context = destinations[1].actor
+        local unwalkable
+        targets, unwalkable = derive_rescue_points(polygon, authored, units, missing, false,
+            walkable_test(context, authored))
+        local settled, shift = settle_on_floor(context, targets, units)
         floor_note = string.format(" floor_settled=%d/%d largest_shift=%.0f",
             settled, #targets, shift)
+        if unwalkable > 0 then
+            floor_note = floor_note .. " off_navmesh_skipped=" .. unwalkable
+        end
     end
     if #targets < 1 then return 0 end
 
@@ -1297,7 +1334,7 @@ local function repair_stranded_units(area, via, hard_only, ignore_budget)
             local lane, authored = authored_shape()
             if lane ~= nil then
                 lane_pool = derive_rescue_points(
-                    lane, authored, units, #units, true)
+                    lane, authored, units, #units, true, walkable_test(area, authored))
                 settle_on_floor(area, lane_pool, units)
             end
         end
@@ -1653,12 +1690,13 @@ local function ensure_player_destinations(area)
             end
         end
         if considered > 0 and off_lane_only then
-            local derived = derive_rescue_points(lane, lane_points, members, missing)
+            local derived, unwalkable = derive_rescue_points(lane, lane_points, members, missing,
+                false, walkable_test(area, lane_points))
             local settled, shift = settle_on_floor(area, derived, members)
             if #derived > 0 and not placement_rescue_reported.derived_floor then
                 placement_rescue_reported.derived_floor = true
-                log(string.format("derived_floor settled=%d/%d largest_shift=%.0f",
-                    settled, #derived, shift))
+                log(string.format("derived_floor settled=%d/%d largest_shift=%.0f off_navmesh_skipped=%d",
+                    settled, #derived, shift, unwalkable))
             end
             local preferred = {}
             for _, point in ipairs(derived) do

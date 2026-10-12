@@ -5,7 +5,8 @@
 --   2. With six: overflow operators rescued onto derived points stand on the floor, not at the
 --      height interpolated from a floating authored destination; an operator passing over a
 --      squadmate's tile while the squad walks in isn't teleported; operators the repair puts
---      back have their walk cancelled; one that later wanders off is reported.
+--      back have their walk cancelled; one that later wanders off is reported. A derived point
+--      over a hole in the navmesh (Dark Waters: under a prop) is skipped for another one.
 --   3. At mission start, an operator standing still in the hole is moved beside a squadmate,
 --      but not while the whole squad is off the navmesh (an intro), and not in a stock squad.
 --   luajit tests/live_fixes_test.lua <Scripts dir>
@@ -17,12 +18,15 @@ local TRIGGER = "/Script/BitReactorGame.CombatPreparationArea:TriggerPreCombat"
 local RELOCATION = "/Game/Game/Core/Blueprints/BP_CombatPreparationArea.BP_CombatPreparationArea_C:MovePlayerUnitsIntoPosition"
 local CAPSULE = 90
 local HOLE = {X = 2370, Y = 0, R = 120}
+local holes = {HOLE}
 
 mock.install({missions = {mock.mission("SK_Kaller_020", 6, 0)}})
 local navigation = mock.object("NavigationSystemV1 Default__NavigationSystemV1", {}, {
     K2_ProjectPointToNavigation = function(_, _, point, projected)
-        local in_hole = (point.X - HOLE.X) ^ 2 + (point.Y - HOLE.Y) ^ 2 <= HOLE.R ^ 2
-        if in_hole or math.abs(point.Z) > 250 then return false end
+        for _, hole in ipairs(holes) do
+            if (point.X - hole.X) ^ 2 + (point.Y - hole.Y) ^ 2 <= hole.R ^ 2 then return false end
+        end
+        if math.abs(point.Z) > 250 then return false end
         projected.X, projected.Y, projected.Z = point.X, point.Y, 0
         return true
     end,
@@ -120,6 +124,25 @@ end
 six[5].at = {X = B + 3700, Y = B + 200, Z = CAPSULE}
 mock.run_until(mock.now() + 12000)
 mock.expect("placement_drift via=drift10000 units=1 moves=", "an operator that walks off after the repair is reported")
+if count("off_navmesh_skipped") ~= 0 then fail("a derived point was skipped with no hole under it") end
+
+-- The same deployment with a hole under the spot operator 5 was rescued to: it gets another one.
+local prop = {X = rescued[5].X, Y = rescued[5].Y, R = 40}
+holes[#holes + 1] = prop
+local holed = {on_lane(1), on_lane(2), on_lane(3), on_lane(4), unit("Operator5", B + 200, B - 600), unit("Operator6", B + 1000, B + 200)}
+squad(holed)
+mock.hooks[TRIGGER].pre(area("Holed"))
+mock.run_until(mock.now() + 600)
+mock.expect("placement_rescue=deployment_lane moved=[^\n]* floor_settled=2/2 largest_shift=[%d-]+ off_navmesh_skipped=1",
+    "the rescue skips the spot over the hole")
+for index = 5, 6 do
+    local at = holed[index].at
+    if (at.X - prop.X) ^ 2 + (at.Y - prop.Y) ^ 2 <= prop.R ^ 2 then fail("Operator" .. index .. " was put over the hole") end
+    if at.X < B or at.X > B + 400 or at.Y < B or at.Y > B + 400 then fail("Operator" .. index .. " not rescued into the lane") end
+    if at.Z ~= CAPSULE then fail(string.format("Operator%d rescued at Z %g, expected %d", index, at.Z, CAPSULE)) end
+end
+mock.run_until(mock.now() + 30000)
+holes[#holes] = nil
 
 -- 3. Mission start.
 local function mission(units)

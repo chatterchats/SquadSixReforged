@@ -74,3 +74,9 @@ Self-check: startup 23/23, squad_select 2/2, mission 3/3.
 
 The origin relocation didn't happen at all: the floating derived destinations seem to have been
 what the game's relocation rejected. The bellhop needs a real campaign launch to check.
+
+### Four again, with the fixes (12ffd3a, 2026-10-11)
+
+Area 0: `placement_repair=skipped reason=stock_squad units=4 authored=4`, `repair_passes=0`, no
+spawn watch activity; the game put all four on the four authored destinations. (Before: three
+repair passes and one operator teleported twice.)

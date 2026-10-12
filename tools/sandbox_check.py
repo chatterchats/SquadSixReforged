@@ -12,6 +12,7 @@ go into one report under dist/sandbox/.
     tools/sandbox_check.py uninstall [--instance 2]     take it out again (probe output is kept)
     tools/sandbox_check.py status    [--instance 2]     what's installed, is the game up
     tools/sandbox_check.py info      [--instance 2] [filter]   roster and mission names
+    tools/sandbox_check.py send      [--instance 2] "<sandbox command>"   one raw command
     tools/sandbox_check.py check     [--instance 2] --squad "A,B,C,D,E,F" \\
         --missions SK_Lothal_035_Crisis,MM_01_010_SerolonisJob,MM_04_030_RetakeLuunata:advance=2
 
@@ -306,6 +307,23 @@ def probe_summary(records):
     return lines, squads
 
 
+def return_to_den(step):
+    for _ in range(7):
+        status, text = step("campaign reset", timeout=300)
+        if status == "ok" or "a save is being written" not in text:
+            break
+        time.sleep(10)
+    if status == "ok":
+        step("wait phase=hub settled=1 timeout=240000", required=True)
+    return status, text
+
+
+def cmd_send(args):
+    instance = Instance(args.instance)
+    status, text = session(instance).send(args.line, args.timeout)
+    print("%s | %s" % (status, text))
+
+
 def cmd_check(args):
     instance = Instance(args.instance)
     if instance.number == 1 and not args.allow_main:
@@ -356,13 +374,17 @@ def cmd_check(args):
         observe_ms = args.observe * 1000
         try:
             step("wait phase=hub settled=1 timeout=240000", required=True)
-            launch = "mission launch %s squad=%s" % (name, ",".join(squad))
+            # Quoted: the sandbox splits values on spaces, and roster names have them.
+            launch = 'mission launch %s squad="%s"' % (name, ",".join(squad))
             if args.enemies:
                 launch += " enemies=%s" % args.enemies
             status, text = step(launch + " timeout=120000")
             section.append("- launch: %s | %s" % (status, text))
             if status == "ok":
                 step("wait phase=mission settled=1 timeout=240000", required=True)
+                # GetAllActorsOfClass includes Blueprint subclasses, unlike the probe's FindAllOf.
+                status, text = step("actors /Script/BitReactorGame.AutoGridVolume 5")
+                section.append("- grid volumes (actors): %s | %s" % (status, text))
                 step("wait ms=%d timeout=%d" % (observe_ms, observe_ms + 30000))
                 step("console squadsixprobe")
                 for round_number in range(advance):
@@ -370,9 +392,10 @@ def cmd_check(args):
                     section.append("- advance %d: kill foes -> %s | %s" % (round_number + 1, status, text))
                     step("wait ms=%d timeout=%d" % (observe_ms, observe_ms + 30000))
                     step("console squadsixprobe")
-                status, text = step("mission win timeout=120000")
-                section.append("- mission win: %s | %s" % (status, text))
-                step("wait phase=hub settled=1 timeout=240000")
+            # Back to the baseline Den, as Off Duty's simtest does (`mission win` needs a cheat
+            # manager the game doesn't always have). Retried while the game is still saving.
+            status, text = return_to_den(step)
+            section.append("- back to the Den: %s | %s" % (status, text))
         except SandboxError as error:
             section.append("- **stopped: %s**" % error)
             stopped = str(error)
@@ -415,12 +438,15 @@ def cmd_check(args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     sub = parser.add_subparsers(dest="command", required=True)
-    for name in ("install", "uninstall", "status", "info", "check"):
+    for name in ("install", "uninstall", "status", "info", "check", "send"):
         command = sub.add_parser(name)
         command.add_argument("--instance", type=int, default=2)
         command.add_argument("--allow-main", action="store_true")
         if name == "info":
             command.add_argument("filter", nargs="?", default="")
+        if name == "send":
+            command.add_argument("line")
+            command.add_argument("--timeout", type=float, default=None)
         if name == "check":
             command.add_argument("--missions", required=True,
                                  help="comma-separated mission names; NAME:advance=N also ends N encounters")
@@ -431,7 +457,7 @@ def main():
                                  help="don't load the sandbox baseline Den first (use the Den as it is)")
     args = parser.parse_args()
     {"install": cmd_install, "uninstall": cmd_uninstall, "status": cmd_status, "info": cmd_info,
-     "check": cmd_check}[args.command](args)
+     "check": cmd_check, "send": cmd_send}[args.command](args)
 
 
 if __name__ == "__main__":

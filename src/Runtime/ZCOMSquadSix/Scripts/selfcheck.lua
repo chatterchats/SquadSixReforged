@@ -5,7 +5,8 @@
 -- quietly, so without this the first sign of a broken name is a player report. One line per
 -- phase answers it from the log instead:
 --
---   selfcheck phase=startup ok=22 missing=none unchecked=none
+--   selfcheck phase=startup ok=20 missing=none unchecked=none
+--   selfcheck phase=squad_select ok=2 missing=none unchecked=none
 --   selfcheck phase=mission ok=3 missing=BP_CombatPreparationArea_C:MovePlayerUnitsIntoPosition unchecked=none
 --
 -- `missing` means the check ran and the name is gone. `unchecked` means it couldn't run (a UE4SS
@@ -13,15 +14,20 @@
 --
 -- Names come from each module's `game_names`, built from the same constants the code uses, so
 -- the list can't drift from the code. Startup names are checked once main.lua has loaded the two
--- UI assets; mission names (BP_CombatPreparationArea) only exist once a mission level loads, so
--- they are checked a few seconds after a TacticalGameState appears.
+-- UI assets. Names that only exist later have their own phase (PHASE_TRIGGERS): the squad screen's
+-- view model when it first opens, and BP_CombatPreparationArea once a mission level loads.
 local Common = require("common")
 local log = Common.log
 local valid = Common.valid
 
-local MISSION_TRIGGER_CLASS = "/Script/BitReactorGame.TacticalGameState"
--- Seconds after the game state appears; the level's Blueprints may still be streaming in.
-local MISSION_CHECK_DELAYS_MS = {3000, 10000, 30000}
+-- Names that only exist once something loads are checked a few seconds after it appears, retried
+-- while Blueprints stream in: the mission's (BP_CombatPreparationArea, with the mission level) and
+-- squad selection's (VM_ActivitySlotList, when the squad screen first opens).
+local PHASE_TRIGGERS = {
+    mission = "/Script/BitReactorGame.TacticalGameState",
+    squad_select = Common.SLOT_LIST_ASSET .. ".VM_ActivitySlotList_C",
+}
+local PHASE_DELAYS_MS = {3000, 10000, 30000}
 
 local function find(path)
     local ok, found = pcall(function() return StaticFindObject(path) end)
@@ -91,15 +97,15 @@ local function run(phase, entries)
     return #missing == 0 and #unchecked == 0
 end
 
-local startup, mission = {}, {}
-local startup_done, mission_registered = false, false
-local mission_started, mission_reported = false, false
+local startup, phases = {}, {}
+local startup_done, phases_registered = false, false
 
 -- Collect every module's names, split by when they can exist.
 local function add(names)
     for _, entry in ipairs(names) do
-        if entry.when == "mission" then
-            mission[#mission + 1] = entry
+        if entry.when and PHASE_TRIGGERS[entry.when] then
+            phases[entry.when] = phases[entry.when] or {}
+            table.insert(phases[entry.when], entry)
         else
             startup[#startup + 1] = entry
         end
@@ -112,37 +118,44 @@ local function check_startup()
     run("startup", startup)
 end
 
--- Once per session: the first mission is enough to see whether its names survived.
-local function register_mission_check()
-    if mission_registered or #mission == 0 then return end
-    local ok = pcall(function()
-        NotifyOnNewObject(MISSION_TRIGGER_CLASS, function()
-            if mission_started then return end
-            mission_started = true
-            for attempt, delay in ipairs(MISSION_CHECK_DELAYS_MS) do
+-- Once per session per phase: its first appearance is enough to see whether its names survived.
+local function register_phase(phase, entries)
+    local started, reported = false, false
+    return pcall(function()
+        NotifyOnNewObject(PHASE_TRIGGERS[phase], function()
+            if started then return end
+            started = true
+            for attempt, delay in ipairs(PHASE_DELAYS_MS) do
                 ExecuteWithDelay(delay, function()
                     ExecuteInGameThread(function()
-                        if mission_reported then return end
+                        if reported then return end
                         -- Report once everything resolves, or on the last attempt whatever
                         -- the result, so a genuinely missing name is still logged.
                         local all_found = true
-                        for _, entry in ipairs(mission) do
+                        for _, entry in ipairs(entries) do
                             if check(entry) ~= "ok" then all_found = false break end
                         end
-                        if all_found or attempt == #MISSION_CHECK_DELAYS_MS then
-                            mission_reported = true
-                            run("mission", mission)
+                        if all_found or attempt == #PHASE_DELAYS_MS then
+                            reported = true
+                            run(phase, entries)
                         end
                     end)
                 end)
             end
         end)
     end)
-    mission_registered = ok
+end
+
+local function register_phase_checks()
+    if phases_registered then return end
+    phases_registered = true
+    for _, phase in ipairs({"squad_select", "mission"}) do
+        if phases[phase] then register_phase(phase, phases[phase]) end
+    end
 end
 
 return {
     add = add,
     check_startup = check_startup,
-    register_mission_check = register_mission_check,
+    register_phase_checks = register_phase_checks,
 }

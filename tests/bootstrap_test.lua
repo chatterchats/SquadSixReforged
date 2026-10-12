@@ -25,7 +25,9 @@ mock.load(scripts)
 mock.run_until(1000)
 local stopped = mock.run_loops(3)
 mock.transcript[#mock.transcript + 1] = "loops_stopped=" .. tostring(stopped)
--- A mission starts: the mission half of the self-check runs a few seconds later.
+-- The squad screen opens, then a mission starts: each phase of the self-check runs a few seconds
+-- after its trigger appears.
+mock.notify("/Game/Game/UI/Strategy/GalaxyMap/BPs/VM_ActivitySlotList.VM_ActivitySlotList_C")
 mock.notify("/Script/BitReactorGame.TacticalGameState")
 mock.run_until(mock.now() + 40000)
 local limits = {}
@@ -46,7 +48,8 @@ expect("hook /Game/Game/UI/AC_HologramManager%.AC_HologramManager_C:ShowLineupHo
 expect("hook /Script/BitReactorGame%.CombatPreparationArea:TriggerPreCombat", "placement trigger")
 expect("command squadsixrescue", "rescue command")
 expect("status version=[%d.]+ complete=true data_container=partial", "status line")
-expect("selfcheck phase=startup ok=22 missing=none unchecked=none", "every startup name resolves")
+expect("selfcheck phase=startup ok=20 missing=none unchecked=none", "every startup name resolves")
+expect("selfcheck phase=squad_select ok=2 missing=none unchecked=none", "the squad screen's names resolve")
 expect("selfcheck phase=mission ok=3 missing=none unchecked=none", "every mission name resolves")
 expect("SK_Ryloth_035=6", "a mission left at 4 is raised at runtime")
 expect("HM_Jae_020=4", "a guarded mission is put back to 4")

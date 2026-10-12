@@ -677,7 +677,8 @@ end
 return {
     -- Every game name this module depends on, for selfcheck.lua.
     game_names = {
-        {"function", SLOT_LIST_FUNCTION},
+        -- VM_ActivitySlotList only loads when the squad screen first opens.
+        {"function", SLOT_LIST_FUNCTION, when = "squad_select"},
         {"function", GENERATE_PROXIES_FUNCTION},
         {"function", SHOW_LINEUP_FUNCTION},
         {"class", SLOT_BOX_CLASS_PATH},
@@ -688,7 +689,7 @@ return {
             SLOT_INDEX_PROPERTY},
         {"property", "/Game/Game/UI/Strategy/GalaxyMap/BPs/VM_ActivitySlot.VM_ActivitySlot_C",
             ACTIVITY_CHARACTER_PROPERTY},
-        {"property", string.match(SLOT_LIST_FUNCTION, "^(.-):"), "ActivitySlots"},
+        {"property", string.match(SLOT_LIST_FUNCTION, "^(.-):"), "ActivitySlots", when = "squad_select"},
         -- No SetEntrySpacing exists on this class, so the property is what fit_squad_screen sets.
         {"property", "/Script/UMG.DynamicEntryBoxBase", "EntrySpacing"},
     },

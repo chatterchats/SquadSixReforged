@@ -151,7 +151,7 @@ register_rescue_command()
 Selfcheck.add(Limits.game_names)
 Selfcheck.add(Lineup.game_names)
 Selfcheck.add(Placement.game_names)
-Selfcheck.register_mission_check()
+Selfcheck.register_phase_checks()
 
 ExecuteWithDelay(1000, function()
     ExecuteInGameThread(maintain_runtime_state)

@@ -69,7 +69,8 @@ changed, and lists what to review. See [docs/core-pak-analysis.md](docs/core-pak
 1. `python3 tools/build_core.py ... --check`: stops if the game's missions or squad limits changed.
 2. Start the game and open squad select, then start a mission. In `UE4SS.log`, look for:
    ```
-   [ZCOM_SQUAD_SIX] selfcheck phase=startup ok=22 missing=none unchecked=none
+   [ZCOM_SQUAD_SIX] selfcheck phase=startup ok=20 missing=none unchecked=none
+   [ZCOM_SQUAD_SIX] selfcheck phase=squad_select ok=2 missing=none unchecked=none
    [ZCOM_SQUAD_SIX] selfcheck phase=mission ok=3 missing=none unchecked=none
    ```
    `missing=` names each function, class or property that no longer exists (for example a

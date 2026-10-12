@@ -40,8 +40,10 @@ expansion, the repair pool, and with nobody standing on a destination), so a fut
 geometry shows up as a diff of that file; regenerate it with `placement_maps_test.lua <Scripts>
 --write-golden` after a deliberate change and review the diff.
 
-Still to check in game: SK_Lothal_035's destinations range from Z 7 to 150, so its points' heights
-are interpolated across that rise. (SerolonisJob area 1, a corridor about 28 uu wide, now gets two
+SK_Lothal_035's destinations range from Z 7 to 150, so its points' heights are interpolated across
+that rise; in game its derived spot came out about 117 uu above the floor. In game the runtime now
+puts derived points on the navmesh under them (`settle_on_floor`), so the interpolated heights in
+the golden file are only what it falls back to without a navmesh. (SerolonisJob area 1, a corridor about 28 uu wide, now gets two
 points 101 uu apart, but the mission keeps four operators, so they aren't used.)
 
 Some maps author two destinations closer than a tile (both Bespin lanes repeat a point exactly,

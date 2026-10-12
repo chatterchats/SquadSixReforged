@@ -125,6 +125,35 @@ RESCUE.capsule_height = 100.0
 -- tile of a destination), derive_rescue_points also tries these points along
 -- the segment between every pair of authored destinations.
 RESCUE.pair_fractions = {1 / 3, 0.5, 2 / 3}
+-- The navmesh, used as the floor under a derived point and to tell whether an
+-- operator can walk at all.
+local FLOOR = {}
+FLOOR.system_path = "/Script/NavigationSystem.Default__NavigationSystemV1"
+FLOOR.project_function = "/Script/NavigationSystem.NavigationSystemV1:K2_ProjectPointToNavigation"
+-- How far from a point to look for the navmesh: a tile's half-width sideways,
+-- and up and down by the most a derived point's height has been seen to be off
+-- (155 uu, Retake Luunata's lower level).
+FLOOR.extent = {X = 50, Y = 50, Z = 250}
+-- A projection that slides further than this sideways found the navmesh beside
+-- the point, not under it.
+FLOOR.max_slide_sq = 2500.0
+-- Mission start: the map's spawn transforms past the stock four aren't always
+-- usable. Squads up to this size are left to the game.
+local SPAWN = {}
+SPAWN.stock_squad = 4
+SPAWN.interval_ms = 2000
+-- Retake Luunata's intro alone holds the squad for about 70 s.
+SPAWN.watch_ms = 300000
+-- Checks an operator must stand still across before it counts as stuck rather
+-- than on its way somewhere.
+SPAWN.settle_checks = 3
+-- The squadmate an operator is moved beside must be within this distance.
+SPAWN.peer_radius_sq = 4000000.0
+-- Distances from that squadmate to try, each in eight directions.
+SPAWN.offsets = {150, 250}
+-- Most the floor beside the squadmate may differ from its own: further is a
+-- ledge or a different level.
+SPAWN.max_step = 100.0
 local PLACEMENT_PROFILES = {
     {
         name = "ColdMetal",
@@ -207,6 +236,11 @@ local staging_window_open = false
 local repair_counts = {}
 local repair_reported = 0
 local placement_rescue_reported = {}
+-- Where the repair put each operator this deployment, by unit key, for the
+-- drift check.
+local restored_positions = {}
+-- Deployments opened since load; the spawn watch stops when this changes.
+local deployments_begun = 0
 
 -- An actor the placement never reached sits at the world origin, plus its
 -- capsule height, so the test ignores Z. No authored destination is within 224
@@ -444,6 +478,79 @@ local function xy_distance_squared(left, right)
     return x * x + y * y
 end
 
+-- The navmesh under or near a point, or nil when there is none within
+-- FLOOR.extent or the call can't be made (an older build, or the navmesh not
+-- loaded yet). Callers treat nil as "no answer", never as proof of anything on
+-- its own.
+local function navigation_floor(context, point)
+    local system = StaticFindObject(FLOOR.system_path)
+    if not valid(system) or not valid(context) or point == nil then return nil end
+    local projected = {}
+    local ok, found = pcall(function()
+        return system:K2_ProjectPointToNavigation(context, point, projected, nil, nil, FLOOR.extent)
+    end)
+    if not ok or found ~= true or type(projected.Z) ~= "number" then return nil end
+    local floor = {X = projected.X, Y = projected.Y, Z = projected.Z}
+    if xy_distance_squared(floor, point) > FLOOR.max_slide_sq then return nil end
+    return floor
+end
+
+-- How high an operator's location (its capsule's centre) stands above the
+-- navmesh: the median over the squad, else RESCUE.capsule_height.
+local function capsule_above_floor(context, units)
+    local heights = {}
+    for _, unit in ipairs(units) do
+        if unit.location ~= nil and not at_world_origin(unit.location) then
+            local floor = navigation_floor(context, unit.location)
+            local height = floor ~= nil and unit.location.Z - floor.Z or nil
+            if height ~= nil and height > 0 and height < FLOOR.extent.Z then
+                heights[#heights + 1] = height
+            end
+        end
+    end
+    if #heights < 1 then return RESCUE.capsule_height end
+    table.sort(heights)
+    return heights[math.floor((#heights + 1) / 2)]
+end
+
+-- Put derived points on the floor. derive_rescue_points interpolates a point's
+-- height between authored destinations, and those can sit well above the floor
+-- themselves (one of Retake Luunata's lower-level points is 92 uu up), so a
+-- derived point can float: 105 and 155 uu there, about 117 on SK_Lothal_035.
+-- Where the navmesh answers under a point, it goes to the navmesh plus the
+-- squad's capsule height; elsewhere it keeps its interpolated height, which
+-- errs high and drops. Returns how many points moved and the largest change.
+local function settle_on_floor(context, points, units)
+    local settled, largest, capsule = 0, 0, nil
+    for _, point in ipairs(points) do
+        if point.lift ~= nil then
+            local guess = {X = point.X, Y = point.Y, Z = point.Z - point.lift}
+            local floor = navigation_floor(context, guess)
+            if floor ~= nil and math.abs(floor.Z - guess.Z) <= RESCUE.level_tolerance then
+                capsule = capsule or capsule_above_floor(context, units)
+                local z = floor.Z + capsule
+                if math.abs(z - point.Z) > math.abs(largest) then largest = z - point.Z end
+                point.Z = z
+                settled = settled + 1
+            end
+            point.lift = nil
+        end
+    end
+    return settled, largest
+end
+
+-- Cancel the walk the game gave an operator. A teleport moves the actor but
+-- not its controller's path: in Retake Luunata two operators the watchdog put
+-- back on the lane then walked about 3,500 uu to wherever the relocation had
+-- sent them. Returns whether the controller took the call.
+local function halt(actor)
+    local ok = pcall(function()
+        local controller = unwrap(actor:GetController())
+        controller:StopMovement()
+    end)
+    return ok
+end
+
 local function transform_profile_point(transform, point)
     return {
         X = transform.tx + transform.scale
@@ -590,7 +697,8 @@ end
 
 -- Rescue points for a map without a profile: inset midpoints of the authored
 -- lane's edges. Height is the median offset of operators already standing on
--- destinations, else RESCUE.capsule_height.
+-- destinations, else RESCUE.capsule_height; `lift` on each point records that
+-- offset for settle_on_floor.
 --
 -- `ignore_units` keeps occupied points in the pool, for the repair, which
 -- checks occupancy itself; the destination expansion leaves it off, since a
@@ -660,6 +768,7 @@ local function derive_rescue_points(polygon, destinations, units, wanted, ignore
         local clearance, separated = clearance_of(point)
         if separated and rise <= RESCUE.level_tolerance then
             point.Z = ((first.Z or 0) + (second.Z or 0)) / 2 + offset
+            point.lift = offset
             point.clearance = clearance
             candidates[#candidates + 1] = point
         end
@@ -706,6 +815,7 @@ local function derive_rescue_points(polygon, destinations, units, wanted, ignore
                     local clearance, separated = clearance_of(point)
                     if separated and inside_deployment(polygon, point) ~= false then
                         point.Z = (first.Z or 0) + rise * fraction + offset
+                        point.lift = offset
                         point.clearance = clearance
                         pool[#pool + 1] = point
                     end
@@ -913,7 +1023,7 @@ local function rescue_known_staging(destinations, volume)
     end
     if #candidates < 1 then return 0 end
 
-    local targets = {}
+    local targets, floor_note = {}, ""
     if profile ~= nil then
         for _, rescue in ipairs(profile.rescues) do
             targets[#targets + 1] = transform_profile_point(
@@ -921,6 +1031,9 @@ local function rescue_known_staging(destinations, volume)
         end
     else
         targets = derive_rescue_points(polygon, authored, units, missing)
+        local settled, shift = settle_on_floor(destinations[1].actor, targets, units)
+        floor_note = string.format(" floor_settled=%d/%d largest_shift=%.0f",
+            settled, #targets, shift)
     end
     if #targets < 1 then return 0 end
 
@@ -976,6 +1089,7 @@ local function rescue_known_staging(destinations, volume)
             end)
             if moved and accepted ~= false
                 and actor_inside_tactical_area(volume, unit.actor) ~= false then
+                halt(unit.actor)
                 unit.location = copy_vector(target)
                 remember_staged_position(unit.actor, unit, volume, true)
                 rescued = rescued + 1
@@ -999,7 +1113,7 @@ local function rescue_known_staging(destinations, volume)
     if rescued > 0 and not placement_rescue_reported[label] then
         placement_rescue_reported[label] = true
         log("placement_rescue=" .. label
-            .. " moved=" .. table.concat(moves, ","))
+            .. " moved=" .. table.concat(moves, ",") .. floor_note)
     end
     -- Return the rescued positions: the lane test that follows rejects
     -- positions the game staged badly, and must not reject one this pass chose
@@ -1093,11 +1207,19 @@ REPAIR.max_staging_offset = 1000.0
 
 -- A reason that also describes an operator still walking into place, since the
 -- relocation walks the squad. Repaired only once the operator has stopped
--- moving between passes; the hard signatures are repaired on sight.
+-- moving between passes; the other signatures are repaired on sight.
+-- `shared_tile` is here because two operators walking past each other share a
+-- tile for a moment: repaired on sight, one was teleported off its own path
+-- twice on each of Retake Luunata's deployments.
 REPAIR.soft_settle = {
     off_lane = true,
+    shared_tile = true,
 }
 REPAIR.settled_radius_sq = 100.0
+-- After the ladder, when to look at whether operators the repair put somewhere
+-- are still there, and how far one may be before that is reported.
+REPAIR.drift_checks_ms = {10000, 20000}
+REPAIR.drift_radius_sq = 90000.0
 local observed_positions = {}
 
 -- Undo a relocation that went wrong. CalculateRushTargets_V2 can give two
@@ -1117,6 +1239,19 @@ local function repair_stranded_units(area, via, hard_only, ignore_budget)
 
     local anchors = destination_anchors(area)
     if #anchors < 1 then return 0 end
+
+    -- A squad no bigger than the area's authored destinations is the game's own
+    -- deployment: this mod added nothing to it, so there is nothing of its own
+    -- to repair.
+    local authored_count = #destination_anchors(area, true)
+    if #units <= authored_count then
+        if not placement_rescue_reported.stock_squad then
+            placement_rescue_reported.stock_squad = true
+            log("placement_repair=skipped reason=stock_squad units=" .. tostring(#units)
+                .. " authored=" .. tostring(authored_count))
+        end
+        return 0, 0
+    end
 
     repair_passes = repair_passes + 1
     repair_units_seen = #units
@@ -1163,6 +1298,7 @@ local function repair_stranded_units(area, via, hard_only, ignore_budget)
             if lane ~= nil then
                 lane_pool = derive_rescue_points(
                     lane, authored, units, #units, true)
+                settle_on_floor(area, lane_pool, units)
             end
         end
         if lane_pool == nil then return nil end
@@ -1200,7 +1336,7 @@ local function repair_stranded_units(area, via, hard_only, ignore_budget)
         observed_positions[unit.key] = copy_vector(unit.location)
     end
 
-    local restored, stranded, reasons, moves = 0, 0, {}, {}
+    local restored, stranded, halted, reasons, moves = 0, 0, 0, {}, {}
     for index, unit in ipairs(units) do
         local reason
         if hard_only then
@@ -1269,6 +1405,8 @@ local function repair_stranded_units(area, via, hard_only, ignore_budget)
                             staged.location, staged.rotation or {}, false, {}, true)
                     end)
                     if moved and accepted ~= false then
+                        if halt(unit.actor) then halted = halted + 1 end
+                        restored_positions[unit.key] = copy_vector(staged.location)
                         repair_counts[unit.key] = attempts + 1
                         restored = restored + 1
                         repair_restored_total = repair_restored_total + 1
@@ -1300,6 +1438,7 @@ local function repair_stranded_units(area, via, hard_only, ignore_budget)
             .. " staged=" .. tostring(staged)
             .. " stranded=" .. tostring(stranded)
             .. " restored=" .. tostring(restored)
+            .. " halted=" .. tostring(halted)
             .. " reasons=" .. table.concat(reasons, ",")
             .. " moves=" .. table.concat(moves, ","))
     end
@@ -1515,6 +1654,12 @@ local function ensure_player_destinations(area)
         end
         if considered > 0 and off_lane_only then
             local derived = derive_rescue_points(lane, lane_points, members, missing)
+            local settled, shift = settle_on_floor(area, derived, members)
+            if #derived > 0 and not placement_rescue_reported.derived_floor then
+                placement_rescue_reported.derived_floor = true
+                log(string.format("derived_floor settled=%d/%d largest_shift=%.0f",
+                    settled, #derived, shift))
+            end
             local preferred = {}
             for _, point in ipairs(derived) do
                 preferred[#preferred + 1] = {
@@ -1703,6 +1848,7 @@ local function begin_deployment(area)
 
     active_deployment_key = key
     active_deployment_area = area
+    deployments_begun = deployments_begun + 1
     staged_positions = {}
     repair_counts = {}
     observed_positions = {}
@@ -1720,6 +1866,7 @@ local function begin_deployment(area)
     reported_placement_triggers = {}
     destination_expansion_reported = false
     placement_rescue_reported = {}
+    restored_positions = {}
     repair_reported = 0
     return key
 end
@@ -1811,6 +1958,26 @@ local function register_rescue_command()
     end)
     registered_rescue_command = ok
     log("rescue_command=" .. tostring(registered_rescue_command))
+end
+
+-- Read-only: whether operators the repair put somewhere are still there. One
+-- line per check that finds any; it can't tell a walk the game started from one
+-- the player ordered, so it only reports.
+local function report_drift(via)
+    local drifted = {}
+    for _, unit in ipairs(every_player_unit()) do
+        local restored = restored_positions[unit.key]
+        if restored ~= nil
+            and distance_squared(restored, unit.location) > REPAIR.drift_radius_sq then
+            drifted[#drifted + 1] = string.format("%.0f/%.0f/%.0f->%.0f/%.0f/%.0f",
+                restored.X, restored.Y, restored.Z,
+                unit.location.X, unit.location.Y, unit.location.Z)
+        end
+    end
+    if #drifted > 0 then
+        log("placement_drift via=" .. via .. " units=" .. tostring(#drifted)
+            .. " moves=" .. table.concat(drifted, ","))
+    end
 end
 
 local function on_relocation_starting(context, name)
@@ -1917,6 +2084,15 @@ local function on_relocation_starting(context, name)
                 repair_stranded_units(area,
                     "watch" .. tostring(at) .. (ladder > 1 and ("#" .. ladder) or ""),
                     true)
+            end)
+        end)
+    end
+    for _, delay in ipairs(REPAIR.drift_checks_ms) do
+        local at = delay
+        ExecuteWithDelay(at, function()
+            ExecuteInGameThread(function()
+                if active_deployment_key ~= key then return end
+                report_drift("drift" .. tostring(at) .. (ladder > 1 and ("#" .. ladder) or ""))
             end)
         end)
     end
@@ -2078,6 +2254,166 @@ local function register_placement_triggers()
     end
 end
 
+-- Mission start (see SPAWN): the squad is watched from the moment the tactical
+-- game state exists until the mission's first deployment opens.
+local spawn_watch = nil
+local registered_spawn_watch = false
+
+-- Somewhere on the navmesh beside `peer`, clear of every operator, or nil.
+local function spot_beside(peer, peer_floor, units)
+    for _, radius in ipairs(SPAWN.offsets) do
+        for step = 0, 7 do
+            local angle = step * math.pi / 4
+            local floor = navigation_floor(peer.actor, {
+                X = peer_floor.X + radius * math.cos(angle),
+                Y = peer_floor.Y + radius * math.sin(angle),
+                Z = peer_floor.Z,
+            })
+            if floor ~= nil and math.abs(floor.Z - peer_floor.Z) <= SPAWN.max_step then
+                local clear = true
+                for _, other in ipairs(units) do
+                    if xy_distance_squared(floor, other.location) < MIN_UNIT_SEPARATION_SQ then
+                        clear = false
+                        break
+                    end
+                end
+                if clear then
+                    return {X = floor.X, Y = floor.Y,
+                            Z = floor.Z + (peer.location.Z - peer_floor.Z)}
+                end
+            end
+        end
+    end
+    return nil
+end
+
+-- An operator standing still off the navmesh, with a squadmate on it within
+-- reach, goes beside that squadmate. Retake Luunata puts one of six at
+-- 159338/-576078, off the navmesh: that operator never follows the squad, in
+-- both six-operator runs, and the combat-preparation relocation can't move it
+-- either. Once per operator per mission, whatever the outcome.
+local function check_spawned_squad(watch)
+    local units = every_player_unit()
+    if #units <= SPAWN.stock_squad then return end
+    watch.squad = #units
+
+    local floors, on_floor = {}, 0
+    for index, unit in ipairs(units) do
+        local previous = watch.positions[unit.key]
+        if previous ~= nil
+            and distance_squared(previous, unit.location) < REPAIR.settled_radius_sq then
+            watch.still[unit.key] = (watch.still[unit.key] or 0) + 1
+        else
+            watch.still[unit.key] = 0
+        end
+        watch.positions[unit.key] = copy_vector(unit.location)
+        if not at_world_origin(unit.location) then
+            floors[index] = navigation_floor(unit.actor, unit.location)
+            if floors[index] ~= nil then on_floor = on_floor + 1 end
+        end
+    end
+    -- Half the squad on the navmesh at least: an intro can park the whole squad
+    -- somewhere without one, and "off the navmesh" then means nothing.
+    if on_floor * 2 < #units then return end
+
+    for index, unit in ipairs(units) do
+        if floors[index] == nil and not watch.moved[unit.key]
+            and not at_world_origin(unit.location)
+            and watch.still[unit.key] >= SPAWN.settle_checks then
+            local peer, peer_floor, nearest = nil, nil, SPAWN.peer_radius_sq
+            for other_index, other in ipairs(units) do
+                local distance = distance_squared(other.location, unit.location)
+                if floors[other_index] ~= nil and distance <= nearest then
+                    peer, peer_floor, nearest = other, floors[other_index], distance
+                end
+            end
+            if peer ~= nil then
+                watch.moved[unit.key] = true
+                local from = copy_vector(unit.location)
+                local target = spot_beside(peer, peer_floor, units)
+                local result = "no_spot"
+                if target ~= nil then
+                    local moved, accepted = pcall(function()
+                        return unit.actor:K2_SetActorLocationAndRotation(
+                            target, actor_rotation(unit.actor) or {}, false, {}, true)
+                    end)
+                    if moved and accepted ~= false then
+                        halt(unit.actor)
+                        unit.location = copy_vector(target)
+                        watch.rescued = watch.rescued + 1
+                        result = "moved"
+                    else
+                        result = "refused"
+                    end
+                end
+                log(string.format("spawn_rescue=%s from=%.0f/%.0f/%.0f to=%s"
+                    .. " beside=%.0f/%.0f/%.0f squad=%d on_navmesh=%d",
+                    result, from.X, from.Y, from.Z,
+                    target ~= nil and string.format("%.0f/%.0f/%.0f",
+                        target.X, target.Y, target.Z) or "none",
+                    peer.location.X, peer.location.Y, peer.location.Z,
+                    #units, on_floor))
+            end
+        end
+    end
+end
+
+local function start_spawn_watch(game_state)
+    local watch = {state = game_state, deployment = deployments_begun,
+        elapsed = 0, squad = 0, rescued = 0, positions = {}, still = {}, moved = {}}
+    spawn_watch = watch
+    local function finish(reason)
+        spawn_watch = nil
+        if watch.squad > SPAWN.stock_squad then
+            log("spawn_watch=done reason=" .. reason
+                .. " after=" .. tostring(math.floor(watch.elapsed / 1000)) .. "s"
+                .. " squad=" .. tostring(watch.squad)
+                .. " rescued=" .. tostring(watch.rescued))
+        end
+    end
+    LoopAsync(SPAWN.interval_ms, function()
+        if spawn_watch ~= watch then return true end
+        watch.elapsed = watch.elapsed + SPAWN.interval_ms
+        if deployments_begun ~= watch.deployment then
+            finish("deployment")
+            return true
+        end
+        if watch.elapsed > SPAWN.watch_ms then
+            finish("timeout")
+            return true
+        end
+        ExecuteInGameThread(function()
+            if spawn_watch ~= watch then return end
+            if not valid(watch.state) then
+                finish("mission_ended")
+                return
+            end
+            local ok, err = pcall(check_spawned_squad, watch)
+            if not ok then
+                log("spawn_watch=error " .. tostring(err))
+                finish("error")
+            end
+        end)
+        return false
+    end)
+end
+
+local function register_spawn_watch()
+    if registered_spawn_watch then return end
+    local ok = pcall(function()
+        NotifyOnNewObject("/Script/BitReactorGame." .. TACTICAL_GAME_STATE_CLASS, function(game_state)
+            ExecuteWithDelay(0, function()
+                ExecuteInGameThread(function() start_spawn_watch(game_state) end)
+            end)
+        end)
+    end)
+    registered_spawn_watch = ok
+    log("spawn_watch=" .. tostring(registered_spawn_watch))
+    -- A UE4SS reload in the middle of a mission: watch the squad already there.
+    local found_ok, existing = pcall(function() return FindFirstOf(TACTICAL_GAME_STATE_CLASS) end)
+    if found_ok and valid(existing) then start_spawn_watch(existing) end
+end
+
 return {
     -- Every game name this module depends on, for selfcheck.lua.
     game_names = {
@@ -2086,6 +2422,9 @@ return {
         {"function", MOVE_UNITS_FUNCTIONS[3]},
         {"function", "/Script/BitReactorGame.CombatPreparationArea:" .. LINKED_AREA_FUNCTION},
         {"function", "/Script/BitReactorGame.TacticalAreaVolume:" .. INSIDE_AREA_FUNCTION},
+        {"function", FLOOR.project_function},
+        {"function", "/Script/Engine.Pawn:GetController"},
+        {"function", "/Script/Engine.Controller:StopMovement"},
         {"property", "/Script/BitReactorGame.CombatPreparationArea", DESTINATIONS_PROPERTY},
         {"property", "/Script/BitReactorGame.TacticalPoint", PLAYER_TEAM_PROPERTY},
         {"property", "/Script/BitReactorGame." .. SQUAD_CLASS, SQUAD_MEMBERS_PROPERTY},
@@ -2099,6 +2438,7 @@ return {
     register_relocation_hook = register_relocation_hook,
     register_area_notification = register_area_notification,
     register_placement_triggers = register_placement_triggers,
+    register_spawn_watch = register_spawn_watch,
     -- The lane geometry, for tests/placement_maps_test.lua, which runs it over every
     -- deployment area in the game (data/mapscan.json), and for the dev probe
     -- (dev/ZCOMSquadSixProbe). Not used by the runtime.

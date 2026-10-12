@@ -36,6 +36,7 @@ local register_rescue_command = Placement.register_rescue_command
 local register_area_notification = Placement.register_area_notification
 local register_relocation_hook = Placement.register_relocation_hook
 local register_placement_triggers = Placement.register_placement_triggers
+local register_spawn_watch = Placement.register_spawn_watch
 
 local SLOT_LIST_CLASS = SLOT_LIST_ASSET .. ".VM_ActivitySlotList_C"
 local target_assets_loaded = false
@@ -147,6 +148,7 @@ log("loaded version=" .. VERSION .. " target_size=" .. tostring(TARGET_SIZE))
 register_early_slot_notification()
 register_layout_notification()
 register_area_notification()
+register_spawn_watch()
 register_rescue_command()
 Selfcheck.add(Limits.game_names)
 Selfcheck.add(Lineup.game_names)

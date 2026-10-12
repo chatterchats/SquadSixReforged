@@ -48,7 +48,7 @@ expect("hook /Game/Game/UI/AC_HologramManager%.AC_HologramManager_C:ShowLineupHo
 expect("hook /Script/BitReactorGame%.CombatPreparationArea:TriggerPreCombat", "placement trigger")
 expect("command squadsixrescue", "rescue command")
 expect("status version=[%d.]+ complete=true data_container=partial", "status line")
-expect("selfcheck phase=startup ok=20 missing=none unchecked=none", "every startup name resolves")
+expect("selfcheck phase=startup ok=23 missing=none unchecked=none", "every startup name resolves")
 expect("selfcheck phase=squad_select ok=2 missing=none unchecked=none", "the squad screen's names resolve")
 expect("selfcheck phase=mission ok=3 missing=none unchecked=none", "every mission name resolves")
 expect("SK_Ryloth_035=6", "a mission left at 4 is raised at runtime")

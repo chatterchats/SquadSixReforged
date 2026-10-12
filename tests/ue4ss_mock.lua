@@ -91,11 +91,16 @@ mock.world = object("World /Game/Maps/Test.Test", {}, {
 })
 
 -- An actor with a location. `move` decides where a teleport lands and what it returns; by
--- default the actor goes exactly where it was asked to and the call reports success.
+-- default the actor goes exactly where it was asked to and the call reports success. Its
+-- controller counts StopMovement calls in `halts`.
 function mock.actor(name, location)
     local self
     local class = object("Class " .. name:gsub("%s.*", ""))
+    local controller = object("Controller " .. name, {}, {
+        StopMovement = function() rawset(self, "halts", self.halts + 1) end,
+    })
     self = object(name, {}, {
+        GetController = function() return controller end,
         GetClass = function() return class end,
         GetWorld = function() return mock.world end,
         K2_DestroyActor = function() self.destroyed = true end,
@@ -115,6 +120,7 @@ function mock.actor(name, location)
     rawset(self, "at", {X = location.X, Y = location.Y, Z = location.Z})
     rawset(self, "scale", {X = 1, Y = 1, Z = 1})
     rawset(self, "hidden", false)
+    rawset(self, "halts", 0)
     return self
 end
 

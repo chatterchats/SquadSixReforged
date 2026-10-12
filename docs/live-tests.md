@@ -39,7 +39,7 @@ interactables; likely the Den launch (the station spawns its NPC under
 (both in `MM_04_030_RetakeLuunata_Gameplay`); objective 050 (move to the lift) activates next.
 `SetStationDialogueEnabled(true)` and setting the flag directly don't help.
 
-### Fixes (in `placement.lua`, covered by `tests/live_fixes_test.lua`; not yet run in game)
+### Fixes (in `placement.lua`, covered by `tests/live_fixes_test.lua`)
 
 - **Repairs at four operators.** In both four-operator deployments Squad Six ran `placement_repair`
   while the game was still walking the squad in, and moved one operator to the same spot twice for
@@ -59,3 +59,18 @@ interactables; likely the Den launch (the station spawns its NPC under
   start does. Until the first deployment of a mission with more than four operators, one standing
   still off the navmesh for 6 s, with half the squad on it and a squadmate within 2000 uu, is moved
   beside that squadmate (`spawn_rescue=moved`, `spawn_watch=done`).
+
+### Six again, with the fixes (12ffd3a, 2026-10-11)
+
+Self-check: startup 23/23, squad_select 2/2, mission 3/3.
+
+| Step | Six |
+|------|-----|
+| Start | `spawn_rescue=moved from=159338/-576078/-18340 to=159275/-576293/-18219`, 18 s in; that operator then walked with the squad. `spawn_watch=done reason=deployment after=164s rescued=1` |
+| Area 0 deployment | `floor_settled=2/2 largest_shift=-14`; no repair needed, all six distinct |
+| Turbolift bellhop | same soft-lock; bypassed |
+| Area 3 deployment | `floor_settled=2/2 largest_shift=-163`; nobody sent to the origin, no repair, no drift; the two operators on derived spots stand at the same height as their squadmates |
+| Crashes | none |
+
+The origin relocation didn't happen at all: the floating derived destinations seem to have been
+what the game's relocation rejected. The bellhop needs a real campaign launch to check.

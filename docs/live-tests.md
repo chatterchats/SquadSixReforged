@@ -118,6 +118,29 @@ Self-check: startup 23/23, squad_select 2/2, mission 3/3. No crashes, no Squad S
 The spawn watch acts on more maps than Retake: on Brentaal 035 and Coil Strikes Back two of six
 operators started off the navmesh. Not yet checked whether they could have walked from there.
 
+## MM_02_030_DarkGrotto ("Dark Waters"), six (211c41c, 2026-10-12)
+
+From the user's campaign save, played through. Squad Expansion keeps this mission at four.
+Probe 0.2.0 (the 0.1.0 probe made mission loads hitch; see its README).
+
+The probe's spot checks, 11 s in:
+
+| Area | Result |
+|------|--------|
+| `BP_CombatPreparationArea_C_1` | all four authored and both derived spots on the navmesh, floor within 50 uu |
+| `BP_CombatPreparationArea_C_0` | authored spots on the navmesh; derived2 (-12146/-20189/3030) **not on the navmesh**, with something ~186 uu tall over it. The floor trace missed under most spots at 11 s and hit at 56 s, so collision there streams in late |
+
+| Encounter | Result |
+|-----------|--------|
+| 1 (area C_0) | the two overflow operators (one ~290 uu above the others) moved onto derived1 and derived2; `floor_settled=1/2` (derived2 has no navmesh, so it kept its interpolated height). The game's relocation then walked that operator to -12193/-20236/3094, ~65 uu off and on the floor. All six distinct, nothing restored. The user saw two operators "spawn kinda off", then walk to their spots |
+| 2 (area C_1) | overflow operators ~1,500 uu back and up to 560 uu higher moved onto the derived spots, `floor_settled=2/2`; nothing restored |
+| End | mission complete, no errors |
+
+**Gap:** a derived point the navmesh doesn't cover is still used (at its interpolated height). Here
+the game's relocation recovered; elsewhere it might send the operator to the origin, as Retake's
+floating spots did. Derived points that fail the navmesh projection should be skipped in favour of
+another candidate.
+
 ## Squad select (12ffd3a, 2026-10-11)
 
 All six models show in the lineup: `proxies=6 valid_proxies=6 hidden_proxies=0`, layout applied

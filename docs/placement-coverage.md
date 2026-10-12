@@ -1,7 +1,7 @@
 # Placement against the game's maps
 
 `tests/placement_maps_test.lua` runs `placement.lua` over all 89 playable deployment areas in
-`data/mapscan.json` (from `tools/map_scan.py`). Results on game build 24874058, with the pair
+`data/mapscan.json` (from `tools/map_scan.py`). Results on game build 25134257, with the pair
 candidates described below:
 
 | Outcome | Areas |

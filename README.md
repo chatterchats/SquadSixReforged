@@ -14,7 +14,8 @@ Missions that inject scripted characters keep their authored limit of four.
 
 ## Status
 
-Adopted from arctco's final release, **1.1.4** (2026-09-03), which is imported unmodified at tag
+**1.2.0** (2026-10-12) is the first release since adoption; see [CHANGELOG.md](CHANGELOG.md). It
+continues from arctco's final release, **1.1.4** (2026-09-03), which is imported unmodified at tag
 `upstream-1.1.4`. See [docs/upstream.md](docs/upstream.md) for what that release contains and
 [docs/core-pak-analysis.md](docs/core-pak-analysis.md) for exactly what the cooked pak changes.
 
@@ -23,6 +24,7 @@ Adopted from arctco's final release, **1.1.4** (2026-09-03), which is imported u
 ```
 src/Core/       cooked IoStore override + zcom-mod.json      -> Content/Paks/~mods
 src/Runtime/    UE4SS mod ZCOMSquadSix + zcom-mod.json        -> ue4ss/Mods
+  ZCOMSquadSix/enabled.txt   loads the mod on a manual install without a mods.txt edit
   ZCOMSquadSix/Scripts/
     main.lua        loads the modules, registers hooks until every target exists, logs status
     limits.lua      mission squad limits at runtime, and the scripted-cast guards
@@ -69,7 +71,7 @@ changed, and lists what to review. See [docs/core-pak-analysis.md](docs/core-pak
 1. `python3 tools/build_core.py ... --check`: stops if the game's missions or squad limits changed.
 2. Start the game and open squad select, then start a mission. In `UE4SS.log`, look for:
    ```
-   [ZCOM_SQUAD_SIX] selfcheck phase=startup ok=20 missing=none unchecked=none
+   [ZCOM_SQUAD_SIX] selfcheck phase=startup ok=23 missing=none unchecked=none
    [ZCOM_SQUAD_SIX] selfcheck phase=squad_select ok=2 missing=none unchecked=none
    [ZCOM_SQUAD_SIX] selfcheck phase=mission ok=3 missing=none unchecked=none
    ```
@@ -110,7 +112,7 @@ refuses to build if they disagree.
 
 ## Requirements
 
-- Star Wars: Zero Company (tested build 24874058)
+- Star Wars: Zero Company (tested builds 25134257 and 24874058)
 - UE4SS
 
 ## License

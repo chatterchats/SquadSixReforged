@@ -1,6 +1,6 @@
 # In-game checks
 
-Runs on a game copy (Instance 2, build 24874058) through ZC Sandbox, with Squad Six at acf2884 and
+Runs on a game copy (Instance 2, build 25134257) through ZC Sandbox, with Squad Six at acf2884 and
 the dev probe installed. Missions are launched straight from the Den (`mission launch`), not from a
 campaign, and the copy also runs other mods (OffDuty, QuickWin, Enhanced_Databank, BetterCamera,
 ColorsPlus, Fast_Resonance, MixamooModConfigManager).

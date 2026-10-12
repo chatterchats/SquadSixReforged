@@ -28,12 +28,14 @@ including the 20 missions left out and why: [`core-pak-analysis.md`](core-pak-an
 
 - **The cooked overrides had no build script.** `tools/build_core.py` now rebuilds them from the
   game's own packages and reproduces all 106 of 1.1.4's packages byte for byte.
-- **The game build is pinned.** Both manifests list `testedBuilds: ["24874058"]` with
-  `"strict": true`, so a game patch may need re-patched overrides and a manifest bump. Run
-  `tools/inspect_core.py` after each patch.
+- **The game build is pinned.** Both manifests list `testedBuilds` with `"strict": true`, so a
+  game patch may need re-patched overrides and a manifest bump. 1.1.4 listed 24874058; 1.2.0 adds
+  25134257, which `tools/build_core.py` rebuilds all 106 of 1.1.4's packages from byte for byte.
+  Run `tools/build_core.py --check` after each patch.
 - **Release history:** arctco's notes for 1.1.0–1.1.4 are on their Nexus page, saved in
   [`upstream-nexus-page-1.1.4.md`](upstream-nexus-page-1.1.4.md). Earlier versions are only
   described in [`runtime-notes.md`](runtime-notes.md).
 - **Only the Zero Mod Manager bundle was imported.** arctco also shipped a Manual archive with
   `ZCOMSquadSix/enabled.txt` (loads the mod without a `mods.txt` edit) and checksum-guarded
-  `install.sh`/`uninstall.sh` for Linux. Those files aren't in this repository.
+  `install.sh`/`uninstall.sh` for Linux. 1.2.0 ships an `enabled.txt` again; the install scripts
+  aren't in this repository.

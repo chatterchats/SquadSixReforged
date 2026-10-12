@@ -7,12 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Adopted from arctco, the original author, after they discontinued the mod. The runtime is now
+## [1.2.0] - 2026-10-12
+
+The first release since the mod was adopted from arctco, the original author, who discontinued it. The runtime is now
 split across modules, with the placement fixes below. The Core container is now built from the
 game's own packages by `tools/build_core.py`, from the squad limits in `data/missions.tsv`.
 
 ### Added
 
+- `ZCOMSquadSix/enabled.txt` in the Runtime folder, so a manual install loads without editing
+  `mods.txt` (arctco's manual archive had one; the mod-manager bundle didn't).
 - `tests/placement_maps_test.lua` runs the placement rules over all 89 deployment areas: on 84 the
   two overflow operators end up inside the lane even when staged outside it and then stranded by
   the relocation. See `docs/placement-coverage.md`.
@@ -56,6 +60,7 @@ game's own packages by `tools/build_core.py`, from the squad limits in `data/mis
 
 ### Changed
 
+- Tested on game build 25134257 as well as 24874058. The manifests list both and stay strict.
 - The Serolonis Job (MM_01_010_SerolonisJob) keeps its authored four operators. It's the opening
   tutorial and the game sets its squad, so the player can't pick operators; 1.1.4 raised it to six
   anyway. It's out of the container and the runtime guards it by name.
@@ -83,8 +88,8 @@ game's own packages by `tools/build_core.py`, from the squad limits in `data/mis
   `lineup.lua`, `placement.lua` and `common.lua`. The code is moved unchanged; 1.1.4's single file
   had reached Lua's limit of 200 top-level locals, so any addition would have stopped it loading.
 
-Tested in game at six on Retake Luunata, Dark Waters, Unfinished Business, The Infinite Coil
-and several skirmishes; see `docs/live-tests.md`.
+Tested in game (build 25134257) at six on Retake Luunata, Dark Waters, Unfinished Business, The
+Infinite Coil and several skirmishes; see `docs/live-tests.md`.
 
 ## [1.1.4] - 2026-09-03
 

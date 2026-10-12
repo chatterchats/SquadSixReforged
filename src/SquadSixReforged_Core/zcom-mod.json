@@ -18,5 +18,8 @@
   ],
   "requires": {
     "ue4ss": true
+  },
+  "nexus": {
+    "modId": 340
   }
 }

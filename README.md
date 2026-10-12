@@ -1,5 +1,6 @@
 # Squad Six Reforged
 
+[![Nexus Mods](https://img.shields.io/badge/Nexus%20Mods-Squad%20Six%20Reforged-d98f40)](https://www.nexusmods.com/starwarszerocompany/mods/340)
 [![Original: Squad Six by arctco](https://img.shields.io/badge/Nexus%20Mods-original%20Squad%20Six%20(mod%2044)-d98f40)](https://www.nexusmods.com/starwarszerocompany/mods/44)
 [![UE4SS](https://img.shields.io/badge/framework-UE4SS-6f42c1)](https://github.com/UE4SS-RE/RE-UE4SS)
 

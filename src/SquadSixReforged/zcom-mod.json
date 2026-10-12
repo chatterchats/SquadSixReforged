@@ -24,5 +24,8 @@
       "id": "community.squad-six-reforged.core",
       "reason": "The mission squad limits ship as an IoStore pak in the same archive."
     }
-  ]
+  ],
+  "nexus": {
+    "modId": 340
+  }
 }

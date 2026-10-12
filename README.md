@@ -80,6 +80,23 @@ changed, and lists what to review. See [docs/core-pak-analysis.md](docs/core-pak
    hard-coded map layouts still matches exactly one area. Diff `data/mapscan.json` to see what a
    patch moved.
 
+## Checking in the game
+
+`tools/sandbox_check.py` drives ZC Sandbox on a game copy (`Instance N`, as Off Duty's simtest uses).
+It launches missions with a six-operator squad, lets the dev probe check the placement spots and
+record the staging, can end encounters (`:advance=N`) to reach later deployments, and writes a
+report to `dist/sandbox/`:
+
+```sh
+python3 tools/sandbox_check.py install --instance 2       # with that copy closed
+python3 tools/sandbox_check.py info --instance 2          # with it running: roster and mission names
+python3 tools/sandbox_check.py check --instance 2 --squad "A,B,C,D,E,F" \
+    --missions SK_Lothal_035_Crisis,MM_01_010_SerolonisJob,MM_04_030_RetakeLuunata:advance=2
+python3 tools/sandbox_check.py uninstall --instance 2     # closed again; probe output is kept
+```
+
+It never starts or stops the game, refuses to install while the copy runs, and stops at a crash.
+
 ## Building a release
 
 ```sh

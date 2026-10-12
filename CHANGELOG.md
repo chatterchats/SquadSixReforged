@@ -83,8 +83,8 @@ game's own packages by `tools/build_core.py`, from the squad limits in `data/mis
   `lineup.lua`, `placement.lua` and `common.lua`. The code is moved unchanged; 1.1.4's single file
   had reached Lua's limit of 200 top-level locals, so any addition would have stopped it loading.
 
-Tested in game on Retake Luunata, Dark Waters and several skirmishes at six; see
-`docs/live-tests.md`.
+Tested in game at six on Retake Luunata, Dark Waters, Unfinished Business, The Infinite Coil
+and several skirmishes; see `docs/live-tests.md`.
 
 ## [1.1.4] - 2026-09-03
 

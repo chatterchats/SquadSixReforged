@@ -164,6 +164,34 @@ The second area seems to be reached by something scripted that overrides telepor
 places stragglers itself. Squad Six's two teleports there were wasted. If another map shows the
 same, operators that far away (say more than 20,000 uu) could be left to the game.
 
+## MM_06_090_FathomFinale ("The Infinite Coil"), six (bdda677, 2026-10-12)
+
+From the user's sandbox campaign, reached through the story, played through. Squad Expansion keeps
+this mission at four; arctco's notes record Harakiri's report of an operator in a crate on the
+staircase in area C_1 (1.1.3 derived 13074/2050 at Z -200 and 12845/2050 at Z 0) and others
+landing on a ledge or inside geometry. Self-check: startup 23/23, squad_select 2/2, mission 3/3.
+
+The probe at 11 s: areas C_2, C_3 and C_4 flat, all authored and derived spots on the navmesh.
+Area C_1 has two authored spots at Z 0 and two at Z -200 (the staircase); derived2 there,
+12845/2050, has no navmesh under it.
+
+| Step | Result |
+|------|--------|
+| Start | two operators off the navmesh moved beside squadmates at 8 s (`spawn_rescue=moved`, `on_navmesh=4`) |
+| 1 (area C_1, stairs) | the crate spot 12845/2050 skipped (`off_navmesh_skipped=1`); the two overflow operators moved onto 13074/2050 and 13137/1880, settled from the interpolated Z -100 onto the lower floor (`floor_settled=2/2 largest_shift=-100`). Final: two at the top (Z 98), four at the bottom (Z -103), all distinct, nothing restored |
+| 2 (area C_2) | arctco's profile for this area (`placement_rescue=FathomFinale`): two operators moved onto its points, at the squad's height; nothing restored, `near=6` |
+| 3 (area C_3) | only two operators in at the trigger (`near=2`), the rest ~2,700 uu back. Two moved onto the derived spots (`floor_settled=2/2`). The watchdog then teleported stragglers four times (3.5, 5 and 7 s; added spot 1 was the target three times), but one kept coming back onto its route until `outside_volume:exhausted`, and the relocation reshuffled the others onto authored spots (`placement_drift`). The user saw all six placed properly |
+| 4 (area C_4) | all six in at the trigger; two moved onto the derived spots, `floor_settled=2/2`, one candidate skipped for no navmesh; nothing restored |
+| End | mission complete, no errors |
+
+Nobody in a crate, in geometry, floating or under the floor.
+
+**Follow-up:** area 3 repeats what Unfinished Business area C_1 showed, with a straggler only
+~2,700 uu back instead of ~58,000, so a distance threshold wouldn't separate the cases. While the
+game is still walking an operator in, a teleport doesn't hold (even with `StopMovement`), and the
+game places them itself. Better: once an operator the watchdog teleported is found back on its
+route, stop teleporting it and leave it to the game.
+
 ## Squad select (12ffd3a, 2026-10-11)
 
 All six models show in the lineup: `proxies=6 valid_proxies=6 hidden_proxies=0`, layout applied

@@ -139,8 +139,15 @@ The probe's spot checks, 11 s in:
 **Gap, fixed since:** a derived point the navmesh doesn't cover was still used (at its interpolated
 height). Here the game's relocation recovered; elsewhere it might send the operator to the origin,
 as Retake's floating spots did. Derived points with no navmesh under them are now skipped for the
-next candidate (`off_navmesh_skipped=`), covered by `tests/live_fixes_test.lua`. Not yet rerun in
-game.
+next candidate (`off_navmesh_skipped=`), covered by `tests/live_fixes_test.lua`.
+
+Rerun with the fix (bdda677), encounter 1: `off_navmesh_skipped=4` (the spot under the prop and
+three others), the overflow operators moved onto -12038/-19878 and -12083/-19995,
+`floor_settled=2/2`, nothing restored. The relocation then walked the second one ~50 uu to
+-12083/-19943, about 80 uu from the first (`shared_tile:already_staged`, left alone); in game they
+stand close but on separate tiles. The probe's checks after the rescue said the occupied spots had
+no navmesh nearby, against Squad Six's check just before: the navmesh appears to be cut around
+standing units, so, like the floor trace, the probe's checks of occupied spots can't be trusted.
 
 ## Squad select (12ffd3a, 2026-10-11)
 

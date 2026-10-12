@@ -80,3 +80,9 @@ what the game's relocation rejected. The bellhop needs a real campaign launch to
 Area 0: `placement_repair=skipped reason=stock_squad units=4 authored=4`, `repair_passes=0`, no
 spawn watch activity; the game put all four on the four authored destinations. (Before: three
 repair passes and one operator teleported twice.)
+
+## Squad select (12ffd3a, 2026-10-11)
+
+All six models show in the lineup: `proxies=6 valid_proxies=6 hidden_proxies=0`, layout applied
+(the first pass found the stock four placed and two at the centre; the second spread all six at
+fit 0.60), `slot_widgets=6 activity_slot_vms=6`. The squad_select self-check passed (2/2).

@@ -80,7 +80,7 @@ too); the export data is the game's apart from the literal. 1.1.4 shipped that w
 
 `tools/build_core.py` rebuilds the pak from the installed game: it reads `data/missions.tsv`, finds
 each `MaxSquadSize` by parsing the package, patches the legacy `.uexp`, packs with
-`retoc to-zen --version UE5_6`, and verifies the result before writing `src/Core`. It refuses to
+`retoc to-zen --version UE5_6`, and verifies the result before writing `src/ZCOMSquadSix_Core`. It refuses to
 build if the game's missions or their limits no longer match the table, so a game patch has to be
 reviewed rather than slipping through. `tools/schema.py` regenerates the property layouts from a
 new `.usmap` if a patch changes the mission classes.

@@ -1,9 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "community.squad-six.runtime",
-  "name": "Squad Six - Runtime",
+  "id": "community.squad-six.core",
+  "name": "Squad Six - Core",
   "version": "1.2.0",
-  "description": "Adds the six-model lineup and six-entry squad-selection UI runtime.",
+  "author": "arctco, continued by Chats",
+  "description": "Raises the deployable squad size from four to six on the supported missions.",
   "game": {
     "appId": 2075800,
     "testedBuilds": [
@@ -13,7 +14,7 @@
     "strict": true
   },
   "type": [
-    "ue4ss"
+    "iostore"
   ],
   "requires": {
     "ue4ss": true

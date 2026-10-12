@@ -47,8 +47,9 @@ WIN64 = GAME_DIR / "SWZeroCompany" / "Binaries" / "Win64"
 PAKS = GAME_DIR / "SWZeroCompany" / "Content" / "Paks" / "~mods"
 CRASHES = Path("prefix/drive_c/users/steamuser/AppData/Local/SWZeroCompany/Saved/Crashes")
 
-RUNTIME_SOURCE = ROOT / "src" / "Runtime" / "ZCOMSquadSix"
-CORE_SOURCE = ROOT / "src" / "Core"
+RUNTIME_SOURCE = ROOT / "src" / "ZCOMSquadSix"
+CORE_SOURCE = ROOT / "src" / "ZCOMSquadSix_Core"
+CORE_FOLDER = "ZCOMSquadSix_Core"  # under ~mods, as the release ZIP installs it
 PROBE_SOURCE = ROOT / "dev" / "ZCOMSquadSixProbe"
 RUNTIME_MOD, PROBE_MOD = "ZCOMSquadSix", "ZCOMSquadSixProbe"
 PAK_FILES = ["pakchunk99-ZCOMSquadSix_P." + extension for extension in ("pak", "ucas", "utoc")]
@@ -188,9 +189,14 @@ def cmd_install(args):
         shutil.rmtree(runtime)
     shutil.copytree(RUNTIME_SOURCE, runtime)
     (runtime / "enabled.txt").write_text("")
-    instance.paks.mkdir(parents=True, exist_ok=True)
+    # The release keeps the paks in ~mods/ZCOMSquadSix_Core; up to 1.1.4 they sat loose in ~mods,
+    # and both copies would load.
     for name in PAK_FILES:
-        shutil.copyfile(CORE_SOURCE / name, instance.paks / name)
+        (instance.paks / name).unlink(missing_ok=True)
+    core = instance.paks / CORE_FOLDER
+    if core.exists():
+        shutil.rmtree(core)
+    shutil.copytree(CORE_SOURCE, core)
     # The probe: replace its scripts, keep its output files.
     probe_scripts = instance.probe / "Scripts"
     if probe_scripts.exists():
@@ -216,6 +222,8 @@ def cmd_uninstall(args):
             shutil.rmtree(folder)
     for name in PAK_FILES:
         (instance.paks / name).unlink(missing_ok=True)
+    if (instance.paks / CORE_FOLDER).exists():
+        shutil.rmtree(instance.paks / CORE_FOLDER)
     print("Removed Squad Six and the probe from instance %d.%s" % (
         instance.number, " Probe output moved to %s" % kept if kept.exists() else ""))
 
@@ -225,7 +233,10 @@ def cmd_status(args):
     marker = instance.mods / RUNTIME_MOD / "installed_from.txt"
     print("instance %d: %s" % (instance.number, instance.base))
     print("  installed: %s" % (marker.read_text().strip() if marker.exists() else "no"))
-    print("  pak: %s" % ("yes" if all((instance.paks / n).exists() for n in PAK_FILES) else "no"))
+    core = instance.paks / CORE_FOLDER
+    loose = [n for n in PAK_FILES if (instance.paks / n).exists()]
+    print("  pak: %s%s" % ("yes" if all((core / n).exists() for n in PAK_FILES) else "no",
+                           " (and a loose 1.1.4-style copy in ~mods: reinstall)" if loose else ""))
     print("  probe: %s" % ("yes" if (instance.probe / "Scripts" / "main.lua").exists() else "no"))
     print("  game running: %s" % instance.running())
     hello = Sandbox(instance.sandbox).hello()

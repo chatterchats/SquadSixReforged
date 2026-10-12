@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "community.squad-six.runtime",
+  "name": "Squad Six - Runtime",
+  "version": "1.2.0",
+  "author": "arctco, continued by Chats",
+  "description": "Six-operator squads: the six-slot squad selection, six-model lineup and in-mission placement for the extra operators.",
+  "game": {
+    "appId": 2075800,
+    "testedBuilds": [
+      "25134257",
+      "24874058"
+    ],
+    "strict": true
+  },
+  "type": [
+    "ue4ss"
+  ],
+  "requires": {
+    "ue4ss": true
+  },
+  "dependencies": [
+    {
+      "id": "community.squad-six.core",
+      "reason": "The mission squad limits ship as an IoStore pak in the same archive."
+    }
+  ]
+}

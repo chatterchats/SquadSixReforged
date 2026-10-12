@@ -1,0 +1,181 @@
+name: Release to Nexus Mods
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nexus-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Test, package and upload
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Read release metadata
+        id: release
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import uuid
+          from pathlib import Path
+          from tools.nexus_changelog import nexus_changelog
+
+          metadata_files = (
+              Path("src/ZCOMSquadSix/modinfo.json"),
+              Path("src/ZCOMSquadSix/zcom-mod.json"),
+              Path("src/ZCOMSquadSix_Core/modinfo.json"),
+              Path("src/ZCOMSquadSix_Core/zcom-mod.json"),
+          )
+          versions = {}
+          for metadata_file in metadata_files:
+              with metadata_file.open(encoding="utf-8") as stream:
+                  version = json.load(stream).get("version")
+              if not isinstance(version, str) or not version.strip():
+                  raise SystemExit(f"Missing version in {metadata_file}")
+              versions[metadata_file] = version.strip()
+
+          if len(set(versions.values())) != 1:
+              details = ", ".join(f"{path}: {version}" for path, version in versions.items())
+              raise SystemExit(f"Metadata versions do not match: {details}")
+
+          version = next(iter(versions.values()))
+          if not re.fullmatch(r"\d+\.\d+\.\d+", version):
+              raise SystemExit(f"Version must use #.#.# format, got {version!r}")
+
+          main_text = Path("src/ZCOMSquadSix/Scripts/main.lua").read_text(encoding="utf-8")
+          main_match = re.search(r'^local VERSION = "([^"]+)"$', main_text, re.MULTILINE)
+          if main_match is None or main_match.group(1) != version:
+              raise SystemExit("main.lua VERSION does not match package metadata")
+
+          readme_title = Path("src/ZCOMSquadSix/README.md").read_text(encoding="utf-8").splitlines()[0]
+          if not readme_title.startswith(f"# Squad Six v{version} "):
+              raise SystemExit("README.md title does not match package metadata")
+
+          changelog_text = Path("CHANGELOG.md").read_text(encoding="utf-8")
+          try:
+              changelog = nexus_changelog(changelog_text, version)
+          except ValueError as error:
+              raise SystemExit(str(error)) from error
+
+          # The Nexus page's numeric ID, recorded once the first file has been uploaded by hand.
+          manifest = json.loads(Path("src/ZCOMSquadSix/zcom-mod.json").read_text(encoding="utf-8"))
+          nexus_mod = (manifest.get("nexus") or {}).get("modId")
+          if not isinstance(nexus_mod, int):
+              raise SystemExit(
+                  "src/ZCOMSquadSix/zcom-mod.json has no nexus.modId: upload the first file to the "
+                  "new Nexus page by hand, then record the page's mod ID there"
+              )
+
+          delimiter = f"CHANGELOG_{uuid.uuid4().hex}"
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
+              output.write(f"version={version}\n")
+              output.write(f"nexus_mod={nexus_mod}\n")
+              output.write(f"changelog<<{delimiter}\n{changelog}\n{delimiter}\n")
+          PY
+
+      - name: Run tests
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq luajit
+          tools/run-tests.sh
+
+      - name: Resolve Nexus IDs
+        id: nexus
+        shell: bash
+        env:
+          NEXUSMODS_API_KEY: ${{ secrets.NEXUSMODS_API_KEY }}
+          NEXUS_MOD: ${{ steps.release.outputs.nexus_mod }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from urllib.error import HTTPError
+          from urllib.parse import quote
+          from urllib.request import Request, urlopen
+
+          api_base = "https://api.nexusmods.com/v3"
+          api_key = os.environ["NEXUSMODS_API_KEY"].strip()
+          if not api_key:
+              raise SystemExit("NEXUSMODS_API_KEY is empty")
+
+          def api_get(path):
+              request = Request(
+                  f"{api_base}{path}",
+                  headers={
+                      "apikey": api_key,
+                      "User-Agent": "chatterchats/ZComSquadSix release workflow",
+                  },
+              )
+              try:
+                  with urlopen(request, timeout=30) as response:
+                      return json.load(response)
+              except HTTPError as error:
+                  detail = error.read().decode("utf-8", errors="replace")
+                  raise SystemExit(
+                      f"Nexus API request failed for {path}: {error.code} {detail}"
+                  ) from error
+
+          mod = api_get(f"/games/starwarszerocompany/mods/{os.environ['NEXUS_MOD']}").get("data", {})
+          mod_id = mod.get("id")
+          if not isinstance(mod_id, str) or not mod_id:
+              raise SystemExit("Nexus API response did not contain the mod's unique ID")
+
+          payload = api_get(f"/mods/{quote(mod_id, safe='')}/files").get("data", {})
+          active_files = [
+              mod_file
+              for mod_file in payload.get("mod_files", [])
+              if mod_file.get("is_active")
+          ]
+          if len(active_files) != 1:
+              names = ", ".join(
+                  str(mod_file.get("name", "<unnamed>")) for mod_file in active_files
+              )
+              raise SystemExit(
+                  "Expected exactly one active Nexus mod file for Squad Six, "
+                  f"found {len(active_files)}: {names or '<none>'}"
+              )
+
+          file_id = active_files[0].get("id")
+          if not isinstance(file_id, str) or not file_id:
+              raise SystemExit("Nexus API response did not contain the mod file's unique ID")
+
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
+              output.write(f"mod_id={mod_id}\n")
+              output.write(f"file_id={file_id}\n")
+          PY
+
+      - name: Package mod
+        shell: bash
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          # The verified release ZIP (laid out as SWZeroCompany/: Binaries/ and Content/, CREDITS.md included).
+          python3 tools/package.py
+          ln "dist/SquadSix-${VERSION}.zip" "SquadSix v${VERSION}.zip"
+
+      - name: Upload to Nexus Mods
+        uses: Nexus-Mods/upload-action@c96019556046053aa26044b44396cd38929daf23
+        with:
+          api_key: ${{ secrets.NEXUSMODS_API_KEY }}
+          file_id: ${{ steps.nexus.outputs.file_id }}
+          filename: SquadSix v${{ steps.release.outputs.version }}.zip
+          version: ${{ steps.release.outputs.version }}
+          display_name: Squad Six
+          mod_id: ${{ steps.nexus.outputs.mod_id }}
+          primary_mod_manager_download: true
+          update_mod_version: true
+          changelog: ${{ steps.release.outputs.changelog }}

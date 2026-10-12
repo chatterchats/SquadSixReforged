@@ -9,8 +9,8 @@ The per-file hashes are in [`upstream-1.1.4.sha256`](upstream-1.1.4.sha256), and
 
 | Part | Files | Has source here? |
 |------|-------|------------------|
-| **Runtime** (UE4SS) | `src/Runtime/ZCOMSquadSix/Scripts/main.lua` (about 3,600 lines; since split into modules, see the README) | Yes. The Lua is the source. |
-| **Core** (IoStore) | `src/Core/pakchunk99-ZCOMSquadSix_P.{pak,ucas,utoc}` | Cooked binaries; now built from `data/missions.tsv` by `tools/build_core.py`. |
+| **Runtime** (UE4SS) | `src/Runtime/ZCOMSquadSix/Scripts/main.lua` at the tag, now `src/ZCOMSquadSix/Scripts/` (about 3,600 lines; since split into modules, see the README) | Yes. The Lua is the source. |
+| **Core** (IoStore) | `src/Core/pakchunk99-ZCOMSquadSix_P.{pak,ucas,utoc}` at the tag, now `src/ZCOMSquadSix_Core/` | Cooked binaries; now built from `data/missions.tsv` by `tools/build_core.py`. |
 
 The runtime builds the six activity-slot view models, the six-model lineup diorama, the six-entry
 squad-select layout, and the placement of operators 5 and 6 inside each map's authored deployment

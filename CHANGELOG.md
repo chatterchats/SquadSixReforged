@@ -7,16 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.2.0] - 2026-10-12
+## [1.2.0]
 
-The first release since the mod was adopted from arctco, the original author, who discontinued it. The runtime is now
-split across modules, with the placement fixes below. The Core container is now built from the
-game's own packages by `tools/build_core.py`, from the squad limits in `data/missions.tsv`.
+The first release since the mod was adopted from arctco, the original author, who discontinued
+it. The runtime is now split across modules, with the placement fixes below. The Core container
+is now built from the game's own packages by `tools/build_core.py`, from the squad limits in
+`data/missions.tsv`. Tested in game (build 25134257) at six on Retake Luunata, Dark Waters,
+Unfinished Business, The Infinite Coil and several skirmishes; see `docs/live-tests.md`.
 
 ### Added
 
-- `ZCOMSquadSix/enabled.txt` in the Runtime folder, so a manual install loads without editing
-  `mods.txt` (arctco's manual archive had one; the mod-manager bundle didn't).
+- `ZCOMSquadSix/enabled.txt`, so a manual install loads without editing `mods.txt` (arctco's
+  manual archive had one; the mod-manager bundle didn't).
+- A player guide (`README.md`) and the credits (`CREDITS.md`) in the mod folder, and
+  `modinfo.json` manifests for Zero Company Mod Command beside each part.
 - `tests/placement_maps_test.lua` runs the placement rules over all 89 deployment areas: on 84 the
   two overflow operators end up inside the lane even when staged outside it and then stranded by
   the relocation. See `docs/placement-coverage.md`.
@@ -36,16 +40,16 @@ game's own packages by `tools/build_core.py`, from the squad limits in `data/mis
   SK_Lothal_050 and OM_Crisis_Guardian_A. The fallback now
   also tries points between pairs of authored destinations when the lane's edges can't hold
   everyone. Other maps are unchanged.
-- Retake Luunata (MM_04_030) at six (see `docs/live-tests.md`):
-  - one of the game's start spots for operators 5 and 6 has no navmesh, so the operator on it
-    couldn't move. Until the first deployment, an operator standing still off the navmesh while
-    the rest of the squad is on it is moved beside a squadmate (squads over four only);
-  - on the lower level the derived spots were 105–155 uu above the floor, and the game's
-    relocation sent two operators to the world origin. Derived spots are now put on the navmesh
-    under them;
-  - operators put back by the repair then walked away: a teleport doesn't cancel the walk the game
-    gave them. Every rescue and repair teleport now stops the operator's movement, and operators
-    who drift more than 300 uu from where they were put are logged (`placement_drift`).
+- Retake Luunata (MM_04_030) at six: one of the game's start spots for operators 5 and 6 has no
+  navmesh, so the operator on it couldn't move. Until the first deployment, an operator standing
+  still off the navmesh while the rest of the squad is on it is moved beside a squadmate (squads
+  over four only). This also happens on Brentaal 035, Coil Strikes Back and The Infinite Coil.
+- Retake Luunata at six: on the lower level the added spots were 105–155 uu above the floor, and
+  the game's relocation sent two operators to the world origin. Added spots are now put on the
+  navmesh under them.
+- Operators put back by the repair then walked away: a teleport doesn't cancel the walk the game
+  gave them. Every rescue and repair teleport now stops the operator's movement, and operators
+  who drift more than 300 uu from where they were put are logged (`placement_drift`).
 - A squad of four on an area with four destinations was still repaired while it walked in, and one
   operator teleported. A stock squad is now left to the game (`placement_repair=skipped
   reason=stock_squad`), and an operator crossing a squadmate's tile isn't moved until it stops.
@@ -60,6 +64,13 @@ game's own packages by `tools/build_core.py`, from the squad limits in `data/mis
 
 ### Changed
 
+- The download now mirrors the game's `SWZeroCompany` folder: the mod goes to
+  `Binaries/Win64/ue4ss/Mods/ZCOMSquadSix` and the squad-limit pak to
+  `Content/Paks/~mods/ZCOMSquadSix_Core`. A manual install is one extract, and Vortex can install
+  it. Zero Mod Manager and Zero Company Mod Command still show the two parts, Squad Six - Runtime
+  and Squad Six - Core. If you installed 1.1.4 or earlier by hand, delete the old
+  `pakchunk99-ZCOMSquadSix_P.pak`, `.ucas` and `.utoc` directly inside `Content/Paks/~mods`, or
+  both copies will load.
 - Tested on game build 25134257 as well as 24874058. The manifests list both and stay strict.
 - The Serolonis Job (MM_01_010_SerolonisJob) keeps its authored four operators. It's the opening
   tutorial and the game sets its squad, so the player can't pick operators; 1.1.4 raised it to six
@@ -87,9 +98,6 @@ game's own packages by `tools/build_core.py`, from the squad limits in `data/mis
 - The runtime is split into `main.lua` (loading and hook registration), `limits.lua`,
   `lineup.lua`, `placement.lua` and `common.lua`. The code is moved unchanged; 1.1.4's single file
   had reached Lua's limit of 200 top-level locals, so any addition would have stopped it loading.
-
-Tested in game (build 25134257) at six on Retake Luunata, Dark Waters, Unfinished Business, The
-Infinite Coil and several skirmishes; see `docs/live-tests.md`.
 
 ## [1.1.4] - 2026-09-03
 

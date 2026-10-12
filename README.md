@@ -22,16 +22,19 @@ continues from arctco's final release, **1.1.4** (2026-09-03), which is imported
 ## Layout
 
 ```
-src/Core/       cooked IoStore override + zcom-mod.json      -> Content/Paks/~mods
-src/Runtime/    UE4SS mod ZCOMSquadSix + zcom-mod.json        -> ue4ss/Mods
-  ZCOMSquadSix/enabled.txt   loads the mod on a manual install without a mods.txt edit
-  ZCOMSquadSix/Scripts/
+src/ZCOMSquadSix/        the UE4SS mod ("Squad Six - Runtime")    -> ue4ss/Mods/ZCOMSquadSix
+  README.md       the player guide (ships in the mod folder; its title carries the version)
+  enabled.txt     loads the mod on a manual install without a mods.txt edit
+  modinfo.json, zcom-mod.json   Zero Company Mod Command and Zero Mod Manager manifests
+  Scripts/
     main.lua        loads the modules, registers hooks until every target exists, logs status
     limits.lua      mission squad limits at runtime, and the scripted-cast guards
     lineup.lua      squad selection: six slots, extra proxies, six-model lineup, nameplates
     placement.lua   tactical deployment: extra destinations, rescue, repair, squadsixrescue
     selfcheck.lua   logs whether every game name the other modules use still resolves
     common.lua      shared constants and reflection/vector helpers
+src/ZCOMSquadSix_Core/   the cooked IoStore override ("Squad Six - Core") + its manifests
+                                                          -> Content/Paks/~mods/ZCOMSquadSix_Core
 data/           missions.tsv: the squad limit for every mission (what the Core pak changes)
                 mapscan.json: every deployment area and its destination points (tools/map_scan.py)
 dev/            ZCOMSquadSixProbe: in-game checks of placement spots and staging (never shipped)
@@ -40,14 +43,16 @@ docs/           upstream notes, file hashes, pak analysis, runtime-notes.md (why
 tests/          runtime tests under a UE4SS stand-in (ue4ss_mock.lua): startup, self-check,
                 lineup, rescue, probe,
                 placement_maps (placement.lua over every deployment area in data/mapscan.json)
-tools/          build_core.py, inspect_core.py, package.py, run-tests.sh, and their helpers
+tools/          build_core.py, inspect_core.py, map_scan.py, sandbox_check.py, package.py,
+                bump_version.py, nexus_changelog.py, run-tests.sh, and their helpers
+.github/workflows/release-nexus.yml   manual Nexus release
 ```
 
 `tools/run-tests.sh` runs the tests with LuaJIT. `bootstrap_test.lua ... --print` writes the
 startup transcript instead, so two versions of the runtime can be diffed.
 
-`src/` mirrors the release ZIP, which Zero Mod Manager installs as "Squad Six - Core" and
-"Squad Six - Runtime". The mod IDs (`community.squad-six.core` / `.runtime`) and the UE4SS folder
+The release ZIP mirrors the game's `SWZeroCompany` folder (see Releasing), and Zero Mod Manager
+and Zero Company Mod Command install it as "Squad Six - Runtime" and "Squad Six - Core". The mod IDs (`community.squad-six.core` / `.runtime`) and the UE4SS folder
 name `ZCOMSquadSix` are kept, so existing installs upgrade in place.
 
 ## Building the Core pak
@@ -58,9 +63,9 @@ The pak is built from the installed game's own packages with
 
 ```sh
 PAKS=".../SWZeroCompany/Content/Paks"
-python3 tools/build_core.py --retoc /path/to/retoc --paks "$PAKS"           # writes src/Core
+python3 tools/build_core.py --retoc /path/to/retoc --paks "$PAKS"           # writes src/ZCOMSquadSix_Core
 python3 tools/build_core.py --retoc /path/to/retoc --paks "$PAKS" --check   # compare only
-python3 tools/inspect_core.py --retoc /path/to/retoc --paks "$PAKS"         # diff src/Core vs the game
+python3 tools/inspect_core.py --retoc /path/to/retoc --paks "$PAKS"         # diff the pak vs the game
 ```
 
 After a game patch, run `--check` first: the build stops if the game's missions or their limits
@@ -100,15 +105,44 @@ python3 tools/sandbox_check.py uninstall --instance 2     # closed again; probe 
 
 It never starts or stops the game, refuses to install while the copy runs, and stops at a crash.
 
-## Building a release
+## Releasing
 
-```sh
-python3 tools/package.py            # dist/SquadSix-<version>.zip
-python3 tools/package.py --verify   # also list which files differ from upstream 1.1.4
+The manually run **Release to Nexus Mods** workflow publishes a release; use `tools/package.py`
+for a local, package-only build.
+
+1. If `data/missions.tsv` changed, rebuild the pak with `tools/build_core.py` and commit
+   `src/ZCOMSquadSix_Core` and `data/core-build.sha256`.
+2. Add player-facing notes under `## [Unreleased]` in [`CHANGELOG.md`](CHANGELOG.md), grouped as
+   Added / Changed / Fixed / Removed.
+3. Bump the version with `patch`, `minor` or `major`:
+
+   ```sh
+   python3 tools/bump_version.py minor
+   ```
+
+   It updates both components' `modinfo.json` and `zcom-mod.json`, `Scripts/main.lua` and the
+   player README title, and turns `[Unreleased]` into the new version.
+4. Run `tools/run-tests.sh` and `python3 tools/package.py` (`--verify` also lists which files
+   differ from upstream 1.1.4), then check `dist/SquadSix-#.#.#.zip` with the mod managers
+   (Vortex included) and a clean manual install. A built version is immutable: the packager
+   refuses to overwrite a ZIP with different contents.
+5. Commit (`chore(release): v#.#.#`), tag `v#.#.#`, and push.
+6. Run **Release to Nexus Mods** from the **Actions** tab. It needs the `NEXUSMODS_API_KEY`
+   repository secret, and the Nexus page's mod ID in `src/ZCOMSquadSix/zcom-mod.json` as
+   `"nexus": {"modId": N}`. The first file on a new page has to be uploaded by hand: the
+   workflow replaces the page's single active file.
+
+The ZIP, `SquadSix-#.#.#.zip`, mirrors the game's `SWZeroCompany` folder, so a manual install is
+one extract and Vortex takes it as a combo mod:
+
+```
+Binaries/Win64/ue4ss/Mods/ZCOMSquadSix/     src/ZCOMSquadSix's player files, plus CREDITS.md
+Content/Paks/~mods/ZCOMSquadSix_Core/       the paks and their manifests
 ```
 
-Bump `version` in both `zcom-mod.json` files and `VERSION` in `main.lua` together; the script
-refuses to build if they disagree.
+The workflow checks that all four manifests, `main.lua` and the README title agree, reads that
+version's notes from the changelog (as plain text, via `tools/nexus_changelog.py`), runs the
+tests, packages, and uploads as a new version of the page's single active file.
 
 ## Requirements
 

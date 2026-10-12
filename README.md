@@ -1,28 +1,29 @@
-# Squad Six
+# Squad Six Reforged
 
-[![Nexus Mods](https://img.shields.io/badge/Nexus%20Mods-original%20(mod%2044)-d98f40)](https://www.nexusmods.com/starwarszerocompany/mods/44)
+[![Original: Squad Six by arctco](https://img.shields.io/badge/Nexus%20Mods-original%20Squad%20Six%20(mod%2044)-d98f40)](https://www.nexusmods.com/starwarszerocompany/mods/44)
 [![UE4SS](https://img.shields.io/badge/framework-UE4SS-6f42c1)](https://github.com/UE4SS-RE/RE-UE4SS)
 
-Squad Six raises the deployable squad size in **Star Wars: Zero Company** from four to six. It
-combines an IoStore data override with a UE4SS Lua runtime that adds six activity slots, a
+Squad Six Reforged raises the deployable squad size in **Star Wars: Zero Company** from four to
+six. It combines an IoStore data override with a UE4SS Lua runtime that adds six activity slots, a
 six-model lineup, a six-entry squad-selection layout and in-map placement for the extra operators.
 Missions that inject scripted characters keep their authored limit of four.
 
-> **Created by arctco.** This is a community continuation of arctco's discontinued mod,
-> maintained with their permission. The manual testing and the hand-picked mission list are
-> theirs; see [CREDITS.md](CREDITS.md).
+> **A continuation of Squad Six by arctco.** arctco created Squad Six, discontinued it, and gave
+> permission for others to continue it with credit. Most of the runtime is still their code, and
+> the manual testing and the hand-picked mission list are theirs; see [CREDITS.md](CREDITS.md).
+> No licence has been chosen yet.
 
 ## Status
 
-**1.2.0** (2026-10-12) is the first release since adoption; see [CHANGELOG.md](CHANGELOG.md). It
-continues from arctco's final release, **1.1.4** (2026-09-03), which is imported unmodified at tag
+**1.2.0** (2026-10-12) is the first release of Squad Six Reforged; see [CHANGELOG.md](CHANGELOG.md).
+It continues from arctco's final release of Squad Six, **1.1.4** (2026-09-03), which is imported unmodified at tag
 `upstream-1.1.4`. See [docs/upstream.md](docs/upstream.md) for what that release contains and
 [docs/core-pak-analysis.md](docs/core-pak-analysis.md) for exactly what the cooked pak changes.
 
 ## Layout
 
 ```
-src/ZCOMSquadSix/        the UE4SS mod ("Squad Six - Runtime")    -> ue4ss/Mods/ZCOMSquadSix
+src/SquadSixReforged/        the UE4SS mod ("Squad Six Reforged")  -> ue4ss/Mods/SquadSixReforged
   README.md       the player guide (ships in the mod folder; its title carries the version)
   enabled.txt     loads the mod on a manual install without a mods.txt edit
   modinfo.json, zcom-mod.json   Zero Company Mod Command and Zero Mod Manager manifests
@@ -33,11 +34,11 @@ src/ZCOMSquadSix/        the UE4SS mod ("Squad Six - Runtime")    -> ue4ss/Mods/
     placement.lua   tactical deployment: extra destinations, rescue, repair, squadsixrescue
     selfcheck.lua   logs whether every game name the other modules use still resolves
     common.lua      shared constants and reflection/vector helpers
-src/ZCOMSquadSix_Core/   the cooked IoStore override ("Squad Six - Core") + its manifests
-                                                          -> Content/Paks/~mods/ZCOMSquadSix_Core
+src/SquadSixReforged_Core/   the cooked IoStore override ("Squad Six Reforged - Core") + its manifests
+                                                          -> Content/Paks/~mods/SquadSixReforged_Core
 data/           missions.tsv: the squad limit for every mission (what the Core pak changes)
                 mapscan.json: every deployment area and its destination points (tools/map_scan.py)
-dev/            ZCOMSquadSixProbe: in-game checks of placement spots and staging (never shipped)
+dev/            SquadSixReforgedProbe: in-game checks of placement spots and staging (never shipped)
 docs/           upstream notes, file hashes, pak analysis, runtime-notes.md (why each rule exists),
                 placement-coverage.md (how placement does on every map)
 tests/          runtime tests under a UE4SS stand-in (ue4ss_mock.lua): startup, self-check,
@@ -52,8 +53,10 @@ tools/          build_core.py, inspect_core.py, map_scan.py, sandbox_check.py, p
 startup transcript instead, so two versions of the runtime can be diffed.
 
 The release ZIP mirrors the game's `SWZeroCompany` folder (see Releasing), and Zero Mod Manager
-and Zero Company Mod Command install it as "Squad Six - Runtime" and "Squad Six - Core". The mod IDs (`community.squad-six.core` / `.runtime`) and the UE4SS folder
-name `ZCOMSquadSix` are kept, so existing installs upgrade in place.
+and Zero Company Mod Command install it as "Squad Six Reforged" and "Squad Six Reforged - Core".
+Its IDs (`community.squad-six-reforged` and `.core`), UE4SS folder (`SquadSixReforged`) and pak
+(`pakchunk99-SquadSixReforged_P`) are its own, so it never installs over arctco's Squad Six
+(`community.squad-six.*`, `ZCOMSquadSix`); the runtime warns at load if both are installed.
 
 ## Building the Core pak
 
@@ -63,7 +66,7 @@ The pak is built from the installed game's own packages with
 
 ```sh
 PAKS=".../SWZeroCompany/Content/Paks"
-python3 tools/build_core.py --retoc /path/to/retoc --paks "$PAKS"           # writes src/ZCOMSquadSix_Core
+python3 tools/build_core.py --retoc /path/to/retoc --paks "$PAKS"           # writes src/SquadSixReforged_Core
 python3 tools/build_core.py --retoc /path/to/retoc --paks "$PAKS" --check   # compare only
 python3 tools/inspect_core.py --retoc /path/to/retoc --paks "$PAKS"         # diff the pak vs the game
 ```
@@ -76,9 +79,9 @@ changed, and lists what to review. See [docs/core-pak-analysis.md](docs/core-pak
 1. `python3 tools/build_core.py ... --check`: stops if the game's missions or squad limits changed.
 2. Start the game and open squad select, then start a mission. In `UE4SS.log`, look for:
    ```
-   [ZCOM_SQUAD_SIX] selfcheck phase=startup ok=23 missing=none unchecked=none
-   [ZCOM_SQUAD_SIX] selfcheck phase=squad_select ok=2 missing=none unchecked=none
-   [ZCOM_SQUAD_SIX] selfcheck phase=mission ok=3 missing=none unchecked=none
+   [SQUAD_SIX_REFORGED] selfcheck phase=startup ok=23 missing=none unchecked=none
+   [SQUAD_SIX_REFORGED] selfcheck phase=squad_select ok=2 missing=none unchecked=none
+   [SQUAD_SIX_REFORGED] selfcheck phase=mission ok=3 missing=none unchecked=none
    ```
    `missing=` names each function, class or property that no longer exists (for example a
    Blueprint struct field whose GUID suffix changed). `unchecked=` means UE4SS couldn't inspect
@@ -111,7 +114,7 @@ The manually run **Release to Nexus Mods** workflow publishes a release; use `to
 for a local, package-only build.
 
 1. If `data/missions.tsv` changed, rebuild the pak with `tools/build_core.py` and commit
-   `src/ZCOMSquadSix_Core` and `data/core-build.sha256`.
+   `src/SquadSixReforged_Core` and `data/core-build.sha256`.
 2. Add player-facing notes under `## [Unreleased]` in [`CHANGELOG.md`](CHANGELOG.md), grouped as
    Added / Changed / Fixed / Removed.
 3. Bump the version with `patch`, `minor` or `major`:
@@ -123,21 +126,21 @@ for a local, package-only build.
    It updates both components' `modinfo.json` and `zcom-mod.json`, `Scripts/main.lua` and the
    player README title, and turns `[Unreleased]` into the new version.
 4. Run `tools/run-tests.sh` and `python3 tools/package.py` (`--verify` also lists which files
-   differ from upstream 1.1.4), then check `dist/SquadSix-#.#.#.zip` with the mod managers
+   differ from upstream 1.1.4), then check `dist/SquadSixReforged-#.#.#.zip` with the mod managers
    (Vortex included) and a clean manual install. A built version is immutable: the packager
    refuses to overwrite a ZIP with different contents.
 5. Commit (`chore(release): v#.#.#`), tag `v#.#.#`, and push.
 6. Run **Release to Nexus Mods** from the **Actions** tab. It needs the `NEXUSMODS_API_KEY`
-   repository secret, and the Nexus page's mod ID in `src/ZCOMSquadSix/zcom-mod.json` as
+   repository secret, and the Nexus page's mod ID in `src/SquadSixReforged/zcom-mod.json` as
    `"nexus": {"modId": N}`. The first file on a new page has to be uploaded by hand: the
    workflow replaces the page's single active file.
 
-The ZIP, `SquadSix-#.#.#.zip`, mirrors the game's `SWZeroCompany` folder, so a manual install is
+The ZIP, `SquadSixReforged-#.#.#.zip`, mirrors the game's `SWZeroCompany` folder, so a manual install is
 one extract and Vortex takes it as a combo mod:
 
 ```
-Binaries/Win64/ue4ss/Mods/ZCOMSquadSix/     src/ZCOMSquadSix's player files, plus CREDITS.md
-Content/Paks/~mods/ZCOMSquadSix_Core/       the paks and their manifests
+Binaries/Win64/ue4ss/Mods/SquadSixReforged/     src/SquadSixReforged's player files, plus CREDITS.md
+Content/Paks/~mods/SquadSixReforged_Core/       the paks and their manifests
 ```
 
 The workflow checks that all four manifests, `main.lua` and the README title agree, reads that

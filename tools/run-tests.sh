@@ -2,7 +2,7 @@
 # Run every tests/*_test.lua with LuaJIT against the runtime in src/.
 # Usage: tools/run-tests.sh
 cd "$(dirname "$0")/.." || exit 1
-scripts="$(pwd)/src/ZCOMSquadSix/Scripts"
+scripts="$(pwd)/src/SquadSixReforged/Scripts"
 pass=0
 fail=0
 for t in tests/*_test.lua; do

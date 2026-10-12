@@ -1,5 +1,5 @@
 local VERSION = "1.2.0"
--- Squad Six's runtime. This file loads the modules and keeps registering hooks until every
+-- Squad Six Reforged's runtime (a continuation of arctco's Squad Six). This file loads the modules and keeps registering hooks until every
 -- target exists; the work itself is in limits.lua (mission squad limits), lineup.lua (squad
 -- selection) and placement.lua (tactical deployment), with shared helpers in common.lua.
 -- selfcheck.lua logs whether every game name those modules use still resolves.
@@ -70,8 +70,8 @@ local function report_status()
         .. " guard=" .. guard_summary())
     if limits.data_container == "missing" and not container_warning_reported then
         container_warning_reported = true
-        log("WARNING: the pakchunk99-ZCOMSquadSix_P container is not mounted."
-            .. " Copy the three pakchunk99-ZCOMSquadSix_P files into"
+        log("WARNING: the pakchunk99-SquadSixReforged_P container is not mounted."
+            .. " Install Squad Six Reforged - Core, or copy the SquadSixReforged_Core folder into"
             .. " SWZeroCompany/Content/Paks/~mods/")
     end
 end
@@ -144,6 +144,17 @@ local function maintain_runtime_state()
 end
 
 log("loaded version=" .. VERSION .. " target_size=" .. tostring(TARGET_SIZE))
+
+-- Another squad-size mod beside this one would act on every deployment too. arctco's original
+-- Squad Six has its own IDs, so mod managers don't replace it with this one.
+for _, other in ipairs({{"ZCOMSquadSix", "arctco's original Squad Six"}, {"SquadExpansion", "Squad Expansion"}}) do
+    local file = io.open(directory .. "../../" .. other[1] .. "/Scripts/main.lua", "r")
+    if file then
+        file:close()
+        log("WARNING: " .. other[2] .. " is also installed (ue4ss/Mods/" .. other[1] .. ")."
+            .. " Remove or disable it: two squad-size mods both act on every deployment.")
+    end
+end
 
 register_early_slot_notification()
 register_layout_notification()

@@ -1,4 +1,4 @@
--- The dev probe (dev/ZCOMSquadSixProbe) under the UE4SS stand-in: a mission on Lothal 035's real
+-- The dev probe (dev/SquadSixReforgedProbe) under the UE4SS stand-in: a mission on Lothal 035's real
 -- deployment area with a navmesh and floor that answer, a squad being staged, and Squad Six adding
 -- two destinations later. The probe runs while missions load, so it also mustn't search all
 -- objects often.
@@ -49,7 +49,7 @@ FindAllOf = function(class)
     return nil
 end
 
-dofile(here .. "../dev/ZCOMSquadSixProbe/Scripts/main.lua")
+dofile(here .. "../dev/SquadSixReforgedProbe/Scripts/main.lua")
 
 -- The mission starts after the probe has loaded.
 local units = {}

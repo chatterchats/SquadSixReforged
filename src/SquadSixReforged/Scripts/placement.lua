@@ -2479,7 +2479,7 @@ return {
     register_spawn_watch = register_spawn_watch,
     -- The lane geometry, for tests/placement_maps_test.lua, which runs it over every
     -- deployment area in the game (data/mapscan.json), and for the dev probe
-    -- (dev/ZCOMSquadSixProbe). Not used by the runtime.
+    -- (dev/SquadSixReforgedProbe). Not used by the runtime.
     internals = {
         RESCUE = RESCUE,
         PLACEMENT_PROFILES = PLACEMENT_PROFILES,

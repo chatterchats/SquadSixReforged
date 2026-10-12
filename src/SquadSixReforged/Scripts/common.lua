@@ -1,4 +1,4 @@
--- Shared by every Squad Six module: the target size, asset paths, logging, and the
+-- Shared by every Squad Six Reforged module: the target size, asset paths, logging, and the
 -- reflection and vector helpers.
 -- Why each rule exists, with the reports behind it: docs/runtime-notes.md.
 
@@ -7,7 +7,7 @@ local SLOT_LIST_ASSET = "/Game/Game/UI/Strategy/GalaxyMap/BPs/VM_ActivitySlotLis
 local HOLOGRAM_MANAGER_ASSET = "/Game/Game/UI/AC_HologramManager"
 local AUTHORED_SIZE = 4
 local function log(message)
-    print("[ZCOM_SQUAD_SIX] " .. message)
+    print("[SQUAD_SIX_REFORGED] " .. message)
 end
 
 local function unwrap(value)

@@ -2,7 +2,7 @@
 
   python3 tools/inspect_core.py --retoc /path/to/retoc --paks ".../SWZeroCompany/Content/Paks"
 
-Each override is fetched from src/ZCOMSquadSix_Core and from the game's base containers (pakchunk*-Windows plus
+Each override is fetched from src/SquadSixReforged_Core and from the game's base containers (pakchunk*-Windows plus
 global, never ~mods), and the differing bytes are listed. Every mission package should be the
 game's package with MaxSquadSize changed, so after a game patch this shows at once whether the
 overrides still match the game they replace: one that differs in more than that is a stale copy
@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from retoc import Retoc, link_base_game  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTAINER = ROOT / "src" / "ZCOMSquadSix_Core" / "pakchunk99-ZCOMSquadSix_P.utoc"
+CONTAINER = ROOT / "src" / "SquadSixReforged_Core" / "pakchunk99-SquadSixReforged_P.utoc"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--retoc", required=True, help="retoc_cli 0.1.5 or later")

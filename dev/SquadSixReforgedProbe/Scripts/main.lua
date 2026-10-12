@@ -29,8 +29,8 @@ local NAV_EXTENT = {X = 50, Y = 50, Z = 250}
 local source = debug.getinfo(1, "S").source:gsub("^@", "")
 local directory = assert(source:match("^(.*[/\\])"), "Scripts directory unavailable")
 -- Squad Six's own placement code, so the probe checks exactly the spots the runtime uses.
--- Installed, Mods/ZCOMSquadSixProbe sits next to Mods/ZCOMSquadSix; tests point elsewhere.
-local runtime_scripts = SquadSixProbeRuntimeScripts or (directory .. "../../ZCOMSquadSix/Scripts/")
+-- Installed, Mods/SquadSixReforgedProbe sits next to Mods/SquadSixReforged; tests point elsewhere.
+local runtime_scripts = SquadSixProbeRuntimeScripts or (directory .. "../../SquadSixReforged/Scripts/")
 local output_dir = SquadSixProbeOutputDir or (directory .. "../")
 package.path = runtime_scripts .. "?.lua;" .. package.path
 for _, module in ipairs({"common", "placement"}) do package.loaded[module] = nil end

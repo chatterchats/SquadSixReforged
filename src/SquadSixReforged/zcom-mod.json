@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "community.squad-six.runtime",
-  "name": "Squad Six - Runtime",
+  "id": "community.squad-six-reforged",
+  "name": "Squad Six Reforged",
   "version": "1.2.0",
   "author": "arctco, continued by Chats",
-  "description": "Six-operator squads: the six-slot squad selection, six-model lineup and in-mission placement for the extra operators.",
+  "description": "Six-operator squads, continuing arctco's Squad Six: the six-slot squad selection, six-model lineup and in-mission placement for the extra operators.",
   "game": {
     "appId": 2075800,
     "testedBuilds": [
@@ -21,7 +21,7 @@
   },
   "dependencies": [
     {
-      "id": "community.squad-six.core",
+      "id": "community.squad-six-reforged.core",
       "reason": "The mission squad limits ship as an IoStore pak in the same archive."
     }
   ]

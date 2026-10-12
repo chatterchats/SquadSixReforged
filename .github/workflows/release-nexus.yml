@@ -33,10 +33,10 @@ jobs:
           from tools.nexus_changelog import nexus_changelog
 
           metadata_files = (
-              Path("src/ZCOMSquadSix/modinfo.json"),
-              Path("src/ZCOMSquadSix/zcom-mod.json"),
-              Path("src/ZCOMSquadSix_Core/modinfo.json"),
-              Path("src/ZCOMSquadSix_Core/zcom-mod.json"),
+              Path("src/SquadSixReforged/modinfo.json"),
+              Path("src/SquadSixReforged/zcom-mod.json"),
+              Path("src/SquadSixReforged_Core/modinfo.json"),
+              Path("src/SquadSixReforged_Core/zcom-mod.json"),
           )
           versions = {}
           for metadata_file in metadata_files:
@@ -54,13 +54,13 @@ jobs:
           if not re.fullmatch(r"\d+\.\d+\.\d+", version):
               raise SystemExit(f"Version must use #.#.# format, got {version!r}")
 
-          main_text = Path("src/ZCOMSquadSix/Scripts/main.lua").read_text(encoding="utf-8")
+          main_text = Path("src/SquadSixReforged/Scripts/main.lua").read_text(encoding="utf-8")
           main_match = re.search(r'^local VERSION = "([^"]+)"$', main_text, re.MULTILINE)
           if main_match is None or main_match.group(1) != version:
               raise SystemExit("main.lua VERSION does not match package metadata")
 
-          readme_title = Path("src/ZCOMSquadSix/README.md").read_text(encoding="utf-8").splitlines()[0]
-          if not readme_title.startswith(f"# Squad Six v{version} "):
+          readme_title = Path("src/SquadSixReforged/README.md").read_text(encoding="utf-8").splitlines()[0]
+          if not readme_title.startswith(f"# Squad Six Reforged v{version} "):
               raise SystemExit("README.md title does not match package metadata")
 
           changelog_text = Path("CHANGELOG.md").read_text(encoding="utf-8")
@@ -70,11 +70,11 @@ jobs:
               raise SystemExit(str(error)) from error
 
           # The Nexus page's numeric ID, recorded once the first file has been uploaded by hand.
-          manifest = json.loads(Path("src/ZCOMSquadSix/zcom-mod.json").read_text(encoding="utf-8"))
+          manifest = json.loads(Path("src/SquadSixReforged/zcom-mod.json").read_text(encoding="utf-8"))
           nexus_mod = (manifest.get("nexus") or {}).get("modId")
           if not isinstance(nexus_mod, int):
               raise SystemExit(
-                  "src/ZCOMSquadSix/zcom-mod.json has no nexus.modId: upload the first file to the "
+                  "src/SquadSixReforged/zcom-mod.json has no nexus.modId: upload the first file to the "
                   "new Nexus page by hand, then record the page's mod ID there"
               )
 
@@ -145,7 +145,7 @@ jobs:
                   str(mod_file.get("name", "<unnamed>")) for mod_file in active_files
               )
               raise SystemExit(
-                  "Expected exactly one active Nexus mod file for Squad Six, "
+                  "Expected exactly one active Nexus mod file for Squad Six Reforged, "
                   f"found {len(active_files)}: {names or '<none>'}"
               )
 
@@ -165,16 +165,16 @@ jobs:
         run: |
           # The verified release ZIP (laid out as SWZeroCompany/: Binaries/ and Content/, CREDITS.md included).
           python3 tools/package.py
-          ln "dist/SquadSix-${VERSION}.zip" "SquadSix v${VERSION}.zip"
+          ln "dist/SquadSixReforged-${VERSION}.zip" "SquadSixReforged v${VERSION}.zip"
 
       - name: Upload to Nexus Mods
         uses: Nexus-Mods/upload-action@c96019556046053aa26044b44396cd38929daf23
         with:
           api_key: ${{ secrets.NEXUSMODS_API_KEY }}
           file_id: ${{ steps.nexus.outputs.file_id }}
-          filename: SquadSix v${{ steps.release.outputs.version }}.zip
+          filename: SquadSixReforged v${{ steps.release.outputs.version }}.zip
           version: ${{ steps.release.outputs.version }}
-          display_name: Squad Six
+          display_name: Squad Six Reforged
           mod_id: ${{ steps.nexus.outputs.mod_id }}
           primary_mod_manager_download: true
           update_mod_version: true

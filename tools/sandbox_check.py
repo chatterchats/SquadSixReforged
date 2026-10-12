@@ -3,7 +3,7 @@
 
 Drives "ZC Unlocked - Sandbox Mode" (ue4ss/Mods/ZCSandbox) through its command file, on a game copy
 ("<games>/Instance N", as Off Duty's simtest uses): launch a mission with a six-operator squad,
-let the dev probe (dev/ZCOMSquadSixProbe) watch the staging, the relocation and the placement
+let the dev probe (dev/SquadSixReforgedProbe) watch the staging, the relocation and the placement
 spots, optionally end encounters with the game's own fatal damage (`kill foes`) to reach the
 next deployment, then return to the Den. Squad Six's and the probe's log lines for each mission
 go into one report under dist/sandbox/.
@@ -47,16 +47,21 @@ WIN64 = GAME_DIR / "SWZeroCompany" / "Binaries" / "Win64"
 PAKS = GAME_DIR / "SWZeroCompany" / "Content" / "Paks" / "~mods"
 CRASHES = Path("prefix/drive_c/users/steamuser/AppData/Local/SWZeroCompany/Saved/Crashes")
 
-RUNTIME_SOURCE = ROOT / "src" / "ZCOMSquadSix"
-CORE_SOURCE = ROOT / "src" / "ZCOMSquadSix_Core"
-CORE_FOLDER = "ZCOMSquadSix_Core"  # under ~mods, as the release ZIP installs it
-PROBE_SOURCE = ROOT / "dev" / "ZCOMSquadSixProbe"
-RUNTIME_MOD, PROBE_MOD = "ZCOMSquadSix", "ZCOMSquadSixProbe"
-PAK_FILES = ["pakchunk99-ZCOMSquadSix_P." + extension for extension in ("pak", "ucas", "utoc")]
+RUNTIME_SOURCE = ROOT / "src" / "SquadSixReforged"
+CORE_SOURCE = ROOT / "src" / "SquadSixReforged_Core"
+CORE_FOLDER = "SquadSixReforged_Core"  # under ~mods, as the release ZIP installs it
+PROBE_SOURCE = ROOT / "dev" / "SquadSixReforgedProbe"
+RUNTIME_MOD, PROBE_MOD = "SquadSixReforged", "SquadSixReforgedProbe"
+PAK_FILES = ["pakchunk99-SquadSixReforged_P." + extension for extension in ("pak", "ucas", "utoc")]
 PROBE_OUTPUT = ["squadsix_probe.log", "squadsix_probe.jsonl"]
 # Other squad-size mods: a Mods folder name, or a pak file name prefix.
 CONFLICTS = ["SquadExpansion", "pakchunk99-SquadExpansion_P"]
-TAGS = ("[ZCOM_SQUAD_SIX]", "[SQUADSIX_PROBE]")
+TAGS = ("[SQUAD_SIX_REFORGED]", "[SQUADSIX_PROBE]", "[ZCOM_SQUAD_SIX]")  # the last: logs from before the rename
+# Earlier dev installs under arctco's Squad Six names (up to 1.2.0's rename to Squad Six Reforged).
+# On a game copy they're ours, so install and uninstall remove them; both would load otherwise.
+LEGACY_MODS = ["ZCOMSquadSix", "ZCOMSquadSixProbe"]
+LEGACY_CORE_FOLDER = "ZCOMSquadSix_Core"
+LEGACY_PAK_FILES = ["pakchunk99-ZCOMSquadSix_P." + extension for extension in ("pak", "ucas", "utoc")]
 
 
 class Instance:
@@ -176,6 +181,33 @@ def refuse_unsafe(instance, allow_main):
         sys.exit("Instance %d's game is running: close it before installing or uninstalling." % instance.number)
 
 
+def remove_legacy(instance, kept):
+    """Remove dev installs under the old names; the old probe's output goes to kept."""
+    removed = []
+    old_probe = instance.mods / "ZCOMSquadSixProbe"
+    for name in PROBE_OUTPUT:
+        if (old_probe / name).exists():
+            kept.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(old_probe / name), str(kept / ("legacy-" + name)))
+    for name in LEGACY_MODS:
+        if (instance.mods / name).exists():
+            shutil.rmtree(instance.mods / name)
+            removed.append("Mods/" + name)
+    if (instance.paks / LEGACY_CORE_FOLDER).exists():
+        shutil.rmtree(instance.paks / LEGACY_CORE_FOLDER)
+        removed.append("~mods/" + LEGACY_CORE_FOLDER)
+    for name in LEGACY_PAK_FILES:
+        if (instance.paks / name).exists():
+            (instance.paks / name).unlink()
+            removed.append("~mods/" + name)
+    if removed:
+        print("Removed the old-name install from instance %d: %s" % (instance.number, ", ".join(removed)))
+
+
+def probe_output_dir(instance):
+    return ROOT / "dist" / "sandbox" / ("instance%d-probe-output" % instance.number)
+
+
 def cmd_install(args):
     instance = Instance(args.instance)
     refuse_unsafe(instance, args.allow_main)
@@ -184,13 +216,13 @@ def cmd_install(args):
     if present:
         sys.exit("Another squad-size mod is installed on instance %d (%s); remove it first." % (
             instance.number, ", ".join(present)))
+    remove_legacy(instance, probe_output_dir(instance))
     runtime = instance.mods / RUNTIME_MOD
     if runtime.exists():
         shutil.rmtree(runtime)
     shutil.copytree(RUNTIME_SOURCE, runtime)
     (runtime / "enabled.txt").write_text("")
-    # The release keeps the paks in ~mods/ZCOMSquadSix_Core; up to 1.1.4 they sat loose in ~mods,
-    # and both copies would load.
+    # The release keeps the paks in ~mods/SquadSixReforged_Core; never leave a loose copy beside it.
     for name in PAK_FILES:
         (instance.paks / name).unlink(missing_ok=True)
     core = instance.paks / CORE_FOLDER
@@ -206,13 +238,14 @@ def cmd_install(args):
         shutil.copyfile(PROBE_SOURCE / name, instance.probe / name)
     stamp = "%s installed %s\n" % (git_identity(), datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
     (runtime / "installed_from.txt").write_text(stamp)
-    print("Installed Squad Six %s and the probe on instance %d." % (stamp.split()[0], instance.number))
+    print("Installed Squad Six Reforged %s and the probe on instance %d." % (stamp.split()[0], instance.number))
 
 
 def cmd_uninstall(args):
     instance = Instance(args.instance)
     refuse_unsafe(instance, args.allow_main)
-    kept = ROOT / "dist" / "sandbox" / ("instance%d-probe-output" % instance.number)
+    kept = probe_output_dir(instance)
+    remove_legacy(instance, kept)
     for name in PROBE_OUTPUT:
         if (instance.probe / name).exists():
             kept.mkdir(parents=True, exist_ok=True)
@@ -224,7 +257,7 @@ def cmd_uninstall(args):
         (instance.paks / name).unlink(missing_ok=True)
     if (instance.paks / CORE_FOLDER).exists():
         shutil.rmtree(instance.paks / CORE_FOLDER)
-    print("Removed Squad Six and the probe from instance %d.%s" % (
+    print("Removed Squad Six Reforged and the probe from instance %d.%s" % (
         instance.number, " Probe output moved to %s" % kept if kept.exists() else ""))
 
 
@@ -236,7 +269,12 @@ def cmd_status(args):
     core = instance.paks / CORE_FOLDER
     loose = [n for n in PAK_FILES if (instance.paks / n).exists()]
     print("  pak: %s%s" % ("yes" if all((core / n).exists() for n in PAK_FILES) else "no",
-                           " (and a loose 1.1.4-style copy in ~mods: reinstall)" if loose else ""))
+                           " (and a loose copy in ~mods: reinstall)" if loose else ""))
+    legacy = [n for n in LEGACY_MODS if (instance.mods / n).exists()] + (
+        [LEGACY_CORE_FOLDER] if (instance.paks / LEGACY_CORE_FOLDER).exists() else []) + [
+        n for n in LEGACY_PAK_FILES if (instance.paks / n).exists()]
+    if legacy:
+        print("  old-name install still present (install removes it): %s" % ", ".join(legacy))
     print("  probe: %s" % ("yes" if (instance.probe / "Scripts" / "main.lua").exists() else "no"))
     print("  game running: %s" % instance.running())
     hello = Sandbox(instance.sandbox).hello()
@@ -439,7 +477,7 @@ def cmd_check(args):
         lines, squads = probe_summary(records)
         section.append("- squad sizes the probe saw: %s" % (", ".join(map(str, sorted(squads))) or "none"))
         section += ["", "Probe:", ""] + (lines or ["  (no area checks)"])
-        key = [l for l in ours if "[ZCOM_SQUAD_SIX]" in l and re.search(
+        key = [l for l in ours if "[SQUAD_SIX_REFORGED]" in l and re.search(
             r"selfcheck|status version|player_destinations|placement_rescue|placement_trigger|"
             r"placement_repair|placement_final|deployment_state|limits|WARNING|ERROR|manual_rescue", l)]
         if not any("placement_trigger" in l for l in key):

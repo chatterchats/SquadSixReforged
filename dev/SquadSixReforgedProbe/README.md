@@ -25,13 +25,13 @@ It registers no hooks and writes nothing to the game.
 
 ## Install
 
-Copy `ZCOMSquadSixProbe` into `SWZeroCompany/Binaries/Win64/ue4ss/Mods/`, next to `ZCOMSquadSix`.
+Copy `SquadSixReforgedProbe` into `SWZeroCompany/Binaries/Win64/ue4ss/Mods/`, next to `SquadSixReforged`.
 It loads Squad Six's own `common.lua` and `placement.lua` from there. `enabled.txt` makes UE4SS
 load it. Use a game copy (see the simtest notes), not your main install.
 
 ## Output
 
-All three go in the mod folder (`Mods/ZCOMSquadSixProbe/`):
+All three go in the mod folder (`Mods/SquadSixReforgedProbe/`):
 
 - `UE4SS.log` lines tagged `[SQUADSIX_PROBE]`;
 - `squadsix_probe.log`, the same lines with timestamps;

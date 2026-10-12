@@ -14,13 +14,13 @@ from re import Match, Pattern
 
 ROOT = Path(__file__).resolve().parent.parent
 CHANGELOG = ROOT / "CHANGELOG.md"
-MODINFO = ROOT / "src/ZCOMSquadSix/modinfo.json"
-ZCOM_MOD = ROOT / "src/ZCOMSquadSix/zcom-mod.json"
-CORE_MODINFO = ROOT / "src/ZCOMSquadSix_Core/modinfo.json"
-CORE_ZCOM_MOD = ROOT / "src/ZCOMSquadSix_Core/zcom-mod.json"
+MODINFO = ROOT / "src/SquadSixReforged/modinfo.json"
+ZCOM_MOD = ROOT / "src/SquadSixReforged/zcom-mod.json"
+CORE_MODINFO = ROOT / "src/SquadSixReforged_Core/modinfo.json"
+CORE_ZCOM_MOD = ROOT / "src/SquadSixReforged_Core/zcom-mod.json"
 JSON_FILES = (MODINFO, ZCOM_MOD, CORE_MODINFO, CORE_ZCOM_MOD)
-MAIN = ROOT / "src/ZCOMSquadSix/Scripts/main.lua"
-README = ROOT / "src/ZCOMSquadSix/README.md"
+MAIN = ROOT / "src/SquadSixReforged/Scripts/main.lua"
+README = ROOT / "src/SquadSixReforged/README.md"
 
 SEMVER_PATTERN = re.compile(r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)")
 JSON_VERSION_PATTERN = re.compile(
@@ -33,7 +33,7 @@ MAIN_VERSION_PATTERN = re.compile(
 )
 # The player guide's title (tools/package.py checks it too).
 README_HEADER_PATTERN = re.compile(
-    r'^(?P<prefix># Squad Six v)(?P<version>[^\s]+)(?P<suffix> .*)$',
+    r'^(?P<prefix># Squad Six Reforged v)(?P<version>[^\s]+)(?P<suffix> .*)$',
     re.MULTILINE,
 )
 

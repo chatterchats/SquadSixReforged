@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "id": "community.squad-six.core",
-  "name": "Squad Six - Core",
+  "id": "community.squad-six-reforged.core",
+  "name": "Squad Six Reforged - Core",
   "version": "1.2.0",
   "author": "arctco, continued by Chats",
   "description": "Raises the deployable squad size from four to six on the supported missions.",

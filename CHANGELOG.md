@@ -9,15 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.0]
 
-The first release since the mod was adopted from arctco, the original author, who discontinued
-it. The runtime is now split across modules, with the placement fixes below. The Core container
+The first release of Squad Six Reforged, which continues Squad Six by arctco: they created it,
+discontinued it and allowed others to carry it on with credit. The runtime is now split across modules, with the placement fixes below. The Core container
 is now built from the game's own packages by `tools/build_core.py`, from the squad limits in
 `data/missions.tsv`. Tested in game (build 25134257) at six on Retake Luunata, Dark Waters,
 Unfinished Business, The Infinite Coil and several skirmishes; see `docs/live-tests.md`.
 
 ### Added
 
-- `ZCOMSquadSix/enabled.txt`, so a manual install loads without editing `mods.txt` (arctco's
+- `SquadSixReforged/enabled.txt`, so a manual install loads without editing `mods.txt` (arctco's
   manual archive had one; the mod-manager bundle didn't).
 - A player guide (`README.md`) and the credits (`CREDITS.md`) in the mod folder, and
   `modinfo.json` manifests for Zero Company Mod Command beside each part.
@@ -64,13 +64,16 @@ Unfinished Business, The Infinite Coil and several skirmishes; see `docs/live-te
 
 ### Changed
 
-- The download now mirrors the game's `SWZeroCompany` folder: the mod goes to
-  `Binaries/Win64/ue4ss/Mods/ZCOMSquadSix` and the squad-limit pak to
-  `Content/Paks/~mods/ZCOMSquadSix_Core`. A manual install is one extract, and Vortex can install
-  it. Zero Mod Manager and Zero Company Mod Command still show the two parts, Squad Six - Runtime
-  and Squad Six - Core. If you installed 1.1.4 or earlier by hand, delete the old
-  `pakchunk99-ZCOMSquadSix_P.pak`, `.ucas` and `.utoc` directly inside `Content/Paks/~mods`, or
-  both copies will load.
+- Renamed to Squad Six Reforged, with its own IDs, so it's a separate mod from arctco's Squad
+  Six: remove Squad Six before installing (its `ZCOMSquadSix` folder and its
+  `pakchunk99-ZCOMSquadSix_P` files). The log warns if Squad Six or Squad Expansion is installed
+  alongside.
+- The download mirrors the game's `SWZeroCompany` folder: the mod goes to
+  `Binaries/Win64/ue4ss/Mods/SquadSixReforged` and the squad-limit pak to
+  `Content/Paks/~mods/SquadSixReforged_Core`. A manual install is one extract, and Vortex can
+  install it. Zero Mod Manager and Zero Company Mod Command show the two parts, Squad Six Reforged
+  and Squad Six Reforged - Core.
+- Log lines now start with `[SQUAD_SIX_REFORGED]`.
 - Tested on game build 25134257 as well as 24874058. The manifests list both and stay strict.
 - The Serolonis Job (MM_01_010_SerolonisJob) keeps its authored four operators. It's the opening
   tutorial and the game sets its squad, so the player can't pick operators; 1.1.4 raised it to six

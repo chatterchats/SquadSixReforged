@@ -1,7 +1,7 @@
-"""Build the Core pak (pakchunk99-ZCOMSquadSix_P) from the installed game's own packages.
+"""Build the Core pak (pakchunk99-SquadSixReforged_P) from the installed game's own packages.
 
   python3 tools/build_core.py --retoc /path/to/retoc --paks ".../SWZeroCompany/Content/Paks"
-  python3 tools/build_core.py ... --check     build to a temporary folder and compare with src/ZCOMSquadSix_Core
+  python3 tools/build_core.py ... --check     build to a temporary folder and compare with src/SquadSixReforged_Core
 
 No editor and no cook: every package in the pak is the game's cooked package with one value
 changed, exactly as in arctco's releases.
@@ -34,8 +34,8 @@ ROOT = Path(__file__).resolve().parents[1]
 MISSIONS = ROOT / "data" / "missions.tsv"
 SCHEMA = ROOT / "tools" / "data" / "schema.json"
 RECORD = ROOT / "data" / "core-build.sha256"
-OUTPUT = ROOT / "src" / "ZCOMSquadSix_Core"
-STEM = "pakchunk99-ZCOMSquadSix_P"
+OUTPUT = ROOT / "src" / "SquadSixReforged_Core"
+STEM = "pakchunk99-SquadSixReforged_P"
 PAK_FILES = [f"{STEM}.{extension}" for extension in ("pak", "ucas", "utoc")]
 MISSION_ROOT = "/Game/Game/GameData/MissionData/"
 MISSION_CLASS = "BrunoMissionData"
@@ -191,15 +191,15 @@ def compare(retoc, built, committed):
                     != retoc.get(committed / f"{STEM}.utoc", theirs[path]))
     only_ours, only_theirs = sorted(set(ours) - set(theirs)), sorted(set(theirs) - set(ours))
     identical = all((built / name).read_bytes() == (committed / name).read_bytes() for name in PAK_FILES)
-    print(f"src/ZCOMSquadSix_Core: {len(set(ours) & set(theirs)) - len(differ)} packages identical, "
-          f"{len(differ)} different, {len(only_ours)} only in this build, {len(only_theirs)} only in src/ZCOMSquadSix_Core"
+    print(f"src/SquadSixReforged_Core: {len(set(ours) & set(theirs)) - len(differ)} packages identical, "
+          f"{len(differ)} different, {len(only_ours)} only in this build, {len(only_theirs)} only in src/SquadSixReforged_Core"
           + ("; container files identical" if identical else "; container files differ in layout"))
     for path in differ:
         print(f"  different: {path}")
     for path in only_ours:
         print(f"  only in this build: {path}")
     for path in only_theirs:
-        print(f"  only in src/ZCOMSquadSix_Core: {path}")
+        print(f"  only in src/SquadSixReforged_Core: {path}")
     return not (differ or only_ours or only_theirs)
 
 
@@ -207,7 +207,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--retoc", required=True)
     parser.add_argument("--paks", required=True, type=Path, help="the game's SWZeroCompany/Content/Paks")
-    parser.add_argument("--check", action="store_true", help="compare with src/ZCOMSquadSix_Core instead of writing it")
+    parser.add_argument("--check", action="store_true", help="compare with src/SquadSixReforged_Core instead of writing it")
     args = parser.parse_args()
     retoc = Retoc(args.retoc)
     schema = zen.Schema(json.loads(SCHEMA.read_text())["schemas"])
@@ -229,7 +229,7 @@ def main():
     lines = [f"{sha256(OUTPUT / name)}  {name}" for name in PAK_FILES]
     lines += [f"{sha256(ROOT / name)}  {name}" for name in RECORDED_INPUTS]
     RECORD.write_text("\n".join(lines) + "\n")
-    print(f"Wrote src/ZCOMSquadSix_Core/{STEM}.* and {RECORD.relative_to(ROOT)}")
+    print(f"Wrote src/SquadSixReforged_Core/{STEM}.* and {RECORD.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

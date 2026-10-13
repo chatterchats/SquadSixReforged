@@ -218,9 +218,14 @@ def cmd_install(args):
             instance.number, ", ".join(present)))
     remove_legacy(instance, probe_output_dir(instance))
     runtime = instance.mods / RUNTIME_MOD
+    # The player's settings page choices (Mixamoo Mod Config Manager) survive a reinstall.
+    values = runtime / "MXM" / "values.lua"
+    kept_values = values.read_bytes() if values.is_file() else None
     if runtime.exists():
         shutil.rmtree(runtime)
     shutil.copytree(RUNTIME_SOURCE, runtime)
+    if kept_values is not None:
+        values.write_bytes(kept_values)
     (runtime / "enabled.txt").write_text("")
     # The release keeps the paks in ~mods/SquadSixReforged_Core; never leave a loose copy beside it.
     for name in PAK_FILES:

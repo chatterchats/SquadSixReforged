@@ -48,6 +48,7 @@ local PROFILE_AREAS = {
 }
 local FIXED_AREAS = {
     DeepCover = "MM_05_010_UmbaraRescue_Gameplay:BP_CombatPreparationArea_C_0",
+    Stillwatch = "MM_04_050_DenBattle_Gameplay:BP_CombatPreparationArea_C_1",
 }
 local TRIGGER = "/Script/BitReactorGame.CombatPreparationArea:TriggerPreCombat"
 local RELOCATION = "/Game/Game/Core/Blueprints/BP_CombatPreparationArea.BP_CombatPreparationArea_C:MovePlayerUnitsIntoPosition"
@@ -161,6 +162,9 @@ for _, area in ipairs(scan.areas) do
                 units[index] = unit
                 overflow[#overflow + 1] = unit
             end
+            -- The array writes into its table, so keep the authored list apart.
+            local authored_actors = {}
+            for index, actor in ipairs(destination_actors) do authored_actors[index] = actor end
             local destinations = mock.array(destination_actors)
             local area_object = mock.object("BP_CombatPreparationArea_C " .. name,
                 {PlayerDestinations = destinations}, {GetWorld = function() return mock.world end})
@@ -177,9 +181,20 @@ for _, area in ipairs(scan.areas) do
                 if count ~= #fixed.spots then
                     fail(string.format("%s: %d destinations, expected the layout's %d", name, count, #fixed.spots))
                 end
+                local reused = 0
                 for index, spot in ipairs(fixed.spots) do
                     local at = index <= count and destinations[index].at or nil
                     if at == nil or d3(at, spot) > 1 then fail(string.format("%s: destination %d isn't spot %d", name, index, index)) end
+                    -- A spot on an authored point keeps the authored actor.
+                    for authored, point in ipairs(points) do
+                        if d3(point, spot) <= 1 then
+                            if index <= count and destinations[index] == authored_actors[authored] then
+                                reused = reused + 1
+                            else
+                                fail(string.format("%s: spot %d replaced authored destination %d", name, index, authored))
+                            end
+                        end
+                    end
                 end
                 -- The relocation strands two operators; the repair must leave them be.
                 mock.hooks[RELOCATION].pre(area_object)
@@ -194,7 +209,7 @@ for _, area in ipairs(scan.areas) do
                         fail(string.format("%s: the repair moved Operator%d on a fixed area", name, index))
                     end
                 end
-                lines[#lines + 1] = string.format("%-70s dest=%d fixed=%s spots=%d", name, #points, fixed.name, count)
+                lines[#lines + 1] = string.format("%-70s dest=%d fixed=%s spots=%d reused=%d", name, #points, fixed.name, count, reused)
                 goto continue
             end
 

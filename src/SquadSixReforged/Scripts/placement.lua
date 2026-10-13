@@ -237,9 +237,34 @@ local FIXED = {
                 {X = -1350, Y = -1060, Z = 224.753},         -- authored: PlayerTacticalPoint_1.1
             },
         },
+        {
+            name = "Stillwatch",
+            -- MM_04_050_DenBattle ("Stillwatch"), its only area: six authored points, two named for
+            -- Trick and Tel-Rea. Trick joins through the mission, so six selected are seven units.
+            destinations = {
+                {X = 3177.759, Y = 7543.714, Z = -700},
+                {X = 2172.991, Y = 7556.39, Z = -691.807},
+                {X = 2908.868, Y = 7947.725, Z = -700},
+                {X = 2100, Y = 8000, Z = -700},
+                {X = 3485.689, Y = 8044.545, Z = -700},
+                {X = 2856.959, Y = 7351.71, Z = -700},
+            },
+            -- The authored six, then a seventh picked by the user in game (2026-10-12).
+            spots = {
+                {X = 3177.759, Y = 7543.714, Z = -700},
+                {X = 2172.991, Y = 7556.39, Z = -691.807},
+                {X = 2908.868, Y = 7947.725, Z = -700},
+                {X = 2100, Y = 8000, Z = -700},
+                {X = 3485.689, Y = 8044.545, Z = -700},
+                {X = 2856.959, Y = 7351.71, Z = -700},
+                {X = 2700, Y = 7847, Z = -700},              -- same floor as authored 4
+            },
+        },
     },
     -- Areas whose destinations were replaced, by object key, for the repair passes.
     applied = {},
+    -- A spot this close to an authored destination is that destination.
+    same_point_sq = 25.0,
 }
 
 local registered_placement_hook = false
@@ -1611,9 +1636,10 @@ end
 -- can be sent somewhere invalid. Add destinations at positions operators
 -- already stand on, before the relocation is calculated; nothing is
 -- extrapolated, since an invented point has no navigation check.
--- Replace the destinations of an area that matches a FIXED layout with its spots: new destination
--- actors of the authored class, team and facing, written over the list in the layout's order.
--- The authored actors stay in the level, unlisted. Returns true once the list holds the spots, or
+-- Replace the destinations of an area that matches a FIXED layout with its spots, written over the
+-- list in the layout's order. A spot on an authored destination keeps that actor; the others are
+-- new destination actors of the authored class, team and facing. Authored actors no spot uses
+-- stay in the level, unlisted. Returns true once the list holds the spots, or
 -- nil when no layout matches or a spot can't be placed, so the usual expansion runs instead.
 function FIXED.apply(area, destinations, raw_count, valid_destinations)
     local layout, transform = nil, nil
@@ -1645,15 +1671,32 @@ function FIXED.apply(area, destinations, raw_count, valid_destinations)
     local facing = actor_rotation(template)
     facing = facing ~= nil and copy_rotator(facing) or {}
 
-    local points = {}
+    local points, spawned, reused = {}, {}, {}
     for index, spot in ipairs(layout.spots) do
         local location = transform_profile_point(transform, spot)
-        local spawn_ok, point = pcall(function()
-            return world:SpawnActor(point_class, location, facing)
-        end)
-        local placed = spawn_ok and valid(point)
-        if placed then
-            points[#points + 1] = point
+        -- A spot on an authored destination keeps that actor: the mission may know it by name
+        -- (Stillwatch's PlayerTacticalPoint_1.2_Trick).
+        for candidate, destination in ipairs(valid_destinations) do
+            if not reused[candidate]
+                and distance_squared(destination.location, location) <= FIXED.same_point_sq then
+                reused[candidate] = true
+                points[index] = destination.actor
+                break
+            end
+        end
+        local placed = points[index] ~= nil
+        if not placed then
+            local spawn_ok, point = pcall(function()
+                return world:SpawnActor(point_class, location, facing)
+            end)
+            placed = spawn_ok and valid(point)
+            if placed then
+                points[index] = point
+                spawned[#spawned + 1] = point
+            end
+        end
+        if placed and spawned[#spawned] == points[index] then
+            local point = points[index]
             if team ~= nil then
                 pcall(function() point[PLAYER_TEAM_PROPERTY] = team end)
             end
@@ -1665,8 +1708,8 @@ function FIXED.apply(area, destinations, raw_count, valid_destinations)
                 and not at_world_origin(actor_location(point) or location)
         end
         if not placed then
-            for _, spawned in ipairs(points) do
-                pcall(function() spawned:K2_DestroyActor() end)
+            for _, point in ipairs(spawned) do
+                pcall(function() point:K2_DestroyActor() end)
             end
             log("fixed_spots=none reason=spot_not_placed layout=" .. layout.name
                 .. " spot=" .. tostring(index))
@@ -1681,12 +1724,13 @@ function FIXED.apply(area, destinations, raw_count, valid_destinations)
             written = index
         end
     end)
-    for index = 1, written do
-        synthesised_destinations[object_key(points[index])] = true
+    for _, point in ipairs(spawned) do
+        synthesised_destinations[object_key(point)] = true
     end
     FIXED.applied[object_key(area)] = layout.name
     log("fixed_spots=" .. layout.name .. " destinations=" .. tostring(raw_count)
         .. "->" .. tostring(array_count(destinations))
+        .. " added=" .. tostring(#spawned)
         .. " written=" .. tostring(written) .. "/" .. tostring(#points)
         .. (write_ok and "" or " write_failed=true"))
     return true

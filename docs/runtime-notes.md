@@ -446,8 +446,17 @@ standing operator (71.8 and 77.2 on the two authored points occupied at the
 time), so that is subtracted from the read heights. The heights differ on
 purpose: two spots are on lower ground.
 
-New actors are listed instead of the authored ones being moved, so nothing in
-the level changes and a mobility setting can't refuse the move. The layout
+A spot on an authored destination (within 5 uu) keeps that actor, since a
+mission may know its points by name: Stillwatch has
+`PlayerTacticalPoint_1.2_Trick` and `..._1.5_Tel`, and Deep Cover
+`TacticalPoint_Rex`. Every other spot is a new actor rather than an authored
+one moved, so nothing in the level changes and a mobility setting can't refuse
+the move.
+
+Stillwatch (MM_04_050_DenBattle) authors six points, and Trick joins through
+the mission, so six selected are seven units. The expansion stopped at six
+(`expanded=false`) and the seventh operator stood in the open; the user picked
+a seventh spot on the same floor, kept after the authored six. The layout
 applies whatever the squad size, since the user prefers these spots outright;
 the game still decides which unit walks to which spot. The repair passes skip
 a fixed area: the spots are known to work, and the forward ones sit outside

@@ -236,3 +236,12 @@ seven units, and `placement_repair=skipped reason=fixed_spots` (`repair_passes=0
 ZC Sandbox once everyone had stopped, six units stood exactly on spots 1 and 3-7, and the seventh
 55 uu from spot 2 on the same lower ground. The user saw them all walk onto the new spots. The
 `mission ... unit_positions` line was logged while one was still walking (-828/-260).
+
+## MM_04_050_ANewOrder ("Stillwatch"), six (9c690bd, 2026-10-12)
+
+From the user's campaign, on the way to Rescue Jae Mordant. Six authored destinations (two named
+for Trick and Tel-Rea); Trick joins through the mission, so seven units. `expanded=false`: the
+expansion stops at six, so nothing was added, `WARNING: fewer destinations than deployed
+operators`, and the sixth operator (Kara) stood in the open. The repair passes saw only units
+walking. The user moved Kara to a spot they prefer; read through ZC Sandbox (2700/7847, the
+floor of authored point 4), it became the seventh spot of the `Stillwatch` fixed layout.

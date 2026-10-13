@@ -943,7 +943,10 @@ end
 local COVER = {library = "/Script/BitReactorGame.Default__BRG_TargetingFunctionLibrary"}
 
 -- The cover pocket nearest `point`, as {X, Y, Z (its floor), tier = 2 full or 1 half, nx, ny
--- (the cover's normal, pointing from the cover to whoever uses it)}, or nil.
+-- (the cover's normal: from whoever uses it towards the cover, the side it protects)}, or nil.
+-- The direction was read the other way round first, and the mod chose exposed spots: in
+-- Smugglers' Den's second area, against enemies to +X, the player moved exactly the three
+-- operators whose pockets had normal -X and kept the three with +X.
 function COVER.nearest(library, actor, point, stats)
     local out = {}
     local ok, found = pcall(function()
@@ -1016,7 +1019,7 @@ function COVER.choose(site, actor, polygon, authored, units, wanted, derived, wa
             if not seen[key] then
                 seen[key] = true
                 stats.pockets = stats.pockets + 1
-                local facing = forward and -(pocket.nx * forward.X + pocket.ny * forward.Y) or 1
+                local facing = forward and (pocket.nx * forward.X + pocket.ny * forward.Y) or 1
                 local point = {X = pocket.X, Y = pocket.Y, Z = pocket.Z + RESCUE.capsule_height,
                                lift = RESCUE.capsule_height, cover = pocket.tier, facing = facing,
                                order = #covers}

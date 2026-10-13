@@ -449,8 +449,8 @@ otherwise.
 Points the mod adds prefer the game's cover. For each derived point, and
 `RESCUE.cover_pool` more around the lane, `BRG_TargetingFunctionLibrary.
 GetNearestCoverForPoint` returns the nearest cover pocket within
-`RESCUE.cover_range`: its floor, its normal (from the cover towards whoever
-uses it) and its flags (1 low, 2 high, with step-out flags above). A pocket is
+`RESCUE.cover_range`: its floor, its normal (from whoever uses it towards the
+cover: the side it protects) and its flags (1 low, 2 high, with step-out flags above). A pocket is
 used when it's in the lane, on the navmesh, a tile from every destination,
 unit and other chosen point, and faces the encounter: the direction from the
 lane's centroid to its tactical volume's centre, within 60 degrees. Full cover
@@ -461,10 +461,15 @@ cover, and the tests' stand-in, behave exactly as before.
 Besides the derived points, the lane is searched on a tile grid
 (`RESCUE.cover_grid`, at most `cover_grid_max` points), and usable cover is
 ranked by how squarely it faces the encounter. In Smugglers' Den's first area
-(2026-10-12) the derived points alone found three pockets, two facing
-sideways: one operator went into half cover facing the enemies, and the other
-fell back to a derived point beside the sideways cover, on its wrong side as
-the player saw it.
+(2026-10-12) the derived points alone found three pockets, two of them facing
+sideways.
+
+The normal's direction was first read the wrong way round, so the facing test
+chose exposed cover. Smugglers' Den showed it: in the first area the operator
+put into "half cover facing the enemies" was the one the player saw on the
+wrong side; in the second, against enemies to +X, the player moved exactly the
+three operators the mod had put in pockets with normal -X, and left the three
+on the game's own points, whose normals were +X.
 
 It applies at three sites, each logged once per deployment as
 `cover site=...`: the staging rescue (`staging`), the expansion's off-lane

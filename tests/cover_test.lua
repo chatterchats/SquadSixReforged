@@ -26,14 +26,14 @@ local navigation = mock.object("NavigationSystemV1 Default__NavigationSystemV1",
         return true
     end,
 })
--- Cover pockets: the encounter lies towards +Y, so cover used from its -Y side (normal -Y)
--- faces it.
+-- Cover pockets: the encounter lies towards +Y, so cover protects against it when its normal
+-- (from the unit towards the cover) points +Y.
 local FULL, HALF = 2 + 12, 1   -- HighCover with both step-outs; LowCover
 local pockets = {
-    {name = "full", X = B + 200, Y = B + 130, nx = 0, ny = -1, kind = FULL},
-    {name = "half", X = B + 100, Y = B + 250, nx = 0, ny = -1, kind = HALF},
-    {name = "away", X = B + 250, Y = B + 330, nx = 0, ny = 1, kind = FULL},
-    {name = "outside", X = B + 520, Y = B + 200, nx = 0, ny = -1, kind = FULL},   -- 120 uu past the edge
+    {name = "full", X = B + 200, Y = B + 130, nx = 0, ny = 1, kind = FULL},
+    {name = "half", X = B + 100, Y = B + 250, nx = 0, ny = 1, kind = HALF},
+    {name = "away", X = B + 250, Y = B + 330, nx = 0, ny = -1, kind = FULL},
+    {name = "outside", X = B + 520, Y = B + 200, nx = 0, ny = 1, kind = FULL},   -- 120 uu past the edge
 }
 local cover_available = true
 local library = mock.object("BRG_TargetingFunctionLibrary " .. LIBRARY, {}, {

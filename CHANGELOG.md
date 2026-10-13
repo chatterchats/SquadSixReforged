@@ -7,20 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0]
+
 ### Added
-- The extra operators are placed in cover where the deployment area has some: full cover first,
-  then half cover, facing the encounter.
-- The game's own deployment spots move into cover facing the enemies when theirs faces away or
-  they have none, within two tiles. On by default; turn it off in the Mixamoo Mod Config
-  Manager settings page, which Squad Six Reforged now has.
-- Story characters who join at the start of a mission get a deployment spot too, so nobody is
-  left standing in the open.
-- Deep Cover takes six operators (it was three), with hand-picked deployment spots for the squad
-  plus Rex.
-- Stillwatch: a seventh deployment spot, so a squad of six plus Trick all get one.
-- Rescue Jae Mordant and Smugglers' Den take six operators (they were kept at four). Jae and
-  Tel-Rea join partway through; there's no duplicate, and saving with seven units works.
-  Smugglers' Den's second encounter has hand-picked deployment spots.
+- **Extra operators deploy in cover.** The spots Squad Six Reforged adds for operators 5 and 6
+  now go into cover facing the enemies where the deployment area has some: full cover first,
+  then half cover.
+- **The game's own deployment spots move into cover** when their cover faces away from the
+  enemies, or they have none, and better cover is within two tiles. On by default.
+- **A settings page** in [Mixamoo Mod Config Manager](https://www.nexusmods.com/starwarszerocompany/mods/149)
+  (optional) to turn that off.
+- **Story characters who join at the start of a mission get a deployment spot too**, so nobody
+  is left standing in the open.
+- **Hand-picked deployment spots** in Deep Cover, Stillwatch and the second encounter of
+  Smugglers' Den.
+
+### Changed
+- **Deep Cover takes six operators** (it was three). With Rex and the clone you rescue, that's up
+  to eight on the field.
+- **Rescue Jae Mordant and Smugglers' Den take six operators** (they were kept at four). Jae and
+  Tel-Rea join partway through as usual, with no duplicate, and saving works.
 
 ## [1.2.0]
 

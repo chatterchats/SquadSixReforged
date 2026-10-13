@@ -7,7 +7,9 @@
 Squad Six Reforged raises the deployable squad size in **Star Wars: Zero Company** from four to
 six. It combines an IoStore data override with a UE4SS Lua runtime that adds six activity slots, a
 six-model lineup, a six-entry squad-selection layout and in-map placement for the extra operators.
-Missions that inject scripted characters keep their authored limit of four.
+Extra operators deploy in cover facing the enemies where the area has some, and a few maps have
+hand-picked deployment spots. Missions that inject scripted characters keep their authored limit
+of four until each has been played at six.
 
 > **A continuation of Squad Six by arctco.** arctco created Squad Six, discontinued it, and gave
 > permission for others to continue it with credit. Most of the runtime is still their code, and
@@ -16,7 +18,9 @@ Missions that inject scripted characters keep their authored limit of four.
 
 ## Status
 
-**1.2.0** (2026-10-12) is the first release of Squad Six Reforged; see [CHANGELOG.md](CHANGELOG.md).
+**1.3.0** (2026-10-13): cover-aware deployment, a settings page, and six operators in Deep Cover,
+Rescue Jae Mordant and Smugglers' Den; see [CHANGELOG.md](CHANGELOG.md). **1.2.0** (2026-10-12)
+was the first release of Squad Six Reforged.
 It continues from arctco's final release of Squad Six, **1.1.4** (2026-09-03), which is imported unmodified at tag
 `upstream-1.1.4`. See [docs/upstream.md](docs/upstream.md) for what that release contains and
 [docs/core-pak-analysis.md](docs/core-pak-analysis.md) for exactly what the cooked pak changes.
@@ -28,6 +32,7 @@ src/SquadSixReforged/        the UE4SS mod ("Squad Six Reforged")  -> ue4ss/Mods
   README.md       the player guide (ships in the mod folder; its title carries the version)
   enabled.txt     loads the mod on a manual install without a mods.txt edit
   modinfo.json, zcom-mod.json   Zero Company Mod Command and Zero Mod Manager manifests
+  MXM/settings.lua   the Mixamoo Mod Config Manager settings page (optional for players)
   Scripts/
     main.lua        loads the modules, registers hooks until every target exists, logs status
     limits.lua      mission squad limits at runtime, and the scripted-cast guards
@@ -35,16 +40,21 @@ src/SquadSixReforged/        the UE4SS mod ("Squad Six Reforged")  -> ue4ss/Mods
     placement.lua   tactical deployment: extra destinations, rescue, repair, squadsixrescue
     selfcheck.lua   logs whether every game name the other modules use still resolves
     common.lua      shared constants and reflection/vector helpers
+    MXM.lua         the Mixamoo Mod Config Manager client library, unmodified
 src/SquadSixReforged_Core/   the cooked IoStore override ("Squad Six Reforged - Core") + its manifests
                                                           -> Content/Paks/~mods/SquadSixReforged_Core
 data/           missions.tsv: the squad limit for every mission (what the Core pak changes)
                 mapscan.json: every deployment area and its destination points (tools/map_scan.py)
-dev/            SquadSixReforgedProbe: in-game checks of placement spots and staging (never shipped)
+dev/            never shipped: SquadSixReforgedProbe (in-game checks of placement spots and staging;
+                `squadsixprobe` also logs squad positions), SquadSixReforgedTestLimits
+                (`squadsixlimit <mission> <n>` sets one mission's limit for a test), and
+                mxm/debug_settings.lua (the cover debug-marker toggle, added on game copies only)
 docs/           upstream notes, file hashes, pak analysis, runtime-notes.md (why each rule exists),
                 placement-coverage.md (how placement does on every map)
 tests/          runtime tests under a UE4SS stand-in (ue4ss_mock.lua): startup, self-check,
-                lineup, rescue, probe,
-                placement_maps (placement.lua over every deployment area in data/mapscan.json)
+                lineup, rescue, probe, cover (cover choice, the game-spot improvement, debug markers),
+                placement_maps (placement.lua over every deployment area in data/mapscan.json,
+                including the fixed layouts)
 tools/          build_core.py, inspect_core.py, map_scan.py, sandbox_check.py, package.py,
                 bump_version.py, nexus_changelog.py, run-tests.sh, and their helpers
 .github/workflows/release-nexus.yml   manual Nexus release

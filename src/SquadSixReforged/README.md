@@ -48,6 +48,10 @@ installed, Squad Six Reforged has an in-game settings page:
   deployment spot whose cover faces away from the enemies, or that has none, moves to cover
   facing them within two tiles. It applies to every squad size, from the next encounter. Turn it
   off to keep the game's own spots.
+- **Show cover debug markers** (off by default): at the start of an encounter, every cover spot
+  the mod considered is shown for a minute with the game's cover glow, recoloured: green usable,
+  yellow too close to a squadmate or spot, red outside the deployment area or not walkable.
+  Cover facing away from the enemies isn't marked. Handy when reporting a bad deployment.
 
 Without the settings manager, the defaults apply.
 

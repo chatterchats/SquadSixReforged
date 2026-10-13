@@ -1044,6 +1044,127 @@ function COVER.forward(polygon, volume)
     return {X = dx / length, Y = dy / length}
 end
 
+-- The debug_cover_markers setting (off by default): every cover pocket the mod considers is
+-- shown with the game's own cover marker, recoloured: green usable, yellow crowded (within a
+-- tile of a destination or unit), red outside the lane or with no navmesh. Cover facing away
+-- from the encounter gets none. Unreal's debug drawing is stripped from the shipping build;
+-- the marker (BP_UI_CoverPoint_ScriptCreated) draws its walls from RepresentedPocket, and its
+-- wall material (M_UI_CoverWall) takes "Base Color", fading with "NormalizedDistance" from the
+-- cursor unless that is 1. Tried by hand through ZC Sandbox in Smugglers' Den (2026-10-12).
+COVER.markers = {
+    class = "/Game/Game/UI/Cover/BP_UI_CoverPoint_ScriptCreated.BP_UI_CoverPoint_ScriptCreated_C",
+    package = "/Game/Game/UI/Cover/BP_UI_CoverPoint_ScriptCreated",
+    seconds = 60,
+    colors = {
+        usable = {R = 0, G = 1, B = 0, A = 1},
+        crowded = {R = 1, G = 0.85, B = 0, A = 1},
+        outside = {R = 1, G = 0, B = 0, A = 1},
+        unwalkable = {R = 1, G = 0, B = 0, A = 1},
+    },
+    -- What this deployment marked, by category, for the log; reset by COVER.markers.report.
+    counts = {},
+    -- Pockets already marked this deployment, so a second search over the same lane doesn't
+    -- stack markers: the first verdict stands. Reset by begin_deployment.
+    shown = {},
+    failed = nil,
+}
+
+function COVER.markers.enabled()
+    return Settings.Get("debug_cover_markers", false) == true
+end
+
+local function marker_name(text)
+    if type(FName) == "function" then return FName(text) end
+    return text
+end
+
+-- Spawn one recoloured marker for `pocket` (from COVER.nearest) in `category`.
+function COVER.markers.mark(world, pocket, category)
+    local markers = COVER.markers
+    local color = markers.colors[category]
+    if color == nil or not markers.enabled() then return end
+    local tag = string.format("%.0f/%.0f", pocket.X, pocket.Y)
+    if markers.shown[tag] then return end
+    markers.shown[tag] = true
+    markers.counts[category] = (markers.counts[category] or 0) + 1
+    if markers.failed ~= nil then return end
+    local class = StaticFindObject(markers.class)
+    if not valid(class) then
+        pcall(function() LoadAsset(markers.package) end)
+        class = StaticFindObject(markers.class)
+    end
+    if not valid(class) or not valid(world) then
+        markers.failed = "no_marker_class"
+        return
+    end
+    local floor = {X = pocket.X, Y = pocket.Y, Z = pocket.Z}
+    local spawn_ok, marker = pcall(function() return world:SpawnActor(class, floor, {}) end)
+    if not spawn_ok or not valid(marker) then
+        markers.failed = "spawn"
+        return
+    end
+    -- One segment across the pocket, as the game's own pockets have: a tile wide, 60 uu up.
+    local tx, ty = -pocket.ny, pocket.nx
+    local cover = {X = pocket.X, Y = pocket.Y, Z = pocket.Z + 60}
+    local normal = {X = pocket.nx, Y = pocket.ny, Z = 0}
+    local set_ok, set_error = pcall(function()
+        local represented = marker.RepresentedPocket
+        represented.PocketPointType = pocket.kind
+        represented.CoverLocation = cover
+        represented.FloorLocation = floor
+        represented.CoverNormal = normal
+        local segments = represented.PocketSegments
+        segments[1] = {
+            ExtentLeft = {X = cover.X + tx * 50, Y = cover.Y + ty * 50, Z = cover.Z},
+            ExtentRight = {X = cover.X - tx * 50, Y = cover.Y - ty * 50, Z = cover.Z},
+            PointType = pocket.kind,
+            LeftStepOutLocation = floor,
+            RightStepOutLocation = floor,
+            CoverLocation = cover,
+            CoverNormal = normal,
+            FloorLocation = floor,
+        }
+    end)
+    if not set_ok then
+        markers.failed = "pocket:" .. tostring(set_error)
+        pcall(function() marker:K2_DestroyActor() end)
+        return
+    end
+    pcall(function() marker:VisualizePocket() end)
+    local walls = {}
+    pcall(function()
+        local list = marker.Walls
+        for index = 1, list:GetArrayNum() do walls[#walls + 1] = unwrap(list[index]) end
+    end)
+    for _, wall in ipairs(walls) do
+        pcall(function()
+            local material = wall.Wall:GetMaterial(0)
+            material:SetVectorParameterValue(marker_name("Base Color"), color)
+            material:SetScalarParameterValue(marker_name("NormalizedDistance"), 1.0)
+        end)
+    end
+    ExecuteWithDelay(markers.seconds * 1000, function()
+        ExecuteInGameThread(function()
+            for _, wall in ipairs(walls) do
+                pcall(function() wall:Hide() end)
+                pcall(function() wall:K2_DestroyActor() end)
+            end
+            pcall(function() marker:K2_DestroyActor() end)
+        end)
+    end)
+end
+
+-- One log line per deployment of what was marked, or why marking stopped.
+function COVER.markers.report(site)
+    local markers = COVER.markers
+    if not markers.enabled() then return end
+    local counts = markers.counts
+    log(string.format("debug_markers site=%s usable=%d crowded=%d outside=%d unwalkable=%d%s", site,
+        counts.usable or 0, counts.crowded or 0, counts.outside or 0, counts.unwalkable or 0,
+        markers.failed and (" failed=" .. markers.failed) or ""))
+    markers.counts = {}
+end
+
 -- The points to add, preferring cover: `derived` (from derive_rescue_points) where no usable
 -- cover is found, so a map without cover, or a game where the call fails, gets exactly what it
 -- got before. Full cover first, then half, then the derived points; each a tile from the
@@ -1053,6 +1174,8 @@ function COVER.choose(site, actor, polygon, authored, units, wanted, derived, wa
     local found_ok, library = pcall(StaticFindObject, COVER.library)
     if not found_ok or not valid(library) then return derived end
     local forward = COVER.forward(polygon, volume)
+    local world = nil
+    if COVER.markers.enabled() then pcall(function() world = actor:GetWorld() end) end
     local stats = {queries = 0, errors = 0, unreadable = 0, pockets = 0, facing_away = 0, refused = 0,
                    outside = 0, crowded = 0, unwalkable = 0}
 
@@ -1081,16 +1204,24 @@ function COVER.choose(site, actor, polygon, authored, units, wanted, derived, wa
                 local point = {X = pocket.X, Y = pocket.Y, Z = pocket.Z + RESCUE.capsule_height,
                                lift = RESCUE.capsule_height, cover = pocket.tier, facing = facing,
                                order = #covers}
+                local category = nil
                 if facing < RESCUE.cover_facing then
                     stats.facing_away = stats.facing_away + 1
                 elseif inside_deployment(polygon, point) == false then
                     stats.refused, stats.outside = stats.refused + 1, stats.outside + 1
+                    category = "outside"
                 elseif not clear_of(point, authored) or not clear_of(point, units, true) then
                     stats.refused, stats.crowded = stats.refused + 1, stats.crowded + 1
+                    category = "crowded"
                 elseif walkable ~= nil and not walkable(point) then
                     stats.refused, stats.unwalkable = stats.refused + 1, stats.unwalkable + 1
+                    category = "unwalkable"
                 else
                     covers[#covers + 1] = point
+                    category = "usable"
+                end
+                if category ~= nil and COVER.markers.enabled() then
+                    COVER.markers.mark(world, pocket, category)
                 end
             end
         end
@@ -1120,6 +1251,7 @@ function COVER.choose(site, actor, polygon, authored, units, wanted, derived, wa
             stats.queries, stats.pockets, #covers, stats.facing_away, stats.refused,
             used.full, used.half, #chosen, forward and "checked" or "unknown",
             stats.errors, stats.unreadable, stats.outside, stats.crowded, stats.unwalkable))
+        COVER.markers.report(site)
     end
     if used.full + used.half == 0 then return derived end
     for _, point in ipairs(chosen) do point.order, point.facing = nil, nil end
@@ -1178,13 +1310,17 @@ function COVER.improve(area, destinations, valid_destinations, anchors)
                 pocket.facing, pocket.distance = facing(pocket), distance
                 if pocket.facing < RESCUE.cover_facing then return end
                 local point = {X = pocket.X, Y = pocket.Y, Z = pocket.Z}
-                if inside_deployment(polygon, point) == false then return end
-                if walkable ~= nil and not walkable(point) then return end
+                local function refuse(category)
+                    if COVER.markers.enabled() then COVER.markers.mark(world, pocket, category) end
+                end
+                if inside_deployment(polygon, point) == false then return refuse("outside") end
+                if walkable ~= nil and not walkable(point) then return refuse("unwalkable") end
                 for other, location in ipairs(points) do
                     if other ~= index and xy_distance_squared(point, location) < MIN_DESTINATION_SEPARATION_SQ then
-                        return
+                        return refuse("crowded")
                     end
                 end
+                refuse("usable")
                 if best == nil or pocket.tier > best.tier
                     or (pocket.tier == best.tier and (pocket.facing > best.facing + 0.01
                         or (math.abs(pocket.facing - best.facing) <= 0.01 and distance < best.distance))) then
@@ -1222,6 +1358,7 @@ function COVER.improve(area, destinations, valid_destinations, anchors)
     log(string.format("improve_spots kept=%d moved=%d no_better_cover=%d queries=%d errors=%d"
         .. " unreadable=%d moves=%s", kept, moved, unmoved, stats.queries, stats.errors,
         stats.unreadable, #moves > 0 and table.concat(moves, ",") or "none"))
+    COVER.markers.report("improve")
 end
 
 -- Search centres covering the lane: tile-spaced points strictly inside it, each at the height of
@@ -2445,6 +2582,7 @@ local function begin_deployment(area)
     placement_rescue_reported = {}
     restored_positions = {}
     repair_reported = 0
+    COVER.markers.shown = {}
     return key
 end
 

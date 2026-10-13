@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The game's own deployment spots move into cover facing the enemies when theirs faces away or
   they have none, within two tiles. On by default; turn it off in the Mixamoo Mod Config
   Manager settings page, which Squad Six Reforged now has.
+- A "Show cover debug markers" setting (off by default) that shows the cover spots the mod
+  considered at each deployment, coloured by whether it could use them.
 - Story characters who join at the start of a mission get a deployment spot too, so nobody is
   left standing in the open.
 - Deep Cover takes six operators (it was three), with hand-picked deployment spots for the squad

@@ -14,6 +14,9 @@
 --      two tiles; one whose only nearby cover faces away, and one whose only good cover is
 --      outside the lane, stay. The moved one is a new actor; the authored one is unlisted.
 --   5. The same with the setting off: nothing moves.
+--   6. debug_cover_markers on: each pocket considered gets one of the game's cover markers, its
+--      pocket set from the cover and its walls recoloured by category (green usable, yellow
+--      crowded, red outside), none for cover facing away; all removed after a minute.
 --   luajit tests/cover_test.lua <Scripts dir>
 local scripts = assert(arg[1], "usage: cover_test.lua <Scripts dir>")
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
@@ -211,5 +214,74 @@ mock.run_until(mock.now() + 600)
 for index = 1, 4 do
     if untouched[index] ~= before[index] then fail("setting off: destination " .. index .. " was replaced") end
 end
+
+-- 6. Debug markers, on scenario 1's pockets and squad.
+local MARKER_CLASS = "/Game/Game/UI/Cover/BP_UI_CoverPoint_ScriptCreated.BP_UI_CoverPoint_ScriptCreated_C"
+local marker_class = mock.object("BlueprintGeneratedClass " .. MARKER_CLASS)
+local markers = {}
+local spawn = mock.world.SpawnActor
+local real_world = mock.world
+mock.world = mock.object("World /Game/Maps/Test.Test", {}, {
+    SpawnActor = function(_, class, location, rotation)
+        if class ~= marker_class then return spawn(real_world, class, location, rotation) end
+        local materials = {}
+        local walls = {}
+        local entry = {at = location, materials = materials, walls_removed = 0}
+        for index = 1, 2 do
+            local material = mock.object("MID", {}, {
+                SetVectorParameterValue = function(_, name, value) materials[#materials + 1] = {name, value} end,
+                SetScalarParameterValue = function(_, name, value) materials[#materials + 1] = {name, value} end,
+            })
+            local component = mock.object("Wall", {}, {GetMaterial = function() return material end})
+            walls[index] = mock.object("BP_UI_Cover_Wall_C", {Wall = component}, {
+                Hide = function() end,
+                K2_DestroyActor = function() entry.walls_removed = entry.walls_removed + 1 end,
+            })
+        end
+        local represented = {PocketSegments = setmetatable({}, {__index = {GetArrayNum = function() return 1 end}})}
+        local marker = mock.object("BP_UI_CoverPoint_ScriptCreated_C", {RepresentedPocket = represented, Walls = mock.array(walls)}, {
+            VisualizePocket = function(self) self.properties.visualized = true end,
+            K2_DestroyActor = function(self) self.properties.destroyed = true end,
+        })
+        entry.marker, entry.represented = marker, represented
+        markers[#markers + 1] = entry
+        return marker
+    end,
+})
+local find_marker = StaticFindObject
+StaticFindObject = function(path)
+    if path == MARKER_CLASS then return marker_class end
+    return find_marker(path)
+end
+for index = #pockets, 1, -1 do pockets[index] = nil end
+pockets[1] = {X = B + 200, Y = B + 130, nx = 0, ny = 1, kind = FULL}         -- usable
+pockets[2] = {X = B + 100, Y = B + 250, nx = 0, ny = 1, kind = HALF}         -- usable
+pockets[3] = {X = B + 250, Y = B + 330, nx = 0, ny = -1, kind = FULL}        -- facing away: no marker
+pockets[4] = {X = B + 520, Y = B + 200, nx = 0, ny = 1, kind = FULL}         -- outside
+mock.settings.debug_cover_markers = true
+deploy("Markers", {on_lane(1), on_lane(2), on_lane(3), on_lane(4),
+    unit("Operator5", B + 200, B - 600), unit("Operator6", B + 1000, B + 200), unit("Operator7", B - 600, B + 200)})
+mock.expect("debug_markers site=staging usable=2 crowded=0 outside=1 unwalkable=0\n", "the markers report what they showed")
+if #markers ~= 3 then fail(string.format("expected three markers, got %d", #markers)) end
+local green, red = 0, 0
+for _, entry in ipairs(markers) do
+    if not entry.marker.properties.visualized then fail("a marker wasn't drawn") end
+    if entry.represented.CoverNormal == nil or entry.represented.PocketSegments[1] == nil then
+        fail("a marker's pocket wasn't set")
+    end
+    local color = nil
+    for _, setting in ipairs(entry.materials) do
+        if setting[1] == "Base Color" then color = setting[2] end
+    end
+    if color == nil then fail("a marker's walls weren't recoloured") end
+    if color.G == 1 and color.R == 0 then green = green + 1 elseif color.R == 1 and color.G == 0 then red = red + 1 end
+    if entry.at.X == pockets[3].X and entry.at.Y == pockets[3].Y then fail("cover facing away was marked") end
+end
+if green ~= 2 or red ~= 1 then fail(string.format("expected two green markers and one red, got %d and %d", green, red)) end
+mock.run_until(mock.now() + 61000)
+for _, entry in ipairs(markers) do
+    if not entry.marker.properties.destroyed or entry.walls_removed ~= 2 then fail("a marker outlived its minute") end
+end
+mock.settings.debug_cover_markers = false
 
 io.stdout:write("ok\n")

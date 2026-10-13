@@ -516,6 +516,26 @@ stub the client (tests/ue4ss_mock.lua): the real one polls its values file on
 a loop that never stops, which the bootstrap test would count against the
 maintenance loop.
 
+### `COVER.markers`
+
+The `debug_cover_markers` setting (off by default). Unreal's DrawDebug calls
+are stripped from the shipping build: a sphere and a box drawn through ZC
+Sandbox in Smugglers' Den showed nothing. A decal with the radial targeting
+material showed, but its colour is the game's global UI colour, not its
+`Color` parameter, in both the preset and the base material. The game's own
+cover marker works: `BP_UI_CoverPoint_ScriptCreated`, given a
+`RepresentedPocket` and asked to `VisualizePocket`, draws `BP_UI_Cover_Wall`
+pieces whose material (`M_UI_CoverWall`) takes `Base Color`; its
+`NormalizedDistance` fades it with the cursor, so it is set to 1. Drawn by
+hand that way, the wall showed green.
+
+The mod gives each marker a one-segment pocket built from the cover's floor
+and normal (a tile wide, 60 uu up), as the hand test did, rather than copying
+the game's segment list. Each pocket is marked once per deployment (the first
+search's verdict), the walls and marker are destroyed after a minute, and the
+log line `debug_markers site=...` counts them; `failed=` says why marking
+stopped, if it did (no class, spawn, or the pocket couldn't be written).
+
 ### `FIXED`
 
 Profiles rescue operators onto extra points and then add destinations where

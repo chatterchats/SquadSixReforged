@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Deep Cover takes six operators (it was three), with hand-picked deployment spots for the squad
   plus Rex.
 - Stillwatch: a seventh deployment spot, so a squad of six plus Trick all get one.
+- Rescue Jae Mordant takes six operators (it was kept at four). Jae joins partway through, and
+  saving with seven units works.
 
 ## [1.2.0]
 

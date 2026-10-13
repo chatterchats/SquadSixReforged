@@ -34,10 +34,11 @@ local GUARDED_MISSION_NAMES = {
 -- eight units: duplicated named operators, or a save that never finishes
 -- writing. Kept at their authored four by exact name: Slug HQ and the
 -- AuthoredHero missions, listed so they stay guarded even where reflection
--- can't read their requirements.
+-- can't read their requirements. HM_Jae_020 left the list once it was played
+-- at six with saves at seven units finishing (docs/live-tests.md).
 local SCRIPTED_COMPANION_MISSION_NAMES = {
     "MM_02_050_SlugHQ",
-    "HM_Cly_010", "HM_Cly_020", "HM_Jae_010", "HM_Jae_020",
+    "HM_Cly_010", "HM_Cly_020", "HM_Jae_010",
     "HM_Kabb_020", "HM_Luco_010", "HM_Trick_010",
 }
 -- Missions whose squad the player doesn't choose. The Serolonis Job is the

@@ -22,8 +22,7 @@ duplicate operators or stop the mission from saving, so they keep their usual fo
 
 - The Serolonis Job (the opening tutorial; the game picks the squad)
 - Smugglers' Den
-- Buy Cheap, Never Sleep; Best Served Cold; Origin of Infection; Sisters; No Kings, No Masters;
-  Rescue Jae Mordant
+- Buy Cheap, Never Sleep; Best Served Cold; Origin of Infection; Sisters; No Kings, No Masters
 - Five more hero missions, by mission ID: HM_Cly_020, HM_Jae_010, HM_Kabb_020, HM_Luco_010 and
   HM_Trick_010 (their titles depend on the game's language)
 

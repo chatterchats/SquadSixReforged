@@ -97,6 +97,12 @@ which hangs the save. With HM_Jae_020 listed the guard covers all eleven
 AuthoredHero missions, which is what the cast census supports directly:
 none of them deploys a free six.
 
+Played since (2026-10-12, build 25134257): HM_Jae_020 at six, Jae joining
+partway through for seven units, an autosave and a manual save at seven both
+finished and the manual one loaded back (docs/live-tests.md). Deep Cover had
+already saved at seven and eight. The hang didn't reproduce, so HM_Jae_020
+left the guard and ships at six from the Core pak.
+
 1.1.0 removed the old "HM_" substring fallback because it over-matched
 twenty-one definitions, six of which carried no requirements. This is not
 that fallback: it is six exact names, chosen from the requirement census,

@@ -14,7 +14,8 @@ mock.install({missions = {
     m("MM_04_050_ANewOrder", 6, 1),
     m("SK_Ryloth_035", 4, 0),            -- left at 4: the runtime raises it
     m("HM_Kabb_010", 4, 2),              -- guarded by reflection
-    m("HM_Jae_020", 6, 1),               -- guarded by name; must be put back to 4
+    m("HM_Jae_010", 6, 1),               -- guarded by name; must be put back to 4
+    m("HM_Jae_020", 6, 1),               -- no longer guarded: played at six
     m("MM_02_050_SlugHQ", 4, 1),         -- guarded by name
     m("SK_Dantooine_025", 3, 0),         -- three-operator mission, untouched
     m("MM_03_010_Bespin", 1, 1),         -- solo mission, untouched
@@ -52,7 +53,8 @@ expect("selfcheck phase=startup ok=23 missing=none unchecked=none", "every start
 expect("selfcheck phase=squad_select ok=2 missing=none unchecked=none", "the squad screen's names resolve")
 expect("selfcheck phase=mission ok=3 missing=none unchecked=none", "every mission name resolves")
 expect("SK_Ryloth_035=6", "a mission left at 4 is raised at runtime")
-expect("HM_Jae_020=4", "a guarded mission is put back to 4")
+expect("HM_Jae_010=4", "a guarded mission is put back to 4")
+expect("HM_Jae_020=6", "Rescue Jae Mordant keeps six")
 expect("HM_Kabb_010=4", "a reflection-guarded mission stays at 4")
 expect("SK_Dantooine_025=3", "a three-operator mission is untouched")
 expect("MM_03_010_Bespin=1", "a solo mission is untouched")

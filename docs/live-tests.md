@@ -245,3 +245,24 @@ expansion stops at six, so nothing was added, `WARNING: fewer destinations than 
 operators`, and the sixth operator (Kara) stood in the open. The repair passes saw only units
 walking. The user moved Kara to a spot they prefer; read through ZC Sandbox (2700/7847, the
 floor of authored point 4), it became the seventh spot of the `Stillwatch` fixed layout.
+
+## HM_Jae_020 ("Rescue Jae Mordant"), six (f52a6df + test build, 2026-10-12)
+
+The mission arctco kept at four after a report that six became seven units and the save never
+finished (five worked). Test build: HM_Jae_020 taken off `SCRIPTED_COMPANION_MISSION_NAMES` on
+Instance 2 only, so the runtime raised it to six. From the user's campaign.
+
+| Step | Result |
+|------|--------|
+| Start | six deployed: four authored destinations, two added (`player_destinations=4->6`), both overflow operators moved onto the lane, `floor_settled=2/2`; the repair passes saw only units walking |
+| Jae | joined partway through, walking in from the side of the map: seven units (ZC Sandbox `units`), no duplicate |
+| Saves | an autosave, then a manual save with seven units, both finished; the manual save loaded back fine |
+
+Cover query, tried through ZC Sandbox at the deployed positions: `BrunoCoverGeneratorSubsystem.
+GetCoverAtLocation` reported `LowCover` (facing -Y) at Kabb's spot and nothing at the others' exact
+positions; `BRG_TargetingFunctionLibrary.GetNearestCoverForPoint` found cover 10 uu from Luco with
+step-outs both sides (a flag combination, printed `(INVALID)` by the text export).
+
+| End | the mission's only encounter; mission complete, back to the Den, no errors |
+
+HM_Jae_020 now ships at six from the Core pak, off the guard list.

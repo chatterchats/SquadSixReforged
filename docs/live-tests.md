@@ -266,3 +266,17 @@ step-outs both sides (a flag combination, printed `(INVALID)` by the text export
 | End | the mission's only encounter; mission complete, back to the Den, no errors |
 
 HM_Jae_020 now ships at six from the Core pak, off the guard list.
+
+## MM_02_050_SlugHQ ("Smugglers' Den"), six (f318bfe + test build, 2026-10-12)
+
+The mission arctco kept at four after a report of six becoming eight units with two Tal Reas.
+Test build: `MM_02_050_SlugHQ` taken off the guard list on Instance 2 only. From the user's
+campaign; squad Kabb, Hawks, Jae, Trick, Ravin (a custom character), BR-1.
+
+| Step | Result |
+|------|--------|
+| Area 1 | cover found at deployment (`errors=0 unreadable=0`): 3 pockets, one used. The user saw one operator on the wrong side of cover; it was the one put into the "half cover facing the enemies", since the facing test had the normal backwards |
+| Tel-Rea | joined before area 2 as the mission's own `Char_Hero_TelRea_Jedi_SlugHQ_C`: seven units, one Tel-Rea, standing on the mission's spot rather than a destination |
+| Area 2 | 4 authored destinations; 2 added at the trigger (six units then) and a seventh when Tel-Rea joined (`destinations=7/7`). The user saw three on the wrong side of cover: the three the mod placed, in pockets with normal -X, against enemies to +X. The three on authored points (normal +X) were kept. Fixed in 9f42e43 |
+| Spots | the user moved the mod's three into good spots; the authored four plus two of theirs became the `SmugglersDen2` fixed layout |
+| Save | a manual save with seven units finished |

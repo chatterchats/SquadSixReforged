@@ -279,6 +279,26 @@ local FIXED = {
                 {X = 2700, Y = 7847, Z = -700},              -- same floor as authored 4
             },
         },
+        {
+            name = "SmugglersDen2",
+            -- MM_02_050_SlugHQ ("Smugglers' Den"), the second area: four authored points, enemies
+            -- to +X. Tel-Rea joins after the trigger and keeps the mission's own spot, so six.
+            destinations = {
+                {X = 2400, Y = 12100, Z = -400},
+                {X = 2100, Y = 12300, Z = -400},
+                {X = 2350, Y = 12650, Z = -400},
+                {X = 2550, Y = 13000, Z = -400},
+            },
+            -- The authored four, which the user kept, then two picked in game (2026-10-12).
+            spots = {
+                {X = 2400, Y = 12100, Z = -400},
+                {X = 2100, Y = 12300, Z = -400},
+                {X = 2350, Y = 12650, Z = -400},
+                {X = 2550, Y = 13000, Z = -400},
+                {X = 2034.652, Y = 12956.393, Z = -400},
+                {X = 2440, Y = 12448.3, Z = -400},
+            },
+        },
     },
     -- Areas whose destinations were replaced, by object key, for the repair passes.
     applied = {},

@@ -49,6 +49,7 @@ local PROFILE_AREAS = {
 local FIXED_AREAS = {
     DeepCover = "MM_05_010_UmbaraRescue_Gameplay:BP_CombatPreparationArea_C_0",
     Stillwatch = "MM_04_050_DenBattle_Gameplay:BP_CombatPreparationArea_C_1",
+    SmugglersDen2 = "MM_02_050_SlugHQ_Gameplay:BP_CombatPreparationArea_C_2",
 }
 local TRIGGER = "/Script/BitReactorGame.CombatPreparationArea:TriggerPreCombat"
 local RELOCATION = "/Game/Game/Core/Blueprints/BP_CombatPreparationArea.BP_CombatPreparationArea_C:MovePlayerUnitsIntoPosition"

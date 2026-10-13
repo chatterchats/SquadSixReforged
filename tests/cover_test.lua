@@ -312,7 +312,8 @@ for _, entry in ipairs(markers) do
     if entry.represented.PocketSegments:GetArrayNum() ~= 1 then fail("a marker's pocket wasn't set") end
     local color = nil
     for _, setting in ipairs(entry.materials) do
-        if setting[1] == "Base Color" then color = setting[2] end
+        if type(setting[1]) == "string" then fail("a material parameter was passed as a plain string") end
+        if setting[1]:ToString() == "Base Color" then color = setting[2] end
     end
     if color == nil then fail("a marker's walls weren't recoloured") end
     if entry.plain_tinted then fail("an unused wall's plain material was tinted") end

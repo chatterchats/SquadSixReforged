@@ -1082,9 +1082,16 @@ function COVER.markers.enabled()
     return Settings.Get("debug_cover_markers", false) == true
 end
 
+-- A material parameter name as an FName, or nil. UE4SS's FName isn't a plain Lua function, so
+-- the first version's `type(FName) == "function"` test passed the bare string instead, and the
+-- game crashed in SetVectorParameterValue (access violation, Serolonis 030, 2026-10-12). Called
+-- the way Colors+ calls it, and checked by reading the text back.
 local function marker_name(text)
-    if type(FName) == "function" then return FName(text) end
-    return text
+    local ok, name = pcall(function() return FName(text) end)
+    if not ok or name == nil then return nil end
+    local text_ok, back = pcall(function() return name:ToString() end)
+    if not text_ok or back ~= text then return nil end
+    return name
 end
 
 -- Spawn one recoloured marker for `pocket` (from COVER.nearest) in `category`.
@@ -1204,9 +1211,14 @@ function COVER.markers.draw(world, pocket, color)
             local material_ok, material = pcall(function() return unwrap(wall.Wall:GetMaterial(0)) end)
             local name = material_ok and valid(material) and full_name(material) or ""
             step("tint_material=" .. (name:match("^(%S+)") or "none"))
-            if name:find("^MaterialInstanceDynamic ") then
-                pcall(function() material:SetVectorParameterValue(marker_name("Base Color"), color) end)
-                pcall(function() material:SetScalarParameterValue(marker_name("NormalizedDistance"), 1.0) end)
+            local base_color, distance = marker_name("Base Color"), marker_name("NormalizedDistance")
+            if base_color == nil or distance == nil then
+                markers.failed = "parameter_names"
+            elseif name:find("^MaterialInstanceDynamic ") then
+                step("tint_color")
+                pcall(function() material:SetVectorParameterValue(base_color, color) end)
+                step("tint_distance")
+                pcall(function() material:SetScalarParameterValue(distance, 1.0) end)
                 tinted = tinted + 1
             end
         end

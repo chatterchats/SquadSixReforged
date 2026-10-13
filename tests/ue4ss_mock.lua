@@ -159,6 +159,11 @@ function mock.install(options)
     end
 
     print = function(message) record("log " .. tostring(message)) end
+    -- UE4SS's FName: a callable that isn't a plain Lua function, returning a name object.
+    FName = setmetatable({}, {__call = function(_, text)
+        return setmetatable({text = text}, {__index = {ToString = function(self) return self.text end},
+            __eq = function(a, b) return a.text == b.text end})
+    end})
     RegisterHook = function(path, pre, post)
         record("hook " .. path .. (post and " +post" or ""))
         mock.hooks[path] = {pre = pre, post = post}

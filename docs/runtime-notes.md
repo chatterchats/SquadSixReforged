@@ -553,7 +553,16 @@ five walls (`Walls`); `VisualizePocket` places and sets up only the ones its
 segments need, and the rest wait at the origin with the plain material asset.
 The hand test tinted only the placed wall's `MID_M_UI_CoverWall_*`; the mod
 tinted every wall in the pool. Now only walls standing on the pocket whose
-material is a `MaterialInstanceDynamic` are tinted. Each pocket is marked once per deployment (the first
+material is a `MaterialInstanceDynamic` are tinted.
+
+That narrowed it but didn't end it: the fourth crash (reading
+0xffffffffffffffff) came after `tint_material=MaterialInstanceDynamic`, in
+`SetVectorParameterValue` itself. The parameter name was the cause: the helper
+tested `type(FName) == "function"`, which UE4SS's callable `FName` fails, and
+passed the bare Lua string where the function takes an FName. Names are now
+made with `FName(...)` as Colors+ makes them, read back to check, and the
+tint is skipped (`failed=parameter_names`) if that fails. The test mock's
+`FName` is a callable table, so a bare string fails the test. Each pocket is marked once per deployment (the first
 search's verdict), the walls and marker are destroyed after a minute, and the
 log line `debug_markers site=...` counts them; `failed=` says why marking
 stopped, if it did (no class, spawn, or the pocket couldn't be written).

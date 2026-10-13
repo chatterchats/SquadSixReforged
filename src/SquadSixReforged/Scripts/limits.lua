@@ -26,20 +26,31 @@ local AUTO_ASSIGN_PROPERTY = "bAutoAssign"
 -- Normally caught by reflection in guards_authored_maximum; this exact-name
 -- list is the fallback when the requirements can't be read.
 local GUARDED_MISSION_NAMES = {
-    "HM_Kabb_010", "HM_Telrea_010", "HM_Telrea_020", "HM_TrickLuco_020",
+    "HM_Telrea_020", "HM_TrickLuco_020",
 }
 
 -- Missions whose story characters join through mission logic rather than
 -- through CharacterRequirements, so six selected operators become seven or
 -- eight units: duplicated named operators, or a save that never finishes
--- writing. Kept at their authored four by exact name: Slug HQ and the
--- AuthoredHero missions, listed so they stay guarded even where reflection
--- can't read their requirements. HM_Jae_020 and Slug HQ left the list once
--- they were played at six with saves at seven units finishing, and no
--- duplicate (docs/live-tests.md).
+-- writing. Kept at their authored four by exact name, so they stay guarded
+-- even where reflection can't read their requirements: HM_Trick_010, where
+-- Sergeant Sawtooth is rescued and joins. HM_Jae_020 and Slug HQ left the list
+-- once they were played at six with saves at seven units finishing, and no
+-- duplicate (docs/live-tests.md); the missions in
+-- COMPANION_AT_SIX_MISSION_NAMES left it because no ally joins them.
 local SCRIPTED_COMPANION_MISSION_NAMES = {
-    "HM_Cly_010", "HM_Cly_020", "HM_Jae_010",
-    "HM_Kabb_020", "HM_Luco_010", "HM_Trick_010",
+    "HM_Trick_010",
+}
+-- Hero missions that auto-assign a companion beside Hawks but take six anyway:
+-- the companion fills one of the six slots, as Hawks does, and no ally joins
+-- through mission logic. Their gameplay levels import no ally spawn group (only
+-- enemy bosses: Idra Farr in Cly_010, Geryon in Luco_010), read from the game
+-- files on 2026-10-13. Exempt from the auto-assign rule in
+-- guards_authored_maximum. Played at six on 2026-10-13, all but HM_Cly_020 and HM_Kabb_020
+-- (docs/live-tests.md).
+local COMPANION_AT_SIX_MISSION_NAMES = {
+    "HM_Cly_010", "HM_Cly_020", "HM_Jae_010", "HM_Kabb_010",
+    "HM_Kabb_020", "HM_Luco_010", "HM_Telrea_010",
 }
 -- Missions whose squad the player doesn't choose. The Serolonis Job is the
 -- opening tutorial: its squad is set by the game, so six slots add nothing
@@ -71,6 +82,9 @@ local function guards_authored_maximum(object)
                 return true
             end
         end
+    end
+    for _, mission in ipairs(COMPANION_AT_SIX_MISSION_NAMES) do
+        if string.find(name, mission, 1, true) then return false end
     end
 
     local read_ok, requirements = pcall(function()

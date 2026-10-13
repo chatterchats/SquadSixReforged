@@ -7,7 +7,10 @@
 --     each checked against the navmesh and a floor trace;
 --   - where the squad's operators stand during the first seconds of the mission (the staging
 --     positions the relocation starts from);
---   - a timeline of when areas, destinations and squad members appear.
+--   - a timeline of when areas, destinations and squad members appear;
+--   - once combat preparation starts, where the living enemies are, as a direction from the lane,
+--     beside the direction placement.lua uses for cover (directions.lua, from the enemy spawners)
+--     and the tactical volume's centre it used before.
 -- It runs while missions load, so it keeps object searches rare: deployment areas are searched for
 -- every AREA_SCAN_SECONDS, and the squad is read from the mission's own game state. (0.1.0 also
 -- searched for grid volumes, once per destination every second; no mission ever had one.)
@@ -15,16 +18,20 @@
 -- must not compete with Squad Six's) and writes nothing to the game. Output goes to UE4SS.log,
 -- squadsix_probe.log and squadsix_probe.jsonl in the mod folder. `squadsixprobe` in the UE4SS
 -- console checks every area immediately and logs where every squad member stands.
-local VERSION = "0.3.0"
+local VERSION = "0.4.0"
 local TAG = "[SQUADSIX_PROBE]"
 local WATCH_INTERVAL_MS = 1000
-local WATCH_SECONDS = 120          -- per mission
+local WATCH_SECONDS = 1800         -- per mission: combat can start after minutes of exploring
 local AREA_SCAN_SECONDS = 5        -- how often to search for deployment areas
 local CHECK_AFTER_SECONDS = 10     -- an area's spots are checked this long after it appears
 local STAGING_SECONDS = 30         -- how long squad positions are recorded
 local MOVED = 50                   -- uu; smaller position changes aren't logged again
 local TRACE_ABOVE, TRACE_BELOW = 300, 1000
 local NAV_EXTENT = {X = 50, Y = 50, Z = 250}
+local ENEMY_SECONDS = 60           -- how long after combat preparation starts enemies are sampled
+local ENEMY_EVERY = 3
+local HOSTILE_RANGE = 100000       -- uu: every enemy on the map
+local UNIT_STATICS = "/Script/BitReactorGame.Default__BitReactorGameStatics_Unit"
 
 local source = debug.getinfo(1, "S").source:gsub("^@", "")
 local directory = assert(source:match("^(.*[/\\])"), "Scripts directory unavailable")
@@ -33,7 +40,7 @@ local directory = assert(source:match("^(.*[/\\])"), "Scripts directory unavaila
 local runtime_scripts = SquadSixProbeRuntimeScripts or (directory .. "../../SquadSixReforged/Scripts/")
 local output_dir = SquadSixProbeOutputDir or (directory .. "../")
 package.path = runtime_scripts .. "?.lua;" .. package.path
-for _, module in ipairs({"common", "placement"}) do package.loaded[module] = nil end
+for _, module in ipairs({"common", "placement", "directions"}) do package.loaded[module] = nil end
 
 local log_file = io.open(output_dir .. "squadsix_probe.log", "a")
 local results_file = io.open(output_dir .. "squadsix_probe.jsonl", "a")
@@ -85,6 +92,8 @@ if not loaded or not placement_loaded then
     return
 end
 local geometry = Placement.internals
+local directions_loaded, Directions = pcall(require, "directions")
+if not directions_loaded or type(Directions) ~= "table" then Directions = {} end
 local valid, unwrap, full_name = Common.valid, Common.unwrap, Common.full_name
 local actor_location, array_count = Common.actor_location, Common.array_count
 
@@ -266,6 +275,79 @@ local function watch_squad()
             members = members})
 end
 
+-- Degrees (0 = +X, 90 = +Y) of a direction, or "none".
+local function degrees(dx, dy)
+    if dx == nil or (dx == 0 and dy == 0) then return "none" end
+    -- UE4SS runs Lua 5.4: no math.atan2, and math.atan takes (y, x).
+    return string.format("%.0f", math.deg((math.atan2 or math.atan)(dy, dx)) % 360)
+end
+
+-- Where the living enemies are, from the lane of the area combat is being prepared in, for up to
+-- ENEMY_SECONDS after it starts, logged whenever their number changes.
+local function watch_enemies()
+    local state = session.game_state
+    if not valid(state) then return end
+    local area_ok, current = pcall(function() return unwrap(state:GetPropertyValue("CombatPreparationArea")) end)
+    if area_ok and valid(current) then
+        local key = area_key(current)
+        if session.enemies == nil or session.enemies.key ~= key then
+            session.enemies = {key = key, area = current, started = session.elapsed, next = session.elapsed,
+                               count = 0}
+        end
+    end
+    local watch = session.enemies
+    if watch == nil or session.elapsed < watch.next or session.elapsed - watch.started > ENEMY_SECONDS then return end
+    watch.next = session.elapsed + ENEMY_EVERY
+
+    local squad_ok, squad = pcall(function() return unwrap(state:GetPropertyValue("PlayerSquad")) end)
+    local members_ok, members = pcall(function() return squad:GetPropertyValue("SquadMembers") end)
+    local member = squad_ok and members_ok and members ~= nil and array_count(members) > 0
+        and unwrap(members[1]) or nil
+    local statics = StaticFindObject(UNIT_STATICS)
+    if not valid(member) or not valid(statics) then return end
+    local hostile_ok, hostile = pcall(function()
+        return statics:GetLivingHostileUnits(member, HOSTILE_RANGE, false, false)
+    end)
+    if not hostile_ok or hostile == nil then return end
+    -- UE4SS returns a function's TArray as a plain Lua table, not an array object.
+    local count = type(hostile) == "table" and #hostile or array_count(hostile)
+    local enemies = {}
+    for index = 1, count do
+        local enemy = unwrap(hostile[index])
+        local location = valid(enemy) and actor_location(enemy) or nil
+        local name = location ~= nil and full_name(enemy) or ""
+        -- The game counts destructible cover (BP_Blockout_Cover_...) as hostile too; characters only.
+        if location ~= nil and name:find("Char_", 1, true) then
+            enemies[#enemies + 1] = {name = name:match("[%.:]([^%.:]+)$") or name:match("(%S+)$") or "?",
+                                     location = vector(location)}
+        end
+    end
+    if #enemies == 0 or #enemies == watch.count then return end
+    watch.count = #enemies
+
+    local lane = (session.areas[watch.key] or {}).authored or destinations_of(watch.area) or {}
+    if #lane == 0 then return end
+    local cx, cy, ex, ey = 0, 0, 0, 0
+    for _, point in ipairs(lane) do cx, cy = cx + point.X / #lane, cy + point.Y / #lane end
+    for _, enemy in ipairs(enemies) do
+        ex, ey = ex + enemy.location.X / #enemies, ey + enemy.location.Y / #enemies
+    end
+    local listed = Directions[watch.key]
+    local volume_dx, volume_dy = nil, nil
+    local volume_ok, volume = pcall(function() return watch.area:GetLinkedTacticalArea() end)
+    local centre = volume_ok and valid(volume) and actor_location(volume) or nil
+    if centre ~= nil then volume_dx, volume_dy = centre.X - cx, centre.Y - cy end
+    local text = {}
+    for _, enemy in ipairs(enemies) do text[#text + 1] = enemy.name .. "=" .. xyz(enemy.location) end
+    log(string.format("enemies t=%ds area=%s n=%d degrees=%s distance=%s spawners_degrees=%s volume_degrees=%s %s",
+        session.elapsed, watch.key, #enemies, degrees(ex - cx, ey - cy),
+        whole(math.sqrt((ex - cx) ^ 2 + (ey - cy) ^ 2)),
+        listed and degrees(listed.X, listed.Y) or "none", degrees(volume_dx, volume_dy), table.concat(text, " ")))
+    record({type = "enemies", version = VERSION, mission = session.mission, elapsed = session.elapsed,
+            area = watch.key, lane_centre = {X = cx, Y = cy}, enemies = enemies,
+            spawners = listed, volume = centre and vector(centre) or nil})
+end
+
 local function tick()
     -- Ticks already queued on the game thread when the watch finished must not run it again.
     if session == nil or session.done then return end
@@ -315,6 +397,7 @@ local function tick()
     end
 
     watch_squad()
+    watch_enemies()
     if final then
         log(string.format("mission watch finished after %ds", session.elapsed))
         session.done = true

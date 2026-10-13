@@ -320,3 +320,91 @@ So the setting caused the reported failure. Fixed by `COVER.scripted_maps`: the 
 the Serolonis Job alone. The dev tools don't break the tutorial: with the fix, the setting on and
 all of them on, the melee works. The second new-campaign failure is unexplained. Nothing in its log
 shows the setting was really off, because `COVER.improve` returns without logging when it is.
+
+## Hero missions at six (7043c6b + test build, 2026-10-13)
+
+The test build lets seven hero missions take six (`COMPANION_AT_SIX_MISSION_NAMES` in limits.lua,
+and the Core pak; see data/missions.tsv). The first install raised them at runtime only, and Best
+Served Cold's squad select still offered four: it copies the limit when the galaxy map is built,
+before the runtime's re-sweep. With the missions in the Core pak, startup logs
+`data_container=loaded fallback_writes=0`. From the user's sandbox campaign on Instance 2.
+
+| Mission | Squad select | Deployment | Save | Mission complete |
+|---------|--------------|------------|------|------------------|
+| HM_Cly_010 "Best Served Cold" | six after `squadsixlimit HM_Cly_010 6` (runtime-only build) | every operator in cover, after the fixes below | manual save finished | yes, back to the Den |
+| HM_TelRea_010 "Origin of Infection" | six | good, after the direction fix | manual save finished and loaded | yes, back to the Den |
+| HM_Luco_010 "Lord of Betrayal" | six | good | manual save finished | yes, back to the Den (user) |
+| HM_Jae_010 "Distress Call" | six | hand-picked layout: everyone on its spots | manual save finished | yes, back to the Den |
+| HM_Kabb_010 "Buy Cheap, Never Sleep" | six | one added operator in the open; cover up to two tiles out, not yet replayed | manual save finished | yes, back to the Den |
+
+Best Served Cold: the deployment lane is at the end of a large tactical volume. The cover direction
+(the volume's centre) was 34 degrees; all seven enemies (Idra Farr and six Pykes, read through ZC
+Sandbox) stood at about 190. The two added spots went to adjacent half cover by the wall with the
+enemies behind, and two of the game's spots moved the same wrong way. That led to
+`tools/encounter_directions.py` and `directions.lua` (runtime-notes.md, "Which way the encounter
+is").
+
+Origin of Infection, three runs:
+1. `math.atan2` in the new direction log line: UE4SS runs Lua 5.4, which has none, so the
+   placement pass stopped (`destinations=4/4`); six walked onto four spots, Hawks into a piece of
+   cover and Kabb in the open. Fixed; tools/run-tests.sh now also runs the tests without what
+   Lua 5.4 lacks (tests/lua54.lua).
+2. Directions from spawner positions: 215 degrees. A reinforcement spawner (Enemy1.4) stands in the
+   lane; the six live Coil enemies stood at about 86 (the volume said 91). 14 of 16 cover pockets
+   counted as facing away, and Luco and Cly got the lane's far edge.
+3. Directions from spawn destinations: 82 degrees, `improve_spots kept=4 moved=0`, the added two
+   in full and half cover (`chosen_full=1 chosen_half=1`). The probe: `enemies ... n=6 degrees=71`
+   at their spawn. The user: "much better spawning positions".
+
+Best Served Cold after the fix: direction 178 degrees, the probe's enemies at 181. Of 15 cover
+pockets near the lane 10 faced away and 4 were within a tile of a spot or squadmate, so one added
+operator got half cover and the other a derived point in the open (-3199/-5464). The user: "kind of
+out of position, but there isn't really anywhere to go"; they suggested allowing cover up to two
+tiles from the area instead of one. They also saw why: Cly stood on the game spot -3200/-4900, on
+the seam between two half-cover tiles, so both were within a tile of her spot and refused as
+crowded; centred on one, the other would have been Trick's. The improvement now snaps such a spot
+onto its cover (`RESCUE.cover_snap`).
+
+Replayed with the snap: Cly's spot moved onto its tile (`-3200/-4900->-3190/-4955half@snap`, and
+`-3650/-6200->-3690/-6194half@snap`), but Trick still stood in the open. Sweeping the cover search
+through ZC Sandbox on a 100 uu grid at two heights found 65 pockets; facing the enemies, the tile
+beside Cly's (-3190/-4849, 106 uu from her spot, 52 past the lane's edge) was usable but never
+returned by the mod's searches, the upper level's two were a game spot and the added half cover, and
+the rest were 550-750 uu forward. The choice now also searches beside each pocket along its cover.
+
+The first replay with that changed nothing: the spot's own tile was never found (a pocket facing
+sideways was nearer every search centre), and the searches beside pockets were made 100 uu above
+the floor with a 60 uu range, which finds nothing. With the search from each destination and at
+floor height: 19 pockets, `usable=2 chosen_half=2`, Cly's tile listed as crowded
+(`crowded_at=...,-3190/-4955<spot@-3190/-4955`). The second added operator took the tile beside the
+other snapped spot (-3690/-6294); the one beside Cly's was among the two refused as outside, the
+snapped spot having moved that corner of the lane. The user: "Every unit's behind cover!"
+
+Distress Call (HM_Jae_010): direction 249 degrees, enemies at 229. All 14 pockets either faced
+away (6) or were crowded (8), and both added operators stood in the open (-703/-2366,
+-739/-2204). The crowded ones were the tiles along a barrier (-550, -450, -350, -250 at Y -2078)
+beside game spots standing 5-10 uu off their own tiles (-540/-2065, -255/-2065): the free
+neighbours were 91 and 96 uu from them, under the 100 uu the check used. Cover now counts as a
+destination's own tile within 75 uu (`RESCUE.same_tile`).
+
+Replayed: both added operators went into those tiles (-450/-2078, -902/-2340), and then the repair
+(`via=watch5000 ... shared_tile:lane,shared_tile:lane`) moved the operators on the neighbouring game
+spots, 91 and 98 uu away, to derived points in the open (-739/-2204, -703/-2366): it still took
+under a whole tile for one tile. It now uses `RESCUE.same_tile` too. The user finds the area
+cramped and suggested a hand-picked layout: they placed all six in game, read through ZC Sandbox
+(operators stand 50.7 uu above destinations here), and the `DistressCall` fixed layout keeps two
+authored points and adds four: -901.955/-2340 (the barrier's cover), 250/-2028.157,
+-350/-1640 and -1448.258/-1920 on raised ground. Played with it: `fixed_spots=DistressCall
+destinations=4->6 added=4 written=6/6`, `placement_repair=skipped reason=fixed_spots`, all six on
+their spots; a manual save finished and the mission completed back to the Den.
+
+Buy Cheap, Never Sleep (HM_Kabb_010): six on the squad screen; direction 205 degrees, enemies at
+222. Two game spots snapped onto their cover; one added operator in half cover (6063/-3362), the
+other on a derived point in the open (6083/-2823): 8 pockets, 3 facing away, 3 holding game spots,
+1 outside, 1 usable. The user moved Kabb to 6015/-2500 (read with `squadsixprobe`; ZC Sandbox
+refuses commands outside its sandbox campaign), the tile beside a snapped spot that the overlay
+showed red: about a tile past the lane's edge. Added points may now take cover up to two tiles out
+(`RESCUE.cover_outside`). A manual save finished.
+
+Lord of Betrayal: no spawn destinations in its level, so the volume's centre, 351 degrees; the
+probe found the eight enemies at 2. The added two in half cover; the game's four kept.

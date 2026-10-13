@@ -8,12 +8,18 @@
 --      cover spots among them, and the operators aren't moved.
 --   3. With no cover search (the call fails), seven destinations still result and the rescue
 --      lands on the derived points exactly as before.
+--   3b. Cover a tile along the line from a crowded pocket, which no search centre has as its
+--      nearest, is found by searching beside the pocket, and used.
+--   3c. Cover on the tile next to a destination that stands 10 uu off its own tile's centre is
+--      used, though it is under a tile from the destination.
 --   (1-3 run with improve_game_spots off, so the authored destinations stay put.)
 --   4. improve_game_spots on, a stock squad of four: an authored destination already in cover
 --      facing the encounter stays; one beside cover facing away moves to cover facing it within
 --      two tiles; one whose only nearby cover faces away, and one whose only good cover is
 --      outside the lane, stay. The moved one is a new actor; the authored one is unlisted.
---      In the Serolonis Job (its tutorial is scripted around the game's spots) none moves.
+--      In the Serolonis Job (its tutorial is scripted around the game's spots) none moves. In an
+--      area directions.lua lists, its enemies' direction is used instead of the volume's. One
+--      in cover but 50 uu off the cover's centre (on the seam between two tiles) moves onto it.
 --   5. The same with the setting off: nothing moves.
 --   6. debug_cover_markers on: each pocket considered gets one of the game's cover markers, its
 --      pocket set from the cover and its walls recoloured by category (green usable, yellow
@@ -67,8 +73,29 @@ StaticFindObject = function(path)
     if path == LIBRARY then return library end
     return find(path)
 end
+-- The generated table loads and holds unit vectors; the test areas get their own table.
+local generated = dofile(scripts:gsub("[/\\]$", "") .. "/directions.lua")
+local listed = 0
+for key, direction in pairs(generated) do
+    listed = listed + 1
+    if math.abs(direction.X ^ 2 + direction.Y ^ 2 - 1) > 0.001 then
+        io.stderr:write("directions.lua: " .. key .. " isn't a unit vector\n")
+        os.exit(1)
+    end
+end
+if listed < 30 then
+    io.stderr:write(string.format("directions.lua lists only %d areas\n", listed))
+    os.exit(1)
+end
+-- The enemies of area "Reversed" lie behind its lane (-Y), its tactical volume in front (+Y).
+package.preload["directions"] = function() return {["Test:Reversed"] = {X = 0, Y = -1}} end
 mock.load(scripts)
 mock.run_until(1000)
+-- Scenarios 1 and 6 refuse cover 120 uu past the edge, as when added points could lie only a tile
+-- outside; 3b checks RESCUE.cover_outside itself.
+local RESCUE = package.loaded.placement.internals.RESCUE
+local COVER_OUTSIDE = RESCUE.cover_outside
+RESCUE.cover_outside = 100
 mock.run_loops(3)
 
 local function fail(message)
@@ -172,6 +199,40 @@ end
 mock.expect("chosen_full=0 chosen_half=0 of=3 facing=checked errors=%d+", "a failing cover search is reported")
 if mock.text():find("WARNING: fewer destinations") then fail("a seven-unit squad was left short of destinations") end
 
+-- 3b. One pocket on corner 3, where a game spot stands (crowded); the next tile along its cover
+-- line is 120 uu past the lane's right edge, beyond a tile but within RESCUE.cover_outside, and the
+-- one after it 240 uu past, beyond it. Every search centre inside the lane is nearer the first,
+-- and a pocket facing sideways inside the lane is nearer still. One operator staged outside needs
+-- a spot: it takes the tile 120 uu out.
+RESCUE.cover_outside = COVER_OUTSIDE
+cover_available = true
+for index = #pockets, 1, -1 do pockets[index] = nil end
+pockets[1] = {X = B + 400, Y = B + 400, nx = 0, ny = 1, kind = HALF}
+pockets[2] = {X = B + 520, Y = B + 400, nx = 0, ny = 1, kind = HALF}
+pockets[3] = {X = B + 330, Y = B + 330, nx = 1, ny = 0, kind = FULL}
+pockets[4] = {X = B + 640, Y = B + 400, nx = 0, ny = 1, kind = HALF}
+local beside = {on_lane(1), on_lane(2), on_lane(3), on_lane(4), unit("Operator5", B + 200, B - 600)}
+list = deploy("Beside", beside)
+if not at(beside[5].at, pockets[2]) then
+    fail(string.format("beside: Operator5 at %.0f/%.0f, not on the tile beside the crowded one", beside[5].at.X, beside[5].at.Y))
+end
+mock.expect("cover site=staging queries=%d+ pockets=4 usable=1 facing_away=1 refused=2 chosen_full=0 chosen_half=1 of=1 .* refused_outside=1 refused_crowded=1 .* crowded_at=5400/5400<spot@5400/5400",
+    "the tile beside a crowded pocket is found and used, and one too far out is refused")
+mock.run_until(mock.now() + 30000)
+RESCUE.cover_outside = 100
+
+-- 3c. Distress Call's shape: the cover tile beside corner 1's is 91 uu from the destination,
+-- which stands 10 uu off its own tile. The squad stands inside the lane, away from it.
+for index = #pockets, 1, -1 do pockets[index] = nil end
+pockets[1] = {X = B + 90, Y = B + 13, nx = 0, ny = 1, kind = HALF}
+local next_tile = {unit("Operator1", B + 300, B + 300), unit("Operator2", B + 200, B + 300),
+    unit("Operator3", B + 300, B + 200), unit("Operator4", B + 200, B + 200), unit("Operator5", B + 200, B - 600)}
+list = deploy("NextTile", next_tile)
+if not at(next_tile[5].at, pockets[1]) then
+    fail(string.format("next tile: Operator5 at %.0f/%.0f, not on the cover beside corner 1", next_tile[5].at.X, next_tile[5].at.Y))
+end
+mock.run_until(mock.now() + 30000)
+
 -- 4. The game's own destinations, improve_game_spots on. Corner 1 is in cover facing the
 -- encounter; corner 2 is beside cover facing away, with good cover 117 uu off inside the lane;
 -- corner 3's only nearby cover faces away; corner 4's good cover is 150 uu outside the lane.
@@ -200,7 +261,7 @@ end
 if improved[2] == authored[2] or not at(improved[2].at, improve_pockets[3]) then
     fail("improve: corner 2 didn't move to the cover facing the encounter")
 end
-mock.expect("improve_spots kept=1 moved=1 no_better_cover=2 queries=%d+ errors=0 unreadable=0 moves=5400/5000%->5300/5060full",
+mock.expect("improve_spots kept=1 snapped=0 moved=1 no_better_cover=2 queries=%d+ errors=0 unreadable=0 moves=5400/5000%->5300/5060full",
     "the improvement reports what it kept and moved")
 for index = 1, 4 do
     if stock[index].halts ~= 0 then fail("improve: Operator" .. index .. " was moved or stopped") end
@@ -220,6 +281,40 @@ for index = 1, 4 do
 end
 mock.expect("improve_spots=skipped reason=scripted_map map=MM_01_010_TheSerolonisJob",
     "the Serolonis Job's spots are left alone")
+
+-- 4c. An area directions.lua lists, with its enemies behind the lane: corner 2's cover faces them
+-- now, so it stays, where in 4 it moved.
+squad({on_lane(1), on_lane(2), on_lane(3), on_lane(4)})
+local reversed_area, reversed = area("Reversed")
+local reversed_spot = reversed[2]
+mock.hooks[TRIGGER].pre(reversed_area)
+mock.run_until(mock.now() + 600)
+if reversed[2] ~= reversed_spot then fail("listed direction: corner 2 moved although its cover faces the enemies") end
+mock.expect("encounter_direction area=Test:Reversed source=spawners degrees=270 volume_degrees=90",
+    "a listed area uses its enemies' direction and logs the volume's")
+mock.expect("encounter_direction area=Test:Improved source=volume degrees=90 volume_degrees=90",
+    "an unlisted area uses its volume's centre")
+
+-- 4d. Corner 1 is 50 uu from the centre of the half cover it's in (Best Served Cold's seam): it
+-- moves onto it. No other corner has cover near it.
+for index = #pockets, 1, -1 do pockets[index] = nil end
+pockets[1] = {X = B + 50, Y = B, nx = 0, ny = 1, kind = HALF}
+squad({on_lane(1), on_lane(2), on_lane(3), on_lane(4)})
+local seam_area, seam = area("Seam")
+local seam_spots = {}
+for index = 1, 4 do seam_spots[index] = seam[index] end
+mock.hooks[TRIGGER].pre(seam_area)
+mock.run_until(mock.now() + 600)
+if seam[1] == seam_spots[1] or not at(seam[1].at, pockets[1]) then fail("seam: corner 1 didn't move onto its cover") end
+for index = 2, 4 do
+    if seam[index] ~= seam_spots[index] then fail("seam: corner " .. index .. " was replaced") end
+end
+mock.expect("improve_spots kept=0 snapped=1 moved=0 no_better_cover=3 queries=%d+ errors=0 unreadable=0 moves=5000/5000%->5050/5000half@snap",
+    "a spot on the seam between two tiles moves onto its cover")
+for index = #pockets, 1, -1 do pockets[index] = nil end
+for index, pocket in ipairs(improve_pockets) do pockets[index] = pocket end
+-- Let this deployment's later repair passes run out before the next scenario's.
+mock.run_until(mock.now() + 30000)
 
 -- 5. Setting off: the same area keeps every authored destination.
 mock.settings.improve_game_spots = false

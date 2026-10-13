@@ -39,13 +39,15 @@ src/SquadSixReforged/        the UE4SS mod ("Squad Six Reforged")  -> ue4ss/Mods
     lineup.lua      squad selection: six slots, extra proxies, six-model lineup, nameplates
     placement.lua   tactical deployment: extra destinations, rescue, repair, squadsixrescue
     selfcheck.lua   logs whether every game name the other modules use still resolves
+    directions.lua  generated: which way each deployment area's enemies are (tools/encounter_directions.py)
     common.lua      shared constants and reflection/vector helpers
     MXM.lua         the Mixamoo Mod Config Manager client library, unmodified
 src/SquadSixReforged_Core/   the cooked IoStore override ("Squad Six Reforged - Core") + its manifests
                                                           -> Content/Paks/~mods/SquadSixReforged_Core
 data/           missions.tsv: the squad limit for every mission (what the Core pak changes)
                 mapscan.json: every deployment area and its destination points (tools/map_scan.py)
-dev/            never shipped: SquadSixReforgedProbe (in-game checks of placement spots and staging;
+dev/            never shipped: SquadSixReforgedProbe (in-game checks of placement spots and staging,
+                and where the enemies are once combat is prepared;
                 `squadsixprobe` also logs squad positions), SquadSixReforgedTestLimits
                 (`squadsixlimit <mission> <n>` sets one mission's limit for a test), and
                 mxm/debug_settings.lua (the cover debug-marker toggle, added on game copies only)
@@ -55,7 +57,7 @@ tests/          runtime tests under a UE4SS stand-in (ue4ss_mock.lua): startup, 
                 lineup, rescue, probe, cover (cover choice, the game-spot improvement, debug markers),
                 placement_maps (placement.lua over every deployment area in data/mapscan.json,
                 including the fixed layouts)
-tools/          build_core.py, inspect_core.py, map_scan.py, sandbox_check.py, package.py,
+tools/          build_core.py, inspect_core.py, map_scan.py, encounter_directions.py, sandbox_check.py, package.py,
                 bump_version.py, nexus_changelog.py, run-tests.sh, and their helpers
 .github/workflows/release-nexus.yml   manual Nexus release
 ```
@@ -101,6 +103,9 @@ changed, and lists what to review. See [docs/core-pak-analysis.md](docs/core-pak
    destination points into `data/mapscan.json`, and checks that each of `placement.lua`'s three
    hard-coded map layouts still matches exactly one area. Diff `data/mapscan.json` to see what a
    patch moved.
+4. `python3 tools/encounter_directions.py --retoc ... --paks "$PAKS"` re-reads every area's enemy
+   spawners into `Scripts/directions.lua`, the direction cover faces. Both tools take
+   `--cache DIR` to keep the extracted levels between runs.
 
 ## Checking in the game
 

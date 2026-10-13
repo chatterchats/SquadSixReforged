@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Seven more hero missions take six operators** (they were kept at four): Best Served Cold, Without
+  Honor or Humanity, Distress Call, Buy Cheap, Never Sleep, Kith and Kin, Lord of Betrayal and
+  Origin of Infection. Hawks and the hero fill two of the six slots as before. Distress Call has
+  hand-picked deployment spots.
+- **Cover faces where the enemies come from.** The mod used to take the middle of the fight's
+  area as the enemies' direction, which is wrong where you start at one end of a large map: in
+  Best Served Cold the extra operators' cover, and the game spots it moved, faced away from the
+  enemies. It now uses the enemy spawn points the game's levels place for each fight.
+- **The extra operators can take cover up to two tiles past the deployment area's edge**, where the
+  only good cover next to the game's spots often is.
+- **Cover next to cover is found.** The extra operators could miss a free cover tile right beside
+  one already taken, and stand in the open instead.
+- **"Move the game's spots into cover" centres a spot on its cover.** A spot standing between two
+  cover tiles blocked both from the extra operators; it now moves onto the tile it's in.
 - With "Move the game's spots into cover" off, the log now says so
   (`improve_spots=skipped reason=setting_off`).
 

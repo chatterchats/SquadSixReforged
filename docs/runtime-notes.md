@@ -457,11 +457,93 @@ GetNearestCoverForPoint` returns the nearest cover pocket within
 `RESCUE.cover_range`: its floor, its normal (from whoever uses it towards the
 cover: the side it protects) and its flags (1 low, 2 high, with step-out flags above). A pocket is
 used when it's in the lane, on the navmesh, a tile from every destination,
-unit and other chosen point, and faces the encounter: the direction from the
-lane's centroid to its tactical volume's centre, within 60 degrees. Full cover
+unit and other chosen point, and faces the encounter (see "Which way the
+encounter is" below), within 60 degrees. Full cover
 goes first, then half, then the derived points. Where no pocket qualifies, or
 the call fails, the derived points are returned unchanged, so maps without
 cover, and the tests' stand-in, behave exactly as before.
+
+#### Which way the encounter is
+
+Up to 1.3.1 it was always the direction from the lane's centroid to its
+tactical volume's centre. That misleads where the lane sits at one end of a
+large volume. In Best Served Cold (HM_Cly_010, 2026-10-13) it pointed at 34
+degrees, towards the middle of the map, while all seven enemies stood at about
+190 degrees, behind the lane; the two added spots and the two game spots it
+moved had their cover facing away from them.
+
+The direction now comes from `directions.lua` where it lists the area (by
+`<level package>:<area>`, as `data/mapscan.json` names areas), and from the
+volume where it doesn't. `tools/encounter_directions.py` writes it from the
+levels. Every enemy is spawned by an actor spawner (no level places enemies
+directly), and a spawner that places a fight's opening enemies lists where they
+stand (`SpawnDestinations`). In both fights checked live, those points were
+exactly where the enemies stood, and the spawners with no destinations had
+spawned nobody: they are reinforcements. Designers also label spawners by wave
+(`BP_ActorSpawner_Enemy1.3`) or after story characters (`_Tel1.3`, `_Rex`,
+`_Anakin`), neutrals and crisis variants; labels are editor data the game
+doesn't load, which is why this is worked out offline. For each area the tool
+takes the destinations of the enemy-labelled spawners of the lowest wave
+assigned to it (nearest area by their destinations' centre), and sums the unit
+vectors to them weighted by 1/distance. An area with no such spawner, or whose
+enemies surround the lane (the sum under half the weights), gets no entry.
+
+The first version used the spawners' own positions. Origin of Infection
+(HM_TelRea_010) showed why that's wrong: a reinforcement spawner stands inside
+its deployment lane, so it gave 215 degrees while the enemies stood at about 86
+(the volume said 91), and the two added operators got cover facing away. With
+the destinations: Best Served Cold 178 degrees (live enemies about 190),
+Origin of Infection 82, Smugglers' Den's second area 10 (enemies to +X).
+39 of 90 areas have an entry (2026-10-13): every story and hero mission's,
+about a third of the skirmishes'. The other skirmishes' spawners list no
+destinations, so they keep the volume. Seven spawners have a property type
+`zen.py` can't read and are left out.
+
+`encounter_direction area=... source=spawners|volume degrees=... volume_degrees=...`
+is logged once per area. The probe logs where the live enemies are once combat
+is prepared (`enemies t=... degrees=... spawners_degrees=... volume_degrees=...`),
+so a played fight shows which was right.
+
+After that, the tiles either side of each pocket facing the encounter are
+searched, along its cover line, until `RESCUE.cover_query_cap` queries. A
+search returns only the nearest pocket, so a tile beside one that is nearer
+every search centre never came up: in Best Served Cold (2026-10-13), with the
+direction right and the game spot snapped, the half cover a tile from that
+spot (-3190/-4849, 52 uu past the lane's edge) was never returned, and the
+second added operator stood in the open. A sweep through ZC Sandbox found it,
+and showed the rest of the cover facing the enemies there is either taken or
+550-750 uu past the lane. The log's `crowded_at=` names each crowded pocket and
+the spot (`<spot@`) or operator (`<unit@`) crowding it.
+
+The search also starts from each destination's own cover (a search from the
+destination within `cover_here_range`): that spot sat on the lane's narrow tip,
+where a pocket facing sideways was nearer every search centre than the spot's
+tile, so the first replay never found the tile to search beside. The searches
+beside a pocket are made at the pocket's floor: the game measures the range
+from the cover's floor, and a query 100 uu above it with a 60 uu range finds
+nothing (checked through ZC Sandbox, 2026-10-13).
+
+A cover pocket counts as crowded by a destination only within
+`RESCUE.same_tile` (75 uu), not a whole tile: the next tile's centre is a
+tile from the destination's tile, and a destination can stand a little off its
+own. In Distress Call (HM_Jae_010, 2026-10-13) the game's spots stood 5 and 10 uu
+off their tiles along a barrier, so the free tiles beside them were 91 and 96 uu
+away and refused; both added operators stood in the open. Units, and the chosen
+points among themselves, still keep a whole tile. The repair uses the same
+distance to decide two operators share a tile (`shared_tile`): on the first
+replay the added operators went into those tiles, and the repair, still
+measuring a whole tile, moved the two operators on the neighbouring game spots
+to derived points in the open.
+
+Cover for the added points may lie up to `RESCUE.cover_outside` (200 uu, two
+tiles) past the lane's edge; the game's own spots keep a tile. A game spot on
+the lane's tip has the cover tile beside it about a tile out, and snapping the
+spot onto its own tile can push that just past a tile: in Buy Cheap, Never
+Sleep (HM_Kabb_010, 2026-10-13) the tile beside a snapped spot (6015/-2500) was
+refused as outside, the debug marker red, and the user moved Kabb onto it as
+the best spot; Best Served Cold's tile beside Cly's went the same way. The
+repair measures against every current destination, the added ones included, so
+it doesn't pull an operator back off such a spot.
 
 Besides the derived points, the lane is searched on a tile grid
 (`RESCUE.cover_grid`, at most `cover_grid_max` points), and usable cover is
@@ -509,6 +591,14 @@ so the repair still treats a squad no bigger than the area's destinations as
 the game's own deployment. It applies at every squad size, since the player
 asked for it: a four-operator squad's spots move too.
 
+A spot already in cover facing the encounter is kept, unless it's more than
+`RESCUE.cover_snap` (30 uu) from that cover's centre: then it moves onto the
+centre, when that passes the same checks as a move (logged `snapped=` and
+`...@snap`). In Best Served Cold (2026-10-13) a game spot stood on the seam
+between two half-cover tiles, 50 uu from each, so both were within a tile of it
+and refused to the added operators as crowded; one of them then stood in the
+open.
+
 Except on the maps in `COVER.scripted_maps`, matched in the area's path: only
 the Serolonis Job (`MM_01_010_TheSerolonisJob`), whose tutorial scripts the
 fights around the game's spots. In 1.3.0 the move of one spot in its second
@@ -517,9 +607,16 @@ script's third enemy then either took an overwatch hit and died to Hawks'
 scripted shot, or never moved into place, and the "Aurelio melee" step
 (`Tutorials.Missions.01.Encounter02.Turn02.030_AurelioMelee`) had no target.
 Played on Instance 2 on 2026-10-13: twice with the setting on, the step stuck;
-with it off, the enemy survived the shot and the melee worked. The game's
-`BitReactor.Tutorials.Missions` tags all belong to mission 01, so no other map
-is listed.
+with it off, the enemy survived the shot and the melee worked. It is the only
+mission with a tutorial manager (`BP_TacticalTutorialManager_MM_01_010_E1`),
+the logic that makes the player take set actions. Other missions' custom logic
+carries `BitReactor.Tutorials.Missions` tags too: The Dark Grotto, Smugglers'
+Den, Bespin, Coil Strikes Back, Belly of the Beast, Fathom and Finale,
+HM_TelRea_020, and the skirmishes' shared turn tracker (all game packages
+searched on 2026-10-13). In Smugglers' Den and HM_TelRea_020 the tag only shows a
+hint popup (`ShowTutorial`); the others weren't opened. None is listed. 1.3.1's
+notes said the tags were all mission 01; that came from searching only the
+packages already extracted for the tutorial.
 
 With the setting off it logs `improve_spots=skipped reason=setting_off` once per
 area. Up to 1.3.1 it logged nothing, so a run couldn't show from the log that

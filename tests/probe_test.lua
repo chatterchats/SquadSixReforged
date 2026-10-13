@@ -1,7 +1,7 @@
 -- The dev probe (dev/SquadSixReforgedProbe) under the UE4SS stand-in: a mission on Lothal 035's real
 -- deployment area with a navmesh and floor that answer, a squad being staged, and Squad Six adding
--- two destinations later. The probe runs while missions load, so it also mustn't search all
--- objects often.
+-- two destinations later, then enemies to the lane's -X with the tactical volume's centre to +Y.
+-- The probe runs while missions load, so it also mustn't search all objects often.
 --   luajit tests/probe_test.lua <Scripts dir>
 local scripts = assert(arg[1], "usage: probe_test.lua <Scripts dir>")
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
@@ -20,9 +20,22 @@ for index, p in ipairs({{449.0, 935.0, 7.3}, {892.7, 635.3, 52.3}, {431.9, 1164.
     destinations[index] = mock.actor("TacticalPoint TacticalPoint_" .. index, {X = p[1], Y = p[2], Z = p[3]})
 end
 local destination_array = mock.array(destinations)
+-- The lane's centre is 785/744.
+local tactical_volume = mock.actor("TacticalAreaVolume Volume", {X = 785, Y = 3744, Z = 0})
 local area = mock.object("BP_CombatPreparationArea_C /Game/Game/Maps/Skirmish/SK_Lothal_035/"
     .. "SK_Lothal_035_Gameplay.SK_Lothal_035_Gameplay:PersistentLevel.BP_CombatPreparationArea_C_0",
-    {PlayerDestinations = destination_array})
+    {PlayerDestinations = destination_array}, {GetLinkedTacticalArea = function() return tactical_volume end})
+-- UE4SS hands back a function's TArray as a plain Lua table.
+local enemies = {mock.actor("Char_Enemy Enemy1", {X = -1215, Y = 644, Z = 0}),
+                 mock.actor("BP_Blockout_Cover_1x1_DS_C Crate", {X = 5000, Y = 5000, Z = 0}),
+                 mock.actor("Char_Enemy Enemy2", {X = -1215, Y = 844, Z = 0})}
+-- directions.lua as the probe should read it: this area's enemies to -Y.
+package.preload["directions"] = function()
+    return {["SK_Lothal_035_Gameplay:BP_CombatPreparationArea_C_0"] = {X = 0, Y = -1}}
+end
+local statics = mock.object("BitReactorGameStatics_Unit Default__BitReactorGameStatics_Unit", {}, {
+    GetLivingHostileUnits = function(_, _, range, sight) return (range >= 100000 and not sight) and enemies or nil end,
+})
 
 -- The floor is at each point's own height; the navmesh projects onto the point.
 local navigation = mock.object("NavigationSystemV1 Default__NavigationSystemV1", {}, {
@@ -40,6 +53,7 @@ local kismet = mock.object("KismetSystemLibrary Default__KismetSystemLibrary", {
 StaticFindObject = function(path)
     if path == "/Script/NavigationSystem.Default__NavigationSystemV1" then return navigation end
     if path == "/Script/Engine.Default__KismetSystemLibrary" then return kismet end
+    if path == "/Script/BitReactorGame.Default__BitReactorGameStatics_Unit" then return statics end
     return generic_find(path)
 end
 local searches = {}
@@ -67,6 +81,7 @@ mock.run_loops(2)
 destination_array[5] = mock.actor("TacticalPoint Added1", {X = 1130, Y = 438, Z = 29})
 destination_array[6] = mock.actor("TacticalPoint Added2", {X = 671, Y = 785, Z = 29})
 for index, unit in ipairs(units) do unit.at = {X = 500 + index * 150, Y = 900, Z = 100} end
+mock.first_of["TacticalGameState"].CombatPreparationArea = area
 mock.run_loops(1)
 mock.run_loops(8)
 
@@ -91,9 +106,13 @@ if searches.BP_CombatPreparationArea_C ~= 3 or other ~= 0 or first_searches ~= 0
         tostring(searches.BP_CombatPreparationArea_C), other, first_searches))
 end
 expect("squad t=3s members=6 Operator1=650/900/100", "the relocation is recorded")
+expect("enemies t=3s area=SK_Lothal_035_Gameplay:BP_CombatPreparationArea_C_0 n=2 degrees=180 distance=2000 "
+    .. "spawners_degrees=270 volume_degrees=90 Enemy1=%-1215/644/0 Enemy2=%-1215/844/0",
+    "the enemies' direction, beside the spawners' and the volume's")
 
 local results = assert(io.open(output .. "-squadsix_probe.jsonl")):read("*a")
-assert(results:find('"type":"area"') and results:find('"type":"squad"'), "JSON lines written:\n" .. results)
+assert(results:find('"type":"area"') and results:find('"type":"squad"') and results:find('"type":"enemies"'),
+    "JSON lines written:\n" .. results)
 os.remove(output .. "-squadsix_probe.jsonl")
 os.remove(output .. "-squadsix_probe.log")
 os.remove(output)

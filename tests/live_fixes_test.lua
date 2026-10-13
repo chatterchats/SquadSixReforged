@@ -6,7 +6,8 @@
 --      height interpolated from a floating authored destination; an operator passing over a
 --      squadmate's tile while the squad walks in isn't teleported; operators the repair puts
 --      back have their walk cancelled; one that later wanders off is reported. A derived point
---      over a hole in the navmesh (Dark Waters: under a prop) is skipped for another one.
+--      over a hole in the navmesh (Dark Waters: under a prop) is skipped for another one. Two
+--      operators on neighbouring tiles, 91 uu apart (Distress Call), aren't sharing a tile.
 --   3. At mission start, an operator standing still in the hole is moved beside a squadmate,
 --      but not while the whole squad is off the navmesh (an intro), and not in a stock squad.
 --   luajit tests/live_fixes_test.lua <Scripts dir>
@@ -143,6 +144,29 @@ for index = 5, 6 do
 end
 mock.run_until(mock.now() + 30000)
 holes[#holes] = nil
+
+-- Distress Call: an added operator in the cover tile beside a destination that stands 9 uu off its
+-- own tile, 91 uu from the operator on it. The repair left both alone only once it measured a
+-- tile as the cover choice does.
+local neighbours = {on_lane(1), on_lane(2), on_lane(3), on_lane(4), unit("Operator5", B + 200, B - 600),
+    unit("Operator6", B + 1000, B + 200)}
+squad(neighbours)
+local neighbours_area = area("Neighbours")
+mock.hooks[TRIGGER].pre(neighbours_area)
+mock.run_until(mock.now() + 600)
+mock.hooks[RELOCATION].pre(neighbours_area)
+neighbours[1].at = {X = B + 9, Y = B, Z = CAPSULE}
+neighbours[5].at = {X = B + 100, Y = B + 10, Z = CAPSULE}
+neighbours[6].at = {X = B + 200, Y = B + 200, Z = CAPSULE}
+local shared_before = count("shared_tile")
+local halts = {neighbours[1].halts, neighbours[5].halts}
+mock.run_until(mock.now() + 9000)
+if count("shared_tile") ~= shared_before then fail("operators on neighbouring tiles were taken for sharing one") end
+if neighbours[1].at.X ~= B + 9 or neighbours[5].at.X ~= B + 100 or neighbours[1].halts ~= halts[1]
+    or neighbours[5].halts ~= halts[2] then
+    fail("an operator on a neighbouring tile was moved")
+end
+mock.run_until(mock.now() + 30000)
 
 -- 3. Mission start.
 local function mission(units)

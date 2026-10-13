@@ -189,11 +189,24 @@ def read_color(reader, schema, package):
     return {"R": r, "G": g, "B": b, "A": a}
 
 
+def read_guid(reader, schema, package):
+    return reader.take(16).hex()
+
+
+def read_date_time(reader, schema, package):
+    # FDateTime and FTimespan are a single int64 of ticks.
+    return reader.unpack("<q")[0]
+
+
 NATIVE_STRUCTS = {
     "GameplayTagContainer": read_gameplay_tag_container,
     "Vector": read_vector,
     "Rotator": read_rotator,
     "Color": read_color,
+    # Reached from actor spawners (tools/encounter_directions.py).
+    "Guid": read_guid,
+    "DateTime": read_date_time,
+    "Timespan": read_date_time,
 }
 
 

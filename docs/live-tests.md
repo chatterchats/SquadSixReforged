@@ -335,6 +335,7 @@ before the runtime's re-sweep. With the missions in the Core pak, startup logs
 | HM_TelRea_010 "Origin of Infection" | six | good, after the direction fix | manual save finished and loaded | yes, back to the Den |
 | HM_Luco_010 "Lord of Betrayal" | six | good | manual save finished | yes, back to the Den (user) |
 | HM_Jae_010 "Distress Call" | six | hand-picked layout: everyone on its spots | manual save finished | yes, back to the Den |
+| HM_Cly_020 "Without Honor or Humanity" | six | good | manual save finished | yes, back to the Den |
 | HM_Kabb_020 "Kith and Kin" | six | good enough after the world-origin fix (no good cover on the map) | manual save finished | yes, back to the Den |
 | HM_Kabb_010 "Buy Cheap, Never Sleep" | six | every operator in cover, after cover up to two tiles out | manual save finished | yes, back to the Den |
 
@@ -422,6 +423,11 @@ operator's staging position 2,400 uu east (`player_destinations ... outside_lane
 where the lane reaches the origin. Replayed: the operator kept the tile at 0/0, its destination there
 (`outside_lane=0`), the repair left everyone alone, and both added operators were in half cover.
 The user: good enough, the map has no really good spots.
+
+Without Honor or Humanity (HM_Cly_020): direction 302 degrees from the spawn destinations, the
+probe's enemies at 267 (the volume said 266): 35 degrees off, the most yet, within the 60 the
+facing check allows. One game spot moved into half cover, three kept; both added operators in half
+cover; the user: spawns look good.
 
 Lord of Betrayal: no spawn destinations in its level, so the volume's centre, 351 degrees; the
 probe found the eight enemies at 2. The added two in half cover; the game's four kept.

@@ -10,7 +10,7 @@
 # (GUARDED_MISSION_NAMES, SCRIPTED_COMPANION_MISSION_NAMES), so keep those lists in step with this file.
 mission	game	squad	note
 AuthoredHero/HM_Cly_010	4	6	"Best Served Cold": auto-assigns Hawks plus a companion, who fills one of the six slots; no ally joins through mission logic (game files read 2026-10-13). played at six on 25134257 (2026-10-13): save and mission complete; cover faced the spawn destinations after the direction, snap and search fixes
-AuthoredHero/HM_Cly_020	4	6	"Without Honor or Humanity": auto-assigns Hawks plus a companion, who fills one of the six slots; no ally joins through mission logic (game files read 2026-10-13). Test build: not yet played at six
+AuthoredHero/HM_Cly_020	4	6	"Without Honor or Humanity": auto-assigns Hawks plus a companion, who fills one of the six slots; no ally joins through mission logic (game files read 2026-10-13). played at six on 25134257 (2026-10-13): save and mission complete
 AuthoredHero/HM_Jae_010	4	6	"Distress Call": auto-assigns Hawks plus a companion, who fills one of the six slots; no ally joins through mission logic (game files read 2026-10-13). played at six on 25134257 (2026-10-13): save and mission complete; placement.lua gives it fixed spots (DistressCall)
 AuthoredHero/HM_Jae_020	4	6	"Rescue Jae Mordant": Jae joins through mission logic, so six is seven units. Guarded at 4 after a 1.1.x report of the save hanging; played at six on 25134257 (2026-10-12) with autosave and manual saves at seven finishing and loading
 AuthoredHero/HM_Kabb_010	4	6	"Buy Cheap, Never Sleep": auto-assigns Hawks plus a companion, who fills one of the six slots; no ally joins through mission logic (game files read 2026-10-13). played at six on 25134257 (2026-10-13): save and mission complete

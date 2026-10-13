@@ -228,5 +228,11 @@ Rerun at six (same save, `squadsixlimit ... 6`, then the save reloaded):
 | Spots | the user walked all seven onto spots they prefer; their positions, read through ZC Sandbox (`call <unit> K2_GetActorLocation`), became the `DeepCover` fixed layout (5d6551a) |
 | Saves | game saves with seven units, and with eight after Baker joined, both finished |
 
-Deep Cover now ships at six (missions.tsv), with the fixed spots; that layout is still to be
-played.
+Deep Cover now ships at six (missions.tsv), with the fixed spots.
+
+Played with 399b368 installed (no test command): squad select offered six (`slot_widgets=6`).
+At the encounter `fixed_spots=DeepCover destinations=5->7 written=7/7`, `destinations=7/7` for
+seven units, and `placement_repair=skipped reason=fixed_spots` (`repair_passes=0`). Read through
+ZC Sandbox once everyone had stopped, six units stood exactly on spots 1 and 3-7, and the seventh
+55 uu from spot 2 on the same lower ground. The user saw them all walk onto the new spots. The
+`mission ... unit_positions` line was logged while one was still walking (-828/-260).

@@ -283,3 +283,17 @@ campaign; squad Kabb, Hawks, Jae, Trick, Ravin (a custom character), BR-1.
 | End | mission complete, back to the Den, no errors |
 
 Slug HQ now ships at six from the Core pak, off the guard list.
+
+## Cover debug markers, SK_Serolonis_030 (19d2775, 2026-10-12)
+
+`debug_cover_markers` on, `improve_game_spots` on. The game's four spots already had cover facing
+the encounter (`improve_spots kept=4`). The staging search found 14 pockets: 3 usable, 4 crowded,
+7 facing away; one operator went into full cover and one into half. The markers drew (`drawn
+walls=5 tinted=1` on the first): the user saw green and yellow outlines on the crates, matching
+3 usable and 4 crowded, and none on cover facing away.
+
+Four crashes before that, all access violations at the first marker, fixed one step at a time
+with the step trace (runtime-notes `COVER.markers`): the pocket written from Lua tables, the
+class loaded and the marker spawned inside `TriggerPreCombat`, every wall in the marker's pool
+tinted, and finally a bare string passed where `SetVectorParameterValue` takes an FName. With
+the markers off, the same encounter never crashed.

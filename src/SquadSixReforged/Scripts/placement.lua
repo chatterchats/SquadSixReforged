@@ -997,6 +997,12 @@ local COVER = {
     -- Areas whose own destinations were already considered, by object key (prepare_new_area
     -- clears it).
     improved = {},
+    -- Maps whose own destinations COVER.improve leaves alone, matched in the area's path. The
+    -- Serolonis Job's tutorial scripts its second encounter around where Hawks and Aurelio
+    -- stand: with one spot moved, Aurelio's overwatch also hit the enemy his melee step needs,
+    -- Hawks' shot killed it, and the tutorial couldn't go on (1.3.0). It is the only mission
+    -- with scripted tutorial steps (the game's BitReactor.Tutorials.Missions tags are all 01).
+    scripted_maps = {"MM_01_010_TheSerolonisJob"},
 }
 
 -- The cover pocket nearest `point`, as {X, Y, Z (its floor), tier = 2 full or 1 half, nx, ny
@@ -1394,11 +1400,18 @@ end
 -- destinations, and its rescues sit where they are.
 -- Smugglers' Den's second area: the game's own points sat beside cover with its back to the
 -- enemies.
+-- Not on a map in COVER.scripted_maps.
 function COVER.improve(area, destinations, valid_destinations, anchors)
     local key = object_key(area)
     if key == "" or COVER.improved[key] or relocation_prehook_ran then return end
     COVER.improved[key] = true
     if Settings.Get("improve_game_spots", true) ~= true then return end
+    for _, map in ipairs(COVER.scripted_maps) do
+        if string.find(full_name(area), map, 1, true) then
+            log("improve_spots=skipped reason=scripted_map map=" .. map)
+            return
+        end
+    end
 
     local units = every_player_unit()
     local actor = units[1] and units[1].actor

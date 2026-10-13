@@ -297,3 +297,25 @@ with the step trace (runtime-notes `COVER.markers`): the pocket written from Lua
 class loaded and the marker spawned inside `TriggerPreCombat`, every wall in the marker's pool
 tinted, and finally a bare string passed where `SetVectorParameterValue` takes an FName. With
 the markers off, the same encounter never crashed.
+
+## The Serolonis Job's tutorial and `improve_game_spots` (2026-10-13)
+
+A player reported that a new campaign's tutorial couldn't go on with the mod installed:
+Aurelio couldn't use his ability. Reproduced on Instance 2 from new campaigns and from the
+encounter-start autosave of the second one. The stuck step is "Aurelio melee" in turn 2 of the
+second fight (In The Box). The script sets up overwatch: one enemy walks into Hawks' cone and
+dies, a second into Aurelio's and dies, then the game cancels Aurelio's overwatch and a third
+enemy, a Separatist, sets up its own. Hawks flanks and shoots it, and Aurelio is meant to finish it in melee.
+
+| Run | `improve_game_spots` | Probe, test limits, dev markers | Result |
+|---|---|---|---|
+| New campaign | on (`moves=-678/1052->-660/1150half` in that fight) | on | stuck at the melee |
+| New campaign | off | on | stuck at the melee |
+| Autosave, Squad Six off (twice) | n/a | off | third enemy survives the shot; melee works |
+| Autosave, Squad Six on | off | off | melee works |
+| Autosave, Squad Six on (twice) | on | off | stuck: Aurelio's overwatch isn't cancelled in time, so the third enemy takes a hit and dies to Hawks' shot, or doesn't move and set up |
+
+So the setting caused the reported failure. The failure with it off happened only with the dev
+tools (the probe, the test-limits tool and the dev markers setting) on; which of them caused it
+wasn't narrowed down, and players don't have them. Fixed by `COVER.scripted_maps`: the setting
+leaves the Serolonis Job alone.

@@ -509,6 +509,18 @@ so the repair still treats a squad no bigger than the area's destinations as
 the game's own deployment. It applies at every squad size, since the player
 asked for it: a four-operator squad's spots move too.
 
+Except on the maps in `COVER.scripted_maps`, matched in the area's path: only
+the Serolonis Job (`MM_01_010_TheSerolonisJob`), whose tutorial scripts the
+fights around the game's spots. In 1.3.0 the move of one spot in its second
+encounter (`-678/1052 -> -660/1150`) changed Aurelio's overwatch cone. The
+script's third enemy then either took an overwatch hit and died to Hawks'
+scripted shot, or never moved into place, and the "Aurelio melee" step
+(`Tutorials.Missions.01.Encounter02.Turn02.030_AurelioMelee`) had no target.
+Played on Instance 2 on 2026-10-13: twice with the setting on, the step stuck;
+with it off, the enemy survived the shot and the melee worked. The game's
+`BitReactor.Tutorials.Missions` tags all belong to mission 01, so no other map
+is listed.
+
 The setting is read through the Mixamoo Mod Config Manager client
 (Scripts/MXM.lua, unmodified, the copy Off Duty, Skip Space Travel and Fast
 Resonance ship). Without the manager the schema's defaults apply. The tests

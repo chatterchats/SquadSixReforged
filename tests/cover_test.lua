@@ -13,6 +13,7 @@
 --      facing the encounter stays; one beside cover facing away moves to cover facing it within
 --      two tiles; one whose only nearby cover faces away, and one whose only good cover is
 --      outside the lane, stay. The moved one is a new actor; the authored one is unlisted.
+--      In the Serolonis Job (its tutorial is scripted around the game's spots) none moves.
 --   5. The same with the setting off: nothing moves.
 --   6. debug_cover_markers on: each pocket considered gets one of the game's cover markers, its
 --      pocket set from the cover and its walls recoloured by category (green usable, yellow
@@ -86,13 +87,14 @@ local volume = mock.object("TacticalVolume", {}, {
     K2_GetActorLocation = function() return {X = B + 200, Y = B + 3000, Z = 0} end,
     IsActorInsideTacticalArea = function() return true end,
 })
-local function area(name)
+local function area(name, map)
     local points = {}
     for index, point in ipairs(LANE) do
         points[index] = mock.actor("TacticalPoint " .. name .. index, {X = point.X, Y = point.Y, Z = 0})
     end
     local list = mock.array(points)
-    return mock.object("BP_CombatPreparationArea_C /Game/Maps/Test.Test:PersistentLevel." .. name,
+    map = map or "/Game/Maps/Test.Test"
+    return mock.object("BP_CombatPreparationArea_C " .. map .. ":PersistentLevel." .. name,
         {PlayerDestinations = list}, {
             GetWorld = function() return mock.world end,
             GetLinkedTacticalArea = function() return volume end,
@@ -202,6 +204,21 @@ mock.expect("improve_spots kept=1 moved=1 no_better_cover=2 queries=%d+ errors=0
 for index = 1, 4 do
     if stock[index].halts ~= 0 then fail("improve: Operator" .. index .. " was moved or stopped") end
 end
+
+-- 4b. The same in the Serolonis Job: its tutorial is scripted around the game's spots, so none
+-- moves.
+squad({on_lane(1), on_lane(2), on_lane(3), on_lane(4)})
+local tutorial_area, tutorial = area("Tutorial",
+    "/Game/Game/Maps/StoryMissions/MM_01_010_TheSerolonisJob/MM_01_010_TheSerolonisJob_Gameplay.MM_01_010_TheSerolonisJob_Gameplay")
+local tutorial_spots = {}
+for index = 1, 4 do tutorial_spots[index] = tutorial[index] end
+mock.hooks[TRIGGER].pre(tutorial_area)
+mock.run_until(mock.now() + 600)
+for index = 1, 4 do
+    if tutorial[index] ~= tutorial_spots[index] then fail("Serolonis Job: destination " .. index .. " was replaced") end
+end
+mock.expect("improve_spots=skipped reason=scripted_map map=MM_01_010_TheSerolonisJob",
+    "the Serolonis Job's spots are left alone")
 
 -- 5. Setting off: the same area keeps every authored destination.
 mock.settings.improve_game_spots = false

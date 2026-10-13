@@ -197,3 +197,24 @@ route, stop teleporting it and leave it to the game.
 All six models show in the lineup: `proxies=6 valid_proxies=6 hidden_proxies=0`, layout applied
 (the first pass found the stock four placed and two at the centre; the second spread all six at
 fit 0.60), `slot_widgets=6 activity_slot_vms=6`. The squad_select self-check passed (2/2).
+
+## MM_05_010_UmbaraRescue ("Deep Cover"), five (39370f2, 2026-10-12)
+
+The first squad above four on a mission whose cast grows by script. The game authors it for three
+(min 3, Hawks auto-assigned); Rex and the rescued clone Baker join through the mission. Raised to
+five for the test with `dev/SquadSixReforgedTestLimits`, from the user's campaign save; Squad Six
+Reforged 1.2.0 unchanged.
+
+| Step | Result |
+|------|--------|
+| Limit | `squadsixlimit MM_05_010_UmbaraRescue 5` changed the definition (`set max 3 -> 5`), but squad select still built three slots: the galaxy map's `BrunoMissionViewModel` keeps its own `MaxSquadSize`, copied before the command. Reloading the save rebuilt it from the definition: five slots, five in the lineup |
+| Slots | Squad Six's slot expansion ran on the five definitions (`slot_definitions=5->6`); its factory rebuild failed (`factory_rebuild=false`), so five stayed five. It assumes a four-slot list: **fix before any mission ships at five** |
+| Start | 5 + Rex = 6 units, following properly. Two operators off the navmesh moved beside squadmates (`spawn_rescue=moved`, `on_navmesh=3`) |
+| Encounter (the mission's only one) | game destinations 5 → 6 (`added_safe_points=1`), one operator moved onto the lane, `floor_settled=1/1`; the repair passes saw only units still walking (`:moving`), nothing restored, six distinct positions. The user saw all six spawn in, none clipped |
+| Baker | rescued mid-encounter and joined the squad: seven units. Squad Six logged nothing, since it acts only at deployment |
+| Save | a game save with seven units on the field finished normally (not loaded back: ZC Sandbox campaign) |
+| End | mission complete, back to the Den, no errors |
+
+So seven units alone doesn't hang a save; HM_Jae_020's hang at seven needs another explanation,
+and each scripted-cast mission's cap has to be tested on its own. Deep Cover is authored for
+3 + 2 joiners = 5 units, ran fine at 7.

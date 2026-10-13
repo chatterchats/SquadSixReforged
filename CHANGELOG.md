@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Deep Cover: hand-picked deployment spots for up to seven units (the squad plus Rex).
+
 ## [1.2.0]
 
 The first release of Squad Six Reforged, which continues Squad Six by arctco: they created it,

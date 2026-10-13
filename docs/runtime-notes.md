@@ -429,6 +429,31 @@ These replacements are the midpoints of the lane's two 575 uu side
 edges, drawn in by RESCUE.inset. Neither extrapolates beyond the
 authored four-point shape.
 
+### `FIXED`
+
+Profiles rescue operators onto extra points and then add destinations where
+they stand; a fixed layout replaces the area's destinations outright with
+spots somebody played. It exists for areas where the authored points are
+worse than hand-picked ones, and for squads larger than the mod's own six-spot
+expansion handles: Deep Cover deploys the squad plus Rex, so a six-operator
+squad is seven units on five authored points, and the expansion stops at six
+(`WARNING: fewer destinations than deployed operators`; two shared a tile).
+
+Deep Cover's seven spots were picked by the user, who walked the squad onto
+them in game; the coordinates were read with ZC Sandbox
+(`call <unit> K2_GetActorLocation`). Destinations sit about 74 uu below a
+standing operator (71.8 and 77.2 on the two authored points occupied at the
+time), so that is subtracted from the read heights. The heights differ on
+purpose: two spots are on lower ground.
+
+New actors are listed instead of the authored ones being moved, so nothing in
+the level changes and a mobility setting can't refuse the move. The layout
+applies whatever the squad size, since the user prefers these spots outright;
+the game still decides which unit walks to which spot. The repair passes skip
+a fixed area: the spots are known to work, and the forward ones sit outside
+the authored lane, which `off_lane`-style checks would otherwise treat as
+stranding. `squadsixrescue` still works there as the manual escape hatch.
+
 ### `at_world_origin`
 
 An actor the placement pass never reached sits at the world origin plus its

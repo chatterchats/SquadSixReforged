@@ -206,6 +206,41 @@ local PLACEMENT_PROFILES = {
         },
     },
 }
+-- Hand-picked deployment spots that replace an area's own: when an area's authored destinations
+-- match `destinations` (the same fingerprint match as the profiles), its destination list becomes
+-- `spots`, in order, whatever the squad size. The game's relocation then walks the squad onto
+-- them like onto its own; which unit takes which spot is still the game's choice. The mod's
+-- repair passes leave a fixed area alone: its spots were checked by playing them, and some sit
+-- outside the authored lane on purpose. Z is a destination's height, about 74 uu below the
+-- standing operator it was read from.
+-- One table rather than separate locals: the main chunk is near Lua's 200-local ceiling.
+local FIXED = {
+    layouts = {
+        {
+            name = "DeepCover",
+            -- MM_05_010_UmbaraRescue ("Deep Cover"), its only area: four authored points and Rex's.
+            destinations = {
+                {X = -1350, Y = -1060, Z = 224.753},
+                {X = -1600, Y = -1070, Z = 220.563},
+                {X = -1994.73, Y = -660.889, Z = 336.141},
+                {X = -2554.776, Y = -232.604, Z = 400},
+                {X = -1800, Y = -696.672, Z = 211.157},
+            },
+            -- Picked by the user in game (2026-10-12), in their order of preference.
+            spots = {
+                {X = -320.771, Y = -340.116, Z = 227},       -- forward, beside the area's centre
+                {X = -849.179, Y = -555.740, Z = 31},        -- lower ground
+                {X = -1549.245, Y = -410.000, Z = 132},      -- lower ground
+                {X = -1800, Y = -696.672, Z = 211.157},      -- authored: TacticalPoint_Rex
+                {X = -751.056, Y = -1060.000, Z = 220},
+                {X = -1600, Y = -1070, Z = 220.563},         -- authored: PlayerTacticalPoint_1.2
+                {X = -1350, Y = -1060, Z = 224.753},         -- authored: PlayerTacticalPoint_1.1
+            },
+        },
+    },
+    -- Areas whose destinations were replaced, by object key, for the repair passes.
+    applied = {},
+}
 
 local registered_placement_hook = false
 local registered_relocation_hook = false
@@ -1271,6 +1306,16 @@ local function repair_stranded_units(area, via, hard_only, ignore_budget)
     area = unwrap(area)
     if not valid(area) then return 0 end
 
+    -- Hand-picked spots, some outside the authored lane on purpose: nothing to repair.
+    local fixed = FIXED.applied[object_key(area)]
+    if fixed then
+        if not placement_rescue_reported.fixed then
+            placement_rescue_reported.fixed = true
+            log("placement_repair=skipped reason=fixed_spots layout=" .. fixed)
+        end
+        return 0, 0
+    end
+
     local units = every_player_unit()
     if #units < 1 then return 0 end
 
@@ -1566,6 +1611,87 @@ end
 -- can be sent somewhere invalid. Add destinations at positions operators
 -- already stand on, before the relocation is calculated; nothing is
 -- extrapolated, since an invented point has no navigation check.
+-- Replace the destinations of an area that matches a FIXED layout with its spots: new destination
+-- actors of the authored class, team and facing, written over the list in the layout's order.
+-- The authored actors stay in the level, unlisted. Returns true once the list holds the spots, or
+-- nil when no layout matches or a spot can't be placed, so the usual expansion runs instead.
+function FIXED.apply(area, destinations, raw_count, valid_destinations)
+    local layout, transform = nil, nil
+    for _, candidate in ipairs(FIXED.layouts) do
+        local candidate_transform = match_placement_profile(candidate, valid_destinations)
+        if candidate_transform ~= nil then
+            if layout ~= nil then
+                log("fixed_spots=none reason=ambiguous_layouts matched="
+                    .. layout.name .. "," .. candidate.name)
+                return nil
+            end
+            layout, transform = candidate, candidate_transform
+        end
+    end
+    if layout == nil then return nil end
+    -- Every listed destination is overwritten, so none of the authored ones stays in use.
+    if raw_count > #layout.spots then
+        log("fixed_spots=none reason=more_destinations_than_spots layout=" .. layout.name
+            .. " destinations=" .. tostring(raw_count))
+        return nil
+    end
+
+    local template = valid_destinations[1].actor
+    local class_ok, point_class = pcall(function() return template:GetClass() end)
+    local world_ok, world = pcall(function() return area:GetWorld() end)
+    if not class_ok or not world_ok or not valid(point_class) or not valid(world) then return nil end
+    local team = nil
+    pcall(function() team = unwrap(template:GetPropertyValue(PLAYER_TEAM_PROPERTY)) end)
+    local facing = actor_rotation(template)
+    facing = facing ~= nil and copy_rotator(facing) or {}
+
+    local points = {}
+    for index, spot in ipairs(layout.spots) do
+        local location = transform_profile_point(transform, spot)
+        local spawn_ok, point = pcall(function()
+            return world:SpawnActor(point_class, location, facing)
+        end)
+        local placed = spawn_ok and valid(point)
+        if placed then
+            points[#points + 1] = point
+            if team ~= nil then
+                pcall(function() point[PLAYER_TEAM_PROPERTY] = team end)
+            end
+            -- As in the expansion: a declined teleport returns false and leaves the origin.
+            local moved, accepted = pcall(function()
+                return point:K2_SetActorLocationAndRotation(location, facing, false, {}, true)
+            end)
+            placed = moved and accepted ~= false
+                and not at_world_origin(actor_location(point) or location)
+        end
+        if not placed then
+            for _, spawned in ipairs(points) do
+                pcall(function() spawned:K2_DestroyActor() end)
+            end
+            log("fixed_spots=none reason=spot_not_placed layout=" .. layout.name
+                .. " spot=" .. tostring(index))
+            return nil
+        end
+    end
+
+    local written = 0
+    local write_ok = pcall(function()
+        for index, point in ipairs(points) do
+            destinations[index] = point
+            written = index
+        end
+    end)
+    for index = 1, written do
+        synthesised_destinations[object_key(points[index])] = true
+    end
+    FIXED.applied[object_key(area)] = layout.name
+    log("fixed_spots=" .. layout.name .. " destinations=" .. tostring(raw_count)
+        .. "->" .. tostring(array_count(destinations))
+        .. " written=" .. tostring(written) .. "/" .. tostring(#points)
+        .. (write_ok and "" or " write_failed=true"))
+    return true
+end
+
 local function ensure_player_destinations(area)
     area = unwrap(area)
     if not valid(area) then return false end
@@ -1595,6 +1721,11 @@ local function ensure_player_destinations(area)
         end
     end
     if #valid_destinations < 1 then return false end
+
+    local fixed = FIXED.applied[object_key(area)]
+    if fixed then return false end
+    fixed = FIXED.apply(area, destinations, raw_count, valid_destinations)
+    if fixed ~= nil then return fixed end
 
     -- A squad that can't be read yet is left alone; the retries at the hook
     -- site run again. Profile rescues run before the proximity-filtered read,
@@ -1920,6 +2051,7 @@ local function prepare_new_area(area)
     placement_attempts[key] = nil
     relocation_scheduled[key] = nil
     relocation_ladders[key] = nil
+    FIXED.applied[key] = nil
     if active_deployment_key == key then
         active_deployment_key = ""
         active_deployment_area = nil
@@ -2483,6 +2615,7 @@ return {
     internals = {
         RESCUE = RESCUE,
         PLACEMENT_PROFILES = PLACEMENT_PROFILES,
+        FIXED = FIXED,
         deployment_polygon = deployment_polygon,
         inside_deployment = inside_deployment,
         derive_rescue_points = derive_rescue_points,

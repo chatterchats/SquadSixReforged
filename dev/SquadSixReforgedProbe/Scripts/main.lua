@@ -14,8 +14,8 @@
 -- Read-only: it registers no hooks (only one mod's hook on a Blueprint function survives, so it
 -- must not compete with Squad Six's) and writes nothing to the game. Output goes to UE4SS.log,
 -- squadsix_probe.log and squadsix_probe.jsonl in the mod folder. `squadsixprobe` in the UE4SS
--- console checks every area immediately.
-local VERSION = "0.2.0"
+-- console checks every area immediately and logs where every squad member stands.
+local VERSION = "0.3.0"
 local TAG = "[SQUADSIX_PROBE]"
 local WATCH_INTERVAL_MS = 1000
 local WATCH_SECONDS = 120          -- per mission
@@ -373,6 +373,13 @@ RegisterConsoleCommandHandler("squadsixprobe", function()
             check_area(state, "console")
         end
     end
+    -- Where everyone stands right now, e.g. to record a hand-picked spot for a placement profile.
+    local members = squad_members()
+    local text = {}
+    for _, member in ipairs(members) do text[#text + 1] = member.name .. "=" .. xyz(member.location) end
+    log(string.format("squad now t=%ds members=%d %s", session.elapsed, #members, table.concat(text, " ")))
+    record({type = "squad", version = VERSION, mission = session.mission, elapsed = session.elapsed,
+            members = members, reason = "console"})
     return true
 end)
 

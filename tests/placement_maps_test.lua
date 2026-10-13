@@ -3,7 +3,8 @@
 --
 -- Geometry, for every playable lane:
 --   - the lane polygon builds (one area's points are collinear; it has none);
---   - each PLACEMENT_PROFILES fingerprint matches exactly its own area, using the runtime's matcher;
+--   - each PLACEMENT_PROFILES and FIXED layout fingerprint matches exactly its own area, using the
+--     runtime's matcher;
 --   - derive_rescue_points finds two interior points for operators 5 and 6, except on the lanes in
 --     SHORT_LANES, and every point it returns is inside its lane.
 -- A six-operator deployment on every lane, through the real hooks:
@@ -14,6 +15,8 @@
 --   - the relocation then strands them at the world origin, and the repair ladder must put them
 --     back: nobody at the origin, no overflow operator sharing a tile, and as many of them inside
 --     the lane as before.
+-- A FIXED area instead must end up with exactly its layout's spots, in order, and the repair must
+-- leave its operators where the relocation put them.
 -- Some maps author two destinations closer than a tile (Bespin, HM_TrickLuco_020; neither
 -- deploys six), so only pairs involving something the runtime added or moved are checked.
 -- The exact points derive_rescue_points returns for every lane (for the destination expansion, for
@@ -42,6 +45,9 @@ local PROFILE_AREAS = {
     ColdMetal = "SK_Kaller_020_Gameplay_Alt:BP_CombatPreparationArea_C_0",
     Kaller025 = "SK_Kaller_025_Gameplay:BP_CombatPreparationArea_C_1",
     FathomFinale = "MM_06_090_FathomAndFinale_Gameplay:BP_CombatPreparationArea_C_2",
+}
+local FIXED_AREAS = {
+    DeepCover = "MM_05_010_UmbaraRescue_Gameplay:BP_CombatPreparationArea_C_0",
 }
 local TRIGGER = "/Script/BitReactorGame.CombatPreparationArea:TriggerPreCombat"
 local RELOCATION = "/Game/Game/Core/Blueprints/BP_CombatPreparationArea.BP_CombatPreparationArea_C:MovePlayerUnitsIntoPosition"
@@ -105,6 +111,15 @@ for _, area in ipairs(scan.areas) do
         for _, profile in ipairs(matched_by) do
             if PROFILE_AREAS[profile] ~= name then fail(name .. ": matched profile " .. profile) end
         end
+        local fixed = nil
+        for _, layout in ipairs(P.FIXED.layouts) do
+            if P.match_placement_profile(layout, live) then
+                if FIXED_AREAS[layout.name] ~= name then fail(name .. ": matched fixed layout " .. layout.name) end
+                fixed = layout
+            elseif FIXED_AREAS[layout.name] == name then
+                fail(name .. ": fixed layout " .. layout.name .. " no longer matches")
+            end
+        end
         for profile, owner in pairs(PROFILE_AREAS) do
             local found = false
             for _, matched in ipairs(matched_by) do found = found or matched == profile end
@@ -155,6 +170,33 @@ for _, area in ipairs(scan.areas) do
 
             mock.hooks[TRIGGER].pre(area_object)
             mock.run_until(mock.now() + 600)
+
+            if fixed then
+                -- The layout's spots, in order, and nothing else.
+                local count = destinations:GetArrayNum()
+                if count ~= #fixed.spots then
+                    fail(string.format("%s: %d destinations, expected the layout's %d", name, count, #fixed.spots))
+                end
+                for index, spot in ipairs(fixed.spots) do
+                    local at = index <= count and destinations[index].at or nil
+                    if at == nil or d3(at, spot) > 1 then fail(string.format("%s: destination %d isn't spot %d", name, index, index)) end
+                end
+                -- The relocation strands two operators; the repair must leave them be.
+                mock.hooks[RELOCATION].pre(area_object)
+                local stranded = {}
+                for index = 1, 2 do
+                    units[index].at = {X = 40 * index, Y = -30 * index, Z = 261}
+                    stranded[index] = {X = 40 * index, Y = -30 * index, Z = 261}
+                end
+                mock.run_until(mock.now() + 9000)
+                for index = 1, 2 do
+                    if d3(units[index].at, stranded[index]) > 1 then
+                        fail(string.format("%s: the repair moved Operator%d on a fixed area", name, index))
+                    end
+                end
+                lines[#lines + 1] = string.format("%-70s dest=%d fixed=%s spots=%d", name, #points, fixed.name, count)
+                goto continue
+            end
 
             -- Destinations after the expansion.
             local after = {}
@@ -222,6 +264,7 @@ for _, area in ipairs(scan.areas) do
             lines[#lines + 1] = string.format("%-70s dest=%d no lane", name, #points)
         end
     end
+    ::continue::
 end
 
 local golden_path = here .. "data/derived_points.txt"

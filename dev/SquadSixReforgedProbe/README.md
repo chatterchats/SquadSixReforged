@@ -38,4 +38,5 @@ All three go in the mod folder (`Mods/SquadSixReforgedProbe/`):
 - `squadsix_probe.jsonl`, one JSON record per area check (`type: "area"`) and per squad snapshot
   (`type: "squad"`), for feeding back into `tests/placement_maps_test.lua`.
 
-Type `squadsixprobe` in the UE4SS console to check every loaded area immediately.
+Type `squadsixprobe` in the UE4SS console to check every loaded area immediately. It also logs
+where every squad member stands (`squad now`), for recording a hand-picked spot.

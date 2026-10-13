@@ -21,6 +21,7 @@ CORE_ZCOM_MOD = ROOT / "src/SquadSixReforged_Core/zcom-mod.json"
 JSON_FILES = (MODINFO, ZCOM_MOD, CORE_MODINFO, CORE_ZCOM_MOD)
 MAIN = ROOT / "src/SquadSixReforged/Scripts/main.lua"
 README = ROOT / "src/SquadSixReforged/README.md"
+MXM_SETTINGS = ROOT / "src/SquadSixReforged/MXM/settings.lua"
 
 SEMVER_PATTERN = re.compile(r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)")
 JSON_VERSION_PATTERN = re.compile(
@@ -29,6 +30,10 @@ JSON_VERSION_PATTERN = re.compile(
 )
 MAIN_VERSION_PATTERN = re.compile(
     r'^(?P<prefix>\s*local\s+VERSION\s*=\s*")(?P<version>[^"]+)(?P<suffix>".*)$',
+    re.MULTILINE,
+)
+MXM_VERSION_PATTERN = re.compile(
+    r'^(?P<prefix>\s*version\s*=\s*")(?P<version>[^"]+)(?P<suffix>".*)$',
     re.MULTILINE,
 )
 # The player guide's title (tools/package.py checks it too).
@@ -166,6 +171,7 @@ def main() -> None:
     texts = {path: read_text(path) for path in JSON_FILES}
     texts.update({
         MAIN: read_text(MAIN),
+        MXM_SETTINGS: read_text(MXM_SETTINGS),
         README: read_text(README),
         CHANGELOG: read_text(CHANGELOG),
     })
@@ -177,6 +183,7 @@ def main() -> None:
 
     versions = {path: extract_version(path, texts[path], JSON_VERSION_PATTERN) for path in JSON_FILES}
     versions[MAIN] = extract_version(MAIN, texts[MAIN], MAIN_VERSION_PATTERN)
+    versions[MXM_SETTINGS] = extract_version(MXM_SETTINGS, texts[MXM_SETTINGS], MXM_VERSION_PATTERN)
     readme_version = extract_version(README, texts[README], README_HEADER_PATTERN)
 
     for path in JSON_FILES:
@@ -201,6 +208,9 @@ def main() -> None:
     updates.update({
         MAIN: replace_version(
             MAIN, texts[MAIN], MAIN_VERSION_PATTERN, current_version, next_version
+        ),
+        MXM_SETTINGS: replace_version(
+            MXM_SETTINGS, texts[MXM_SETTINGS], MXM_VERSION_PATTERN, current_version, next_version
         ),
         README: replace_version(
             README, texts[README], README_HEADER_PATTERN, current_version, next_version

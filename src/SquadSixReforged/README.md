@@ -12,7 +12,11 @@ and the hand-picked list of missions behind it. See `CREDITS.md` beside this fil
 - **Missions take six** wherever the game can handle it.
 - **The extra two are placed properly in missions.** The game only marks four spots in each
   deployment area. Squad Six Reforged adds two more inside the area, on the floor, and moves
-  operators 5 and 6 there if the game leaves them stuck or outside it.
+  operators 5 and 6 there if the game leaves them stuck or outside it. Story characters who join
+  at the start of a mission get a spot too.
+- **Spots in cover.** The added spots go into cover facing the enemies where the area has some,
+  full cover first. By default the game's own spots move into such cover too when theirs faces
+  away (see Settings).
 - It doesn't change classes, progression, abilities, equipment, enemies or your saves.
 
 ## Missions that stay at four
@@ -32,6 +36,20 @@ four until each has been played at six:
 - UE4SS for Star Wars Zero Company (Nexus Mods)
 - No other squad-size mod, including arctco's original Squad Six or Squad Expansion: they change
   the same things. The log warns if one is installed alongside.
+- Optional: [Mixamoo Mod Config Manager](https://www.nexusmods.com/starwarszerocompany/mods/149),
+  for the settings page
+
+## Settings
+
+With the [Mixamoo Mod Config Manager](https://www.nexusmods.com/starwarszerocompany/mods/149)
+installed, Squad Six Reforged has an in-game settings page:
+
+- **Move the game's spots into cover** (on by default): at the start of an encounter, a
+  deployment spot whose cover faces away from the enemies, or that has none, moves to cover
+  facing them within two tiles. It applies to every squad size, from the next encounter. Turn it
+  off to keep the game's own spots.
+
+Without the settings manager, the defaults apply.
 
 ## Switching from arctco's Squad Six
 

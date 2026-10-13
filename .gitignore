@@ -7,3 +7,6 @@ __pycache__/
 Thumbs.db
 *.swp
 *.tmp
+
+# Mixamoo Mod Config Manager writes the player's settings here in game
+src/SquadSixReforged/MXM/values.lua

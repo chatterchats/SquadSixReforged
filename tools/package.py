@@ -2,7 +2,8 @@
 
 The ZIP mirrors the game's SWZeroCompany folder, so a manual install is one extract and the
 Vortex extension takes it as a combo mod (it needs both Binaries/ and Content/ at the root):
-  Binaries/Win64/ue4ss/Mods/SquadSixReforged/   exactly src/SquadSixReforged's player files, plus
+  Binaries/Win64/ue4ss/Mods/SquadSixReforged/   exactly src/SquadSixReforged's player files (with
+                                                the MXM settings page and Scripts/MXM.lua), plus
                                                 CREDITS.md (arctco's credit travels with every copy)
   Content/Paks/~mods/SquadSixReforged_Core/     src/SquadSixReforged_Core: the three
                                                 pakchunk99-SquadSixReforged_P files (committed
@@ -44,6 +45,7 @@ for manifest in (SOURCE / "zcom-mod.json", CORE / "modinfo.json", CORE / "zcom-m
     assert json.loads(manifest.read_text())["version"] == version, manifest.relative_to(ROOT)
 assert f'local VERSION = "{version}"' in (SCRIPTS / "main.lua").read_text()
 assert f"Squad Six Reforged v{version} " in (SOURCE / "README.md").read_text()
+assert f'version = "{version}"' in (SOURCE / "MXM" / "settings.lua").read_text()
 
 
 def sha(path):
@@ -73,7 +75,10 @@ def checked_paks():
     return PAKS
 
 
-COMMON = [SOURCE / leaf for leaf in ("enabled.txt", "modinfo.json", "zcom-mod.json", "README.md")]
+# MXM/settings.lua is the Mixamoo Mod Config Manager page; MXM/values.lua (the player's choices)
+# is written beside it in game and never ships.
+COMMON = [SOURCE / leaf for leaf in ("enabled.txt", "modinfo.json", "zcom-mod.json", "README.md",
+                                     "MXM/settings.lua")]
 REQUIRE = re.compile(r'require\("(\w+)"\)')
 
 

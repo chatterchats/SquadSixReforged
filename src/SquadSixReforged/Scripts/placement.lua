@@ -3,6 +3,8 @@
 -- squadsixrescue console command.
 -- Why each rule exists, with the reports behind it: docs/runtime-notes.md.
 local Common = require("common")
+-- Player settings (MXM/settings.lua), read where they are used: they can change mid-game.
+local Settings = require("MXM")
 local TARGET_SIZE = Common.TARGET_SIZE
 local log = Common.log
 local unwrap = Common.unwrap
@@ -141,6 +143,13 @@ RESCUE.cover_pool = 8
 -- around the derived points, two facing sideways. At most cover_grid_max grid points.
 RESCUE.cover_grid = 100.0
 RESCUE.cover_grid_max = 80
+-- The game's own destinations (the improve_game_spots setting): one already in cover facing the
+-- encounter is kept, found by a search this close to it; otherwise it moves to the best usable
+-- cover within cover_improve_range, searched around it at cover_improve_offsets in eight
+-- directions.
+RESCUE.cover_here_range = 60.0
+RESCUE.cover_improve_range = 200.0
+RESCUE.cover_improve_offsets = {100.0, 200.0}
 -- A volume centre closer than this to the lane's centroid gives no usable direction, so any
 -- cover is taken.
 RESCUE.cover_min_forward = 300.0
@@ -959,19 +968,47 @@ local function derive_rescue_points(polygon, destinations, units, wanted, ignore
     return chosen, unwalkable
 end
 
+-- A new destination actor like `template` (its class, team and facing) at `location`, or nil.
+-- A declined teleport returns false and leaves the actor at the origin, so that spawn is
+-- destroyed rather than listed.
+local function spawn_destination(template, world, location)
+    local class_ok, point_class = pcall(function() return template:GetClass() end)
+    if not class_ok or not valid(point_class) or not valid(world) then return nil end
+    local facing = actor_rotation(template)
+    facing = facing ~= nil and copy_rotator(facing) or {}
+    local spawn_ok, point = pcall(function() return world:SpawnActor(point_class, location, facing) end)
+    if not spawn_ok or not valid(point) then return nil end
+    local team = nil
+    pcall(function() team = unwrap(template:GetPropertyValue(PLAYER_TEAM_PROPERTY)) end)
+    if team ~= nil then pcall(function() point[PLAYER_TEAM_PROPERTY] = team end) end
+    local moved, accepted = pcall(function()
+        return point:K2_SetActorLocationAndRotation(location, facing, false, {}, true)
+    end)
+    if moved and accepted ~= false and not at_world_origin(actor_location(point) or location) then
+        return point
+    end
+    pcall(function() point:K2_DestroyActor() end)
+    return nil
+end
+
 -- The game's cover, for the points the mod adds (RESCUE.cover_*).
-local COVER = {library = "/Script/BitReactorGame.Default__BRG_TargetingFunctionLibrary"}
+local COVER = {
+    library = "/Script/BitReactorGame.Default__BRG_TargetingFunctionLibrary",
+    -- Areas whose own destinations were already considered, by object key (prepare_new_area
+    -- clears it).
+    improved = {},
+}
 
 -- The cover pocket nearest `point`, as {X, Y, Z (its floor), tier = 2 full or 1 half, nx, ny
 -- (the cover's normal: from whoever uses it towards the cover, the side it protects)}, or nil.
 -- The direction was read the other way round first, and the mod chose exposed spots: in
 -- Smugglers' Den's second area, against enemies to +X, the player moved exactly the three
 -- operators whose pockets had normal -X and kept the three with +X.
-function COVER.nearest(library, actor, point, stats)
+function COVER.nearest(library, actor, point, stats, range)
     local out = {}
     local ok, found = pcall(function()
         return library:GetNearestCoverForPoint(actor, {X = point.X, Y = point.Y, Z = point.Z},
-            out, RESCUE.cover_range)
+            out, range or RESCUE.cover_range)
     end)
     stats.queries = stats.queries + 1
     if not ok then
@@ -1082,6 +1119,104 @@ function COVER.choose(site, actor, polygon, authored, units, wanted, derived, wa
     if used.full + used.half == 0 then return derived end
     for _, point in ipairs(chosen) do point.order, point.facing = nil, nil end
     return chosen
+end
+
+-- The improve_game_spots setting: before the relocation walks anyone in, each of the area's own
+-- destinations that has no cover facing the encounter moves to the best usable cover within
+-- RESCUE.cover_improve_range: full before half, then facing more squarely, then nearer. The
+-- authored actors stay in the level, unlisted, and their replacements count as authored, so the
+-- repair still leaves a stock squad alone. Needs the encounter's direction; once per area. Not
+-- called for an area a PLACEMENT_PROFILES entry matches: the profile knows its map by these
+-- destinations, and its rescues sit where they are.
+-- Smugglers' Den's second area: the game's own points sat beside cover with its back to the
+-- enemies.
+function COVER.improve(area, destinations, valid_destinations, anchors)
+    local key = object_key(area)
+    if key == "" or COVER.improved[key] or relocation_prehook_ran then return end
+    COVER.improved[key] = true
+    if Settings.Get("improve_game_spots", true) ~= true then return end
+
+    local units = every_player_unit()
+    local actor = units[1] and units[1].actor
+    local found_ok, library = pcall(StaticFindObject, COVER.library)
+    if not found_ok or not valid(library) or not valid(actor) then return end
+    local world_ok, world = pcall(function() return area:GetWorld() end)
+    if not world_ok or not valid(world) then return end
+
+    local points = {}
+    for index, destination in ipairs(valid_destinations) do points[index] = destination.location end
+    local polygon = deployment_polygon(points)
+    local forward = COVER.forward(polygon, linked_tactical_area(area))
+    if forward == nil then
+        log("improve_spots=skipped reason=no_direction destinations=" .. tostring(#points))
+        return
+    end
+    local walkable = walkable_test(area, points)
+    local stats = {queries = 0, errors = 0, unreadable = 0}
+    local function facing(pocket) return pocket.nx * forward.X + pocket.ny * forward.Y end
+
+    local kept, moved, unmoved, moves = 0, 0, 0, {}
+    for index, destination in ipairs(valid_destinations) do
+        local origin = destination.location
+        local here = COVER.nearest(library, actor, origin, stats, RESCUE.cover_here_range)
+        if here ~= nil and facing(here) >= RESCUE.cover_facing then
+            kept = kept + 1
+        else
+            local best, seen = nil, {}
+            local function consider(pocket)
+                if pocket == nil then return end
+                local tag = string.format("%.0f/%.0f", pocket.X, pocket.Y)
+                if seen[tag] then return end
+                seen[tag] = true
+                local distance = xy_distance_squared(pocket, origin)
+                if distance > RESCUE.cover_improve_range ^ 2 then return end
+                pocket.facing, pocket.distance = facing(pocket), distance
+                if pocket.facing < RESCUE.cover_facing then return end
+                local point = {X = pocket.X, Y = pocket.Y, Z = pocket.Z}
+                if inside_deployment(polygon, point) == false then return end
+                if walkable ~= nil and not walkable(point) then return end
+                for other, location in ipairs(points) do
+                    if other ~= index and xy_distance_squared(point, location) < MIN_DESTINATION_SEPARATION_SQ then
+                        return
+                    end
+                end
+                if best == nil or pocket.tier > best.tier
+                    or (pocket.tier == best.tier and (pocket.facing > best.facing + 0.01
+                        or (math.abs(pocket.facing - best.facing) <= 0.01 and distance < best.distance))) then
+                    best = pocket
+                end
+            end
+            for _, offset in ipairs(RESCUE.cover_improve_offsets) do
+                for step = 0, 7 do
+                    local angle = step * math.pi / 4
+                    consider(COVER.nearest(library, actor, {X = origin.X + offset * math.cos(angle),
+                        Y = origin.Y + offset * math.sin(angle), Z = origin.Z}, stats, RESCUE.cover_here_range * 2))
+                end
+            end
+            local point = nil
+            if best ~= nil then
+                -- The destination's own height above its floor, carried to the new floor.
+                local floor = navigation_floor(area, origin)
+                local lift = floor ~= nil and origin.Z - floor.Z or 0
+                local location = {X = best.X, Y = best.Y, Z = best.Z + lift}
+                point = spawn_destination(destination.actor, world, location)
+                if point ~= nil and pcall(function() destinations[destination.index] = point end) then
+                    moves[#moves + 1] = string.format("%.0f/%.0f->%.0f/%.0f%s", origin.X, origin.Y,
+                        location.X, location.Y, best.tier == 2 and "full" or "half")
+                    destination.actor, destination.location = point, location
+                    points[index], anchors[index] = location, copy_vector(location)
+                    moved = moved + 1
+                elseif point ~= nil then
+                    pcall(function() point:K2_DestroyActor() end)
+                    point = nil
+                end
+            end
+            if point == nil then unmoved = unmoved + 1 end
+        end
+    end
+    log(string.format("improve_spots kept=%d moved=%d no_better_cover=%d queries=%d errors=%d"
+        .. " unreadable=%d moves=%s", kept, moved, unmoved, stats.queries, stats.errors,
+        stats.unreadable, #moves > 0 and table.concat(moves, ",") or "none"))
 end
 
 -- Search centres covering the lane: tile-spaced points strictly inside it, each at the height of
@@ -1863,13 +1998,8 @@ function FIXED.apply(area, destinations, raw_count, valid_destinations)
     end
 
     local template = valid_destinations[1].actor
-    local class_ok, point_class = pcall(function() return template:GetClass() end)
     local world_ok, world = pcall(function() return area:GetWorld() end)
-    if not class_ok or not world_ok or not valid(point_class) or not valid(world) then return nil end
-    local team = nil
-    pcall(function() team = unwrap(template:GetPropertyValue(PLAYER_TEAM_PROPERTY)) end)
-    local facing = actor_rotation(template)
-    facing = facing ~= nil and copy_rotator(facing) or {}
+    if not world_ok or not valid(world) then return nil end
 
     local points, spawned, reused = {}, {}, {}
     for index, spot in ipairs(layout.spots) do
@@ -1884,30 +2014,11 @@ function FIXED.apply(area, destinations, raw_count, valid_destinations)
                 break
             end
         end
-        local placed = points[index] ~= nil
-        if not placed then
-            local spawn_ok, point = pcall(function()
-                return world:SpawnActor(point_class, location, facing)
-            end)
-            placed = spawn_ok and valid(point)
-            if placed then
-                points[index] = point
-                spawned[#spawned + 1] = point
-            end
+        if points[index] == nil then
+            points[index] = spawn_destination(template, world, location)
+            spawned[#spawned + 1] = points[index]
         end
-        if placed and spawned[#spawned] == points[index] then
-            local point = points[index]
-            if team ~= nil then
-                pcall(function() point[PLAYER_TEAM_PROPERTY] = team end)
-            end
-            -- As in the expansion: a declined teleport returns false and leaves the origin.
-            local moved, accepted = pcall(function()
-                return point:K2_SetActorLocationAndRotation(location, facing, false, {}, true)
-            end)
-            placed = moved and accepted ~= false
-                and not at_world_origin(actor_location(point) or location)
-        end
-        if not placed then
+        if points[index] == nil then
             for _, point in ipairs(spawned) do
                 pcall(function() point:K2_DestroyActor() end)
             end
@@ -1960,6 +2071,7 @@ local function ensure_player_destinations(area)
             valid_destinations[#valid_destinations + 1] = {
                 actor = point,
                 location = copy_vector(location),
+                index = index,
             }
             anchors[#anchors + 1] = copy_vector(location)
         end
@@ -1970,6 +2082,16 @@ local function ensure_player_destinations(area)
     if fixed then return false end
     fixed = FIXED.apply(area, destinations, raw_count, valid_destinations)
     if fixed ~= nil then return fixed end
+    local profiled = nil
+    for _, profile in ipairs(PLACEMENT_PROFILES) do
+        if match_placement_profile(profile, valid_destinations) ~= nil then profiled = profile.name end
+    end
+    if profiled == nil then
+        COVER.improve(area, destinations, valid_destinations, anchors)
+    elseif not COVER.improved[object_key(area)] then
+        COVER.improved[object_key(area)] = true
+        log("improve_spots=skipped reason=profile profile=" .. profiled)
+    end
 
     -- A squad that can't be read yet is left alone; the retries at the hook
     -- site run again. Profile rescues run before the proximity-filtered read,
@@ -2333,6 +2455,7 @@ local function prepare_new_area(area)
     relocation_scheduled[key] = nil
     relocation_ladders[key] = nil
     FIXED.applied[key] = nil
+    COVER.improved[key] = nil
     if active_deployment_key == key then
         active_deployment_key = ""
         active_deployment_area = nil

@@ -8,6 +8,12 @@
 --      cover spots among them, and the operators aren't moved.
 --   3. With no cover search (the call fails), seven destinations still result and the rescue
 --      lands on the derived points exactly as before.
+--   (1-3 run with improve_game_spots off, so the authored destinations stay put.)
+--   4. improve_game_spots on, a stock squad of four: an authored destination already in cover
+--      facing the encounter stays; one beside cover facing away moves to cover facing it within
+--      two tiles; one whose only nearby cover faces away, and one whose only good cover is
+--      outside the lane, stay. The moved one is a new actor; the authored one is unlisted.
+--   5. The same with the setting off: nothing moves.
 --   luajit tests/cover_test.lua <Scripts dir>
 local scripts = assert(arg[1], "usage: cover_test.lua <Scripts dir>")
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
@@ -97,6 +103,7 @@ local function destination_at(list, pocket)
     end
     return false
 end
+mock.settings.improve_game_spots = false
 local function deploy(name, units)
     squad(units)
     local deployment, list = area(name)
@@ -158,5 +165,51 @@ for index = 5, 7 do
 end
 mock.expect("chosen_full=0 chosen_half=0 of=3 facing=checked errors=%d+", "a failing cover search is reported")
 if mock.text():find("WARNING: fewer destinations") then fail("a seven-unit squad was left short of destinations") end
+
+-- 4. The game's own destinations, improve_game_spots on. Corner 1 is in cover facing the
+-- encounter; corner 2 is beside cover facing away, with good cover 117 uu off inside the lane;
+-- corner 3's only nearby cover faces away; corner 4's good cover is 150 uu outside the lane.
+cover_available = true
+mock.settings.improve_game_spots = true
+for index = #pockets, 1, -1 do pockets[index] = nil end
+local improve_pockets = {
+    {X = B, Y = B, nx = 0, ny = 1, kind = FULL},
+    {X = B + 400, Y = B, nx = 0, ny = -1, kind = FULL},
+    {X = B + 300, Y = B + 60, nx = 0, ny = 1, kind = FULL},
+    {X = B + 350, Y = B + 300, nx = 0, ny = -1, kind = FULL},
+    {X = B - 150, Y = B + 400, nx = 0, ny = 1, kind = FULL},
+}
+for index, pocket in ipairs(improve_pockets) do pockets[index] = pocket end
+local stock = {on_lane(1), on_lane(2), on_lane(3), on_lane(4)}
+squad(stock)
+local improved_area, improved = area("Improved")
+local authored = {}
+for index = 1, 4 do authored[index] = improved[index] end
+mock.hooks[TRIGGER].pre(improved_area)
+mock.run_until(mock.now() + 600)
+if improved:GetArrayNum() ~= 4 then fail("improve: the destination count changed") end
+if improved[1] ~= authored[1] or improved[3] ~= authored[3] or improved[4] ~= authored[4] then
+    fail("improve: a destination with no better cover was replaced")
+end
+if improved[2] == authored[2] or not at(improved[2].at, improve_pockets[3]) then
+    fail("improve: corner 2 didn't move to the cover facing the encounter")
+end
+mock.expect("improve_spots kept=1 moved=1 no_better_cover=2 queries=%d+ errors=0 unreadable=0 moves=5400/5000%->5300/5060full",
+    "the improvement reports what it kept and moved")
+for index = 1, 4 do
+    if stock[index].halts ~= 0 then fail("improve: Operator" .. index .. " was moved or stopped") end
+end
+
+-- 5. Setting off: the same area keeps every authored destination.
+mock.settings.improve_game_spots = false
+squad({on_lane(1), on_lane(2), on_lane(3), on_lane(4)})
+local plain_area, untouched = area("NotImproved")
+local before = {}
+for index = 1, 4 do before[index] = untouched[index] end
+mock.hooks[TRIGGER].pre(plain_area)
+mock.run_until(mock.now() + 600)
+for index = 1, 4 do
+    if untouched[index] ~= before[index] then fail("setting off: destination " .. index .. " was replaced") end
+end
 
 io.stdout:write("ok\n")

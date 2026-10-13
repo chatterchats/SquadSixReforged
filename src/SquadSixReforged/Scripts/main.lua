@@ -17,6 +17,9 @@ local Limits = require("limits")
 local Lineup = require("lineup")
 local Placement = require("placement")
 local Selfcheck = require("selfcheck")
+-- The Mixamoo Mod Config Manager page (MXM/settings.lua). Registering at load lists the mod in
+-- the menu before the first mission; without the menu installed the defaults apply.
+pcall(function() require("MXM").Init() end)
 local TARGET_SIZE = Common.TARGET_SIZE
 local SLOT_LIST_ASSET = Common.SLOT_LIST_ASSET
 local HOLOGRAM_MANAGER_ASSET = Common.HOLOGRAM_MANAGER_ASSET

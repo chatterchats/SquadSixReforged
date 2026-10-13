@@ -488,6 +488,34 @@ height pocket with both step-outs 10 uu from another). Confirmed in
 Smugglers' Den: the cover is there at `TriggerPreCombat`, and UE4SS returns the
 out struct's nested vectors readably (`errors=0 unreadable=0`).
 
+### `COVER.improve`
+
+The `improve_game_spots` setting (on by default, MXM/settings.lua). Smugglers'
+Den's second area showed the game's own points beside cover with its back to
+the enemies, so the mod moves them as it places its own: each authored
+destination with no cover facing the encounter within `cover_here_range`
+moves to the best usable cover within `cover_improve_range` (searched around
+it at `cover_improve_offsets` in eight directions): full before half, then
+facing more squarely, then nearer. The same usability rules as the added
+points apply, plus a tile from every other destination.
+
+It runs once per area, at the first `ensure_player_destinations` and only
+before the relocation has started, so the game walks the squad straight onto
+the new spots. It needs the encounter's direction (`COVER.forward`), and it
+skips areas with a fixed layout or a matching profile: both identify their map
+by the authored points, and their spots were placed by hand. The replacements
+are new actors, as the fixed layouts' are; they are not marked synthesised,
+so the repair still treats a squad no bigger than the area's destinations as
+the game's own deployment. It applies at every squad size, since the player
+asked for it: a four-operator squad's spots move too.
+
+The setting is read through the Mixamoo Mod Config Manager client
+(Scripts/MXM.lua, unmodified, the copy Off Duty, Skip Space Travel and Fast
+Resonance ship). Without the manager the schema's defaults apply. The tests
+stub the client (tests/ue4ss_mock.lua): the real one polls its values file on
+a loop that never stops, which the bootstrap test would count against the
+maintenance loop.
+
 ### `FIXED`
 
 Profiles rescue operators onto extra points and then add destinations where

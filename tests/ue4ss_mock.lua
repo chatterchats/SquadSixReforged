@@ -8,7 +8,7 @@
 --   mock.hooks[path].pre(...)   -- calls a registered hook; mock.commands[name]() a console command
 --   mock.actor(name, location)  -- an actor that can be moved; mock.first_of[class] = object
 --   mock.transcript             -- log lines and registrations, in order
-local mock = {transcript = {}, missions = {}, hooks = {}, commands = {}, first_of = {}}
+local mock = {transcript = {}, missions = {}, hooks = {}, commands = {}, first_of = {}, settings = {}}
 
 local function record(line) mock.transcript[#mock.transcript + 1] = line end
 
@@ -128,6 +128,18 @@ local delayed, loops, notifications, now = {}, {}, {}, 0
 
 function mock.install(options)
     options = options or {}
+    -- The Mixamoo Mod Config Manager client (Scripts/MXM.lua) polls its values file forever,
+    -- which the maintenance-loop checks would count as a loop that never stops. Tests set
+    -- mock.settings instead; anything unset reads as the default the caller passes.
+    package.loaded["MXM"] = {
+        Init = function(self) return self end,
+        Get = function(key, fallback)
+            local value = mock.settings[key]
+            if value == nil then return fallback end
+            return value
+        end,
+        OnChange = function() end,
+    }
     local missing = options.missing or {}
     local properties = options.properties or mock.game_properties
     for _, value in ipairs(options.missions or {}) do

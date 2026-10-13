@@ -245,13 +245,25 @@ mock.world = mock.object("World /Game/Maps/Test.Test", {}, {
         local materials = {}
         local walls = {}
         local entry = {at = location, materials = materials, walls_removed = 0}
+        -- The pool: wall 1 placed on the pocket with its own dynamic material, wall 2 unused at
+        -- the origin with the plain material asset, which must never be tinted.
         for index = 1, 2 do
-            local material = mock.object("MID", {}, {
-                SetVectorParameterValue = function(_, name, value) materials[#materials + 1] = {name, value} end,
-                SetScalarParameterValue = function(_, name, value) materials[#materials + 1] = {name, value} end,
+            local placed = index == 1
+            local material = mock.object(placed and "MaterialInstanceDynamic /Engine/Transient.MID_M_UI_CoverWall_1"
+                or "Material /Game/Game/UI/Cover/Materials/M_UI_CoverWall.M_UI_CoverWall", {}, {
+                SetVectorParameterValue = function(_, name, value)
+                    if not placed then entry.plain_tinted = true end
+                    materials[#materials + 1] = {name, value}
+                end,
+                SetScalarParameterValue = function(_, name, value)
+                    if not placed then entry.plain_tinted = true end
+                    materials[#materials + 1] = {name, value}
+                end,
             })
             local component = mock.object("Wall", {}, {GetMaterial = function() return material end})
+            local at = placed and {X = location.X, Y = location.Y, Z = location.Z} or {X = 0, Y = 0, Z = 0}
             walls[index] = mock.object("BP_UI_Cover_Wall_C", {Wall = component}, {
+                K2_GetActorLocation = function() return at end,
                 Hide = function() end,
                 K2_DestroyActor = function() entry.walls_removed = entry.walls_removed + 1 end,
             })
@@ -303,6 +315,7 @@ for _, entry in ipairs(markers) do
         if setting[1] == "Base Color" then color = setting[2] end
     end
     if color == nil then fail("a marker's walls weren't recoloured") end
+    if entry.plain_tinted then fail("an unused wall's plain material was tinted") end
     if color.G == 1 and color.R == 0 then green = green + 1 elseif color.R == 1 and color.G == 0 then red = red + 1 end
     if entry.at.X == pockets[3].X and entry.at.Y == pockets[3].Y then fail("cover facing away was marked") end
 end

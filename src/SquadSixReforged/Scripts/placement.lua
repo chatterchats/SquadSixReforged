@@ -1070,6 +1070,8 @@ COVER.markers = {
     queue = {},
     scheduled = false,
     draw_delay_ms = 100,
+    -- A wall VisualizePocket placed stands on its pocket (the hand test's was exactly on it).
+    wall_radius_sq = 10000.0,
     statics = "/Script/Engine.Default__GameplayStatics",
     -- ESpawnActorCollisionHandlingMethod::AlwaysSpawn, ESpawnActorScaleMethod::MultiplyWithRoot.
     always_spawn = 1,
@@ -1183,20 +1185,33 @@ function COVER.markers.draw(world, pocket, color)
     end
     step("visualize")
     pcall(function() marker:VisualizePocket() end)
+    -- Only the walls VisualizePocket placed on this pocket, and only a material that is its own
+    -- dynamic instance. The marker keeps a pool of walls; the unused ones wait at the origin
+    -- with the plain material asset, and tinting every wall in the pool crashed the game three
+    -- times (access violation, Serolonis 030, 2026-10-12; the trace stopped at this step).
     step("tint")
-    local walls = {}
+    local walls, tinted = {}, 0
     pcall(function()
         local list = marker.Walls
-        for index = 1, list:GetArrayNum() do walls[#walls + 1] = unwrap(list[index]) end
+        for index = 1, list:GetArrayNum() do
+            local wall = unwrap(list[index])
+            if valid(wall) then walls[#walls + 1] = wall end
+        end
     end)
     for _, wall in ipairs(walls) do
-        pcall(function()
-            local material = wall.Wall:GetMaterial(0)
-            material:SetVectorParameterValue(marker_name("Base Color"), color)
-            material:SetScalarParameterValue(marker_name("NormalizedDistance"), 1.0)
-        end)
+        local at = actor_location(wall)
+        if at ~= nil and xy_distance_squared(at, pocket) <= markers.wall_radius_sq then
+            local material_ok, material = pcall(function() return unwrap(wall.Wall:GetMaterial(0)) end)
+            local name = material_ok and valid(material) and full_name(material) or ""
+            step("tint_material=" .. (name:match("^(%S+)") or "none"))
+            if name:find("^MaterialInstanceDynamic ") then
+                pcall(function() material:SetVectorParameterValue(marker_name("Base Color"), color) end)
+                pcall(function() material:SetScalarParameterValue(marker_name("NormalizedDistance"), 1.0) end)
+                tinted = tinted + 1
+            end
+        end
     end
-    step("drawn")
+    step("drawn walls=" .. tostring(#walls) .. " tinted=" .. tostring(tinted))
     markers.traced = true
     ExecuteWithDelay(markers.seconds * 1000, function()
         ExecuteInGameThread(function()

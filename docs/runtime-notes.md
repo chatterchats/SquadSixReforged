@@ -546,7 +546,14 @@ pass), the marker Blueprint is loaded at mission start rather than with
 `LoadAsset` inside `TriggerPreCombat`, and markers are spawned with the
 engine's deferred spawn, as the hand test did, not UE4SS's `SpawnActor`. The
 first marker of a session logs each step (`debug_markers step=...`), so a third
-failure shows where it stopped. Each pocket is marked once per deployment (the first
+failure shows where it stopped.
+
+It did: the third crash's trace stopped at `tint`. The marker keeps a pool of
+five walls (`Walls`); `VisualizePocket` places and sets up only the ones its
+segments need, and the rest wait at the origin with the plain material asset.
+The hand test tinted only the placed wall's `MID_M_UI_CoverWall_*`; the mod
+tinted every wall in the pool. Now only walls standing on the pocket whose
+material is a `MaterialInstanceDynamic` are tinted. Each pocket is marked once per deployment (the first
 search's verdict), the walls and marker are destroyed after a minute, and the
 log line `debug_markers site=...` counts them; `failed=` says why marking
 stopped, if it did (no class, spawn, or the pocket couldn't be written).

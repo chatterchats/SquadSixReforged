@@ -217,7 +217,25 @@ end
 
 -- 6. Debug markers, on scenario 1's pockets and squad.
 local MARKER_CLASS = "/Game/Game/UI/Cover/BP_UI_CoverPoint_ScriptCreated.BP_UI_CoverPoint_ScriptCreated_C"
-local marker_class = mock.object("BlueprintGeneratedClass " .. MARKER_CLASS)
+-- The engine's text import, as the runtime uses it: the pocket text is kept, and the segment
+-- list then reads one element.
+local imported = {}
+local pocket_property = mock.object("StructProperty RepresentedPocket", {}, {
+    GetFName = function() return {ToString = function() return "RepresentedPocket" end} end,
+    ContainerPtrToValuePtr = function(_, owner) return owner end,
+    ImportText = function(_, text, owner)
+        imported[#imported + 1] = text
+        owner.properties.RepresentedPocket.PocketSegments = mock.array({{}})
+    end,
+})
+local parent_class = mock.object("Class BRG_CoverVisualizationActor", {}, {
+    ForEachProperty = function(_, callback) callback(pocket_property) end,
+    GetSuperStruct = function() return nil end,
+})
+local marker_class = mock.object("BlueprintGeneratedClass " .. MARKER_CLASS, {}, {
+    ForEachProperty = function() end,
+    GetSuperStruct = function() return parent_class end,
+})
 local markers = {}
 local spawn = mock.world.SpawnActor
 local real_world = mock.world
@@ -238,9 +256,14 @@ mock.world = mock.object("World /Game/Maps/Test.Test", {}, {
                 K2_DestroyActor = function() entry.walls_removed = entry.walls_removed + 1 end,
             })
         end
-        local represented = {PocketSegments = setmetatable({}, {__index = {GetArrayNum = function() return 1 end}})}
+        local represented = {PocketSegments = mock.array({})}
         local marker = mock.object("BP_UI_CoverPoint_ScriptCreated_C", {RepresentedPocket = represented, Walls = mock.array(walls)}, {
-            VisualizePocket = function(self) self.properties.visualized = true end,
+            GetClass = function() return marker_class end,
+            VisualizePocket = function(self)
+                -- The game reads the segments it was given; none means a pocket that was never set.
+                if self.properties.RepresentedPocket.PocketSegments:GetArrayNum() ~= 1 then error("no pocket") end
+                self.properties.visualized = true
+            end,
             K2_DestroyActor = function(self) self.properties.destroyed = true end,
         })
         entry.marker, entry.represented = marker, represented
@@ -266,9 +289,7 @@ if #markers ~= 3 then fail(string.format("expected three markers, got %d", #mark
 local green, red = 0, 0
 for _, entry in ipairs(markers) do
     if not entry.marker.properties.visualized then fail("a marker wasn't drawn") end
-    if entry.represented.CoverNormal == nil or entry.represented.PocketSegments[1] == nil then
-        fail("a marker's pocket wasn't set")
-    end
+    if entry.represented.PocketSegments:GetArrayNum() ~= 1 then fail("a marker's pocket wasn't set") end
     local color = nil
     for _, setting in ipairs(entry.materials) do
         if setting[1] == "Base Color" then color = setting[2] end
@@ -278,6 +299,15 @@ for _, entry in ipairs(markers) do
     if entry.at.X == pockets[3].X and entry.at.Y == pockets[3].Y then fail("cover facing away was marked") end
 end
 if green ~= 2 or red ~= 1 then fail(string.format("expected two green markers and one red, got %d and %d", green, red)) end
+if #imported ~= 3 then fail("expected three pockets imported as text") end
+local expected_text = "(PocketSegments=((ExtentLeft=(X=5150.000,Y=5130.000,Z=60.000),ExtentRight=(X=5250.000,Y=5130.000,Z=60.000),"
+    .. "PointType=HighCover,LeftStepOutLocation=(X=5200.000,Y=5130.000,Z=0.000),RightStepOutLocation=(X=5200.000,Y=5130.000,Z=0.000),"
+    .. "CoverLocation=(X=5200.000,Y=5130.000,Z=60.000),CoverNormal=(X=0.000,Y=1.000,Z=0.000),FloorLocation=(X=5200.000,Y=5130.000,Z=0.000))),"
+    .. "LeftStepOutLocation=(X=5200.000,Y=5130.000,Z=0.000),RightStepOutLocation=(X=5200.000,Y=5130.000,Z=0.000),PocketPointType=HighCover,"
+    .. "CoverLocation=(X=5200.000,Y=5130.000,Z=60.000),FloorLocation=(X=5200.000,Y=5130.000,Z=0.000),CoverNormal=(X=0.000,Y=1.000,Z=0.000))"
+local found_text = false
+for _, text in ipairs(imported) do found_text = found_text or text == expected_text end
+if not found_text then fail("the full-cover pocket's text isn't as expected:\n" .. table.concat(imported, "\n")) end
 mock.run_until(mock.now() + 61000)
 for _, entry in ipairs(markers) do
     if not entry.marker.properties.destroyed or entry.walls_removed ~= 2 then fail("a marker outlived its minute") end

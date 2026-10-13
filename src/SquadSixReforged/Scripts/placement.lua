@@ -1103,30 +1103,19 @@ function COVER.markers.mark(world, pocket, category)
         markers.failed = "spawn"
         return
     end
-    -- One segment across the pocket, as the game's own pockets have: a tile wide, 60 uu up.
-    local tx, ty = -pocket.ny, pocket.nx
-    local cover = {X = pocket.X, Y = pocket.Y, Z = pocket.Z + 60}
-    local normal = {X = pocket.nx, Y = pocket.ny, Z = 0}
-    local set_ok, set_error = pcall(function()
-        local represented = marker.RepresentedPocket
-        represented.PocketPointType = pocket.kind
-        represented.CoverLocation = cover
-        represented.FloorLocation = floor
-        represented.CoverNormal = normal
-        local segments = represented.PocketSegments
-        segments[1] = {
-            ExtentLeft = {X = cover.X + tx * 50, Y = cover.Y + ty * 50, Z = cover.Z},
-            ExtentRight = {X = cover.X - tx * 50, Y = cover.Y - ty * 50, Z = cover.Z},
-            PointType = pocket.kind,
-            LeftStepOutLocation = floor,
-            RightStepOutLocation = floor,
-            CoverLocation = cover,
-            CoverNormal = normal,
-            FloorLocation = floor,
-        }
-    end)
-    if not set_ok then
-        markers.failed = "pocket:" .. tostring(set_error)
+    -- The pocket goes in through the engine's own text import, as ZC Sandbox's `set` did:
+    -- appending a segment from a Lua table left its CoverActor pointer uninitialised, and
+    -- VisualizePocket crashed reading it (access violation, Serolonis 030, 2026-10-12).
+    local property = markers.pocket_property(marker)
+    local import_ok, import_error = false, "no RepresentedPocket property"
+    if property ~= nil then
+        import_ok, import_error = pcall(function()
+            property:ImportText(markers.pocket_text(pocket), property:ContainerPtrToValuePtr(marker), 0, marker)
+        end)
+    end
+    local count_ok, segments = pcall(function() return marker.RepresentedPocket.PocketSegments:GetArrayNum() end)
+    if not import_ok or not count_ok or segments ~= 1 then
+        markers.failed = "pocket:" .. tostring(import_ok and ("segments=" .. tostring(segments)) or import_error)
         pcall(function() marker:K2_DestroyActor() end)
         return
     end
@@ -1152,6 +1141,51 @@ function COVER.markers.mark(world, pocket, category)
             pcall(function() marker:K2_DestroyActor() end)
         end)
     end)
+end
+
+-- The marker's RepresentedPocket property (declared on BRG_CoverVisualizationActor), found once
+-- by walking the class chain, as selfcheck.lua does.
+function COVER.markers.pocket_property(marker)
+    if COVER.markers.property ~= nil then return COVER.markers.property end
+    local class_ok, struct = pcall(function() return marker:GetClass() end)
+    local depth = 0
+    while class_ok and struct ~= nil and valid(struct) and depth < 32 do
+        local found = nil
+        pcall(function()
+            struct:ForEachProperty(function(property)
+                if property:GetFName():ToString() == "RepresentedPocket" then
+                    found = property
+                    return true
+                end
+            end)
+        end)
+        if found ~= nil then
+            COVER.markers.property = found
+            return found
+        end
+        class_ok, struct = pcall(function() return struct:GetSuperStruct() end)
+        depth = depth + 1
+    end
+    return nil
+end
+
+-- A cover pocket as engine text: one segment across it, a tile wide and 60 uu up, as the game's
+-- own pockets have. Enum flag combinations have no names, so the type is just high or low.
+function COVER.markers.pocket_text(pocket)
+    local function vector(x, y, z) return string.format("(X=%.3f,Y=%.3f,Z=%.3f)", x, y, z) end
+    local kind = pocket.tier == 2 and "HighCover" or "LowCover"
+    local tx, ty = -pocket.ny, pocket.nx
+    local floor = vector(pocket.X, pocket.Y, pocket.Z)
+    local cz = pocket.Z + 60
+    local cover = vector(pocket.X, pocket.Y, cz)
+    local normal = vector(pocket.nx, pocket.ny, 0)
+    local segment = "(ExtentLeft=" .. vector(pocket.X + tx * 50, pocket.Y + ty * 50, cz)
+        .. ",ExtentRight=" .. vector(pocket.X - tx * 50, pocket.Y - ty * 50, cz)
+        .. ",PointType=" .. kind .. ",LeftStepOutLocation=" .. floor .. ",RightStepOutLocation=" .. floor
+        .. ",CoverLocation=" .. cover .. ",CoverNormal=" .. normal .. ",FloorLocation=" .. floor .. ")"
+    return "(PocketSegments=(" .. segment .. "),LeftStepOutLocation=" .. floor
+        .. ",RightStepOutLocation=" .. floor .. ",PocketPointType=" .. kind .. ",CoverLocation=" .. cover
+        .. ",FloorLocation=" .. floor .. ",CoverNormal=" .. normal .. ")"
 end
 
 -- One log line per deployment of what was marked, or why marking stopped.

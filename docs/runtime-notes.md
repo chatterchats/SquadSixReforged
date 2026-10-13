@@ -531,7 +531,13 @@ hand that way, the wall showed green.
 
 The mod gives each marker a one-segment pocket built from the cover's floor
 and normal (a tile wide, 60 uu up), as the hand test did, rather than copying
-the game's segment list. Each pocket is marked once per deployment (the first
+the game's segment list. It goes in through the property's `ImportText`, the
+engine's text import that ZC Sandbox's `set` uses. The first version wrote the
+struct from Lua tables, appending the segment with `segments[1] = {...}`; the
+game crashed at the first marker (access violation reading 0x110000000f,
+SK_Serolonis_030): the appended segment's `CoverActor` pointer, which the table
+didn't name, was left uninitialised, and `VisualizePocket` read it. A marker
+whose pocket doesn't read back one segment is destroyed before it is drawn. Each pocket is marked once per deployment (the first
 search's verdict), the walls and marker are destroyed after a minute, and the
 log line `debug_markers site=...` counts them; `failed=` says why marking
 stopped, if it did (no class, spawn, or the pocket couldn't be written).

@@ -125,6 +125,20 @@ RESCUE.capsule_height = 100.0
 -- tile of a destination), derive_rescue_points also tries these points along
 -- the segment between every pair of authored destinations.
 RESCUE.pair_fractions = {1 / 3, 0.5, 2 / 3}
+-- Destinations are added for every unit at deployment, story characters that join through the
+-- mission included (Stillwatch: six selected plus Trick on six authored points left one
+-- operator standing in the open), up to this many in all.
+RESCUE.max_destinations = 8
+-- Cover for added points: the game's nearest cover pocket within this range of a derived point
+-- replaces it when it's in the lane, on the navmesh, a tile from everyone and facing the
+-- encounter (within acos(cover_facing) of the direction from the lane to its tactical volume's
+-- centre). cover_pool derived points are searched around, besides the ones wanted.
+RESCUE.cover_range = 250.0
+RESCUE.cover_facing = 0.5
+RESCUE.cover_pool = 8
+-- A volume centre closer than this to the lane's centroid gives no usable direction, so any
+-- cover is taken.
+RESCUE.cover_min_forward = 300.0
 -- The navmesh, used as the floor under a derived point and to tell whether an
 -- operator can walk at all.
 local FLOOR = {}
@@ -791,9 +805,10 @@ end
 -- already serve get exactly the edge points, as before.
 --
 -- `walkable` (from walkable_test) drops candidates with no navmesh under them,
--- so the pair points can stand in. Returns the points and how many candidates
--- it dropped.
-local function derive_rescue_points(polygon, destinations, units, wanted, ignore_units, walkable)
+-- so the pair points can stand in. `slots` is how many destinations the lane
+-- must hold in all (TARGET_SIZE unless the expansion passes the squad's size).
+-- Returns the points and how many candidates it dropped.
+local function derive_rescue_points(polygon, destinations, units, wanted, ignore_units, walkable, slots)
     if polygon == nil or wanted < 1 then return {}, 0 end
     local unwalkable = 0
     local function walkable_point(point)
@@ -889,7 +904,7 @@ local function derive_rescue_points(polygon, destinations, units, wanted, ignore
     end
 
     -- Narrow lanes: enough for the operators past the authored destinations?
-    local needed = math.min(wanted, TARGET_SIZE - #destinations)
+    local needed = math.min(wanted, (slots or TARGET_SIZE) - #destinations)
     if #chosen >= needed then return chosen, unwalkable end
     local pool = {}
     for _, point in ipairs(candidates) do pool[#pool + 1] = point end
@@ -917,6 +932,123 @@ local function derive_rescue_points(polygon, destinations, units, wanted, ignore
     local spread = spread_points(pool, wanted)
     if #spread > #chosen then return spread, unwalkable end
     return chosen, unwalkable
+end
+
+-- The game's cover, for the points the mod adds (RESCUE.cover_*).
+local COVER = {library = "/Script/BitReactorGame.Default__BRG_TargetingFunctionLibrary"}
+
+-- The cover pocket nearest `point`, as {X, Y, Z (its floor), tier = 2 full or 1 half, nx, ny
+-- (the cover's normal, pointing from the cover to whoever uses it)}, or nil.
+function COVER.nearest(library, actor, point, stats)
+    local out = {}
+    local ok, found = pcall(function()
+        return library:GetNearestCoverForPoint(actor, {X = point.X, Y = point.Y, Z = point.Z},
+            out, RESCUE.cover_range)
+    end)
+    stats.queries = stats.queries + 1
+    if not ok then
+        stats.errors = stats.errors + 1
+        return nil
+    end
+    if found ~= true then return nil end
+    local read_ok, pocket = pcall(function()
+        local floor, normal = out.FloorLocation, out.CoverNormal
+        return {X = floor.X, Y = floor.Y, Z = floor.Z, nx = normal.X, ny = normal.Y,
+                kind = tonumber(unwrap(out.PocketPointType)) or 0}
+    end)
+    if not read_ok or type(pocket.X) ~= "number" or type(pocket.nx) ~= "number" then
+        stats.unreadable = stats.unreadable + 1
+        return nil
+    end
+    -- EBrunoCoverPointType flags: 1 LowCover, 2 HighCover (step-out flags above).
+    pocket.tier = math.floor(pocket.kind / 2) % 2 == 1 and 2 or (pocket.kind % 2 == 1 and 1 or 0)
+    if pocket.tier == 0 then return nil end
+    return pocket
+end
+
+-- Which way the encounter lies from the lane: towards the linked tactical volume's centre, or
+-- nil when that centre is unknown or too close to the lane to say.
+function COVER.forward(polygon, volume)
+    local centre = valid(volume) and actor_location(volume) or nil
+    if centre == nil or polygon == nil or #polygon < 1 then return nil end
+    local cx, cy = 0, 0
+    for _, corner in ipairs(polygon) do cx, cy = cx + corner.X / #polygon, cy + corner.Y / #polygon end
+    local dx, dy = centre.X - cx, centre.Y - cy
+    local length = math.sqrt(dx * dx + dy * dy)
+    if length < RESCUE.cover_min_forward then return nil end
+    return {X = dx / length, Y = dy / length}
+end
+
+-- The points to add, preferring cover: `derived` (from derive_rescue_points) where no usable
+-- cover is found, so a map without cover, or a game where the call fails, gets exactly what it
+-- got before. Full cover first, then half, then the derived points; each a tile from the
+-- destinations, the units and each other. Logs once per deployment what it found.
+function COVER.choose(site, actor, polygon, authored, units, wanted, derived, walkable, volume, slots)
+    if wanted < 1 or polygon == nil or not valid(actor) then return derived end
+    local found_ok, library = pcall(StaticFindObject, COVER.library)
+    if not found_ok or not valid(library) then return derived end
+    local forward = COVER.forward(polygon, volume)
+    local stats = {queries = 0, errors = 0, unreadable = 0, pockets = 0, facing_away = 0, refused = 0}
+
+    local centres = {}
+    for _, point in ipairs(derived) do centres[#centres + 1] = point end
+    local pool = derive_rescue_points(polygon, authored, units, RESCUE.cover_pool, false, walkable, slots)
+    for _, point in ipairs(pool) do centres[#centres + 1] = point end
+
+    local function clear_of(point, others, location)
+        for _, other in ipairs(others) do
+            local at = location and other.location or other
+            if at ~= nil and xy_distance_squared(point, at) < MIN_DESTINATION_SEPARATION_SQ then return false end
+        end
+        return true
+    end
+    local covers, seen = {}, {}
+    for _, centre in ipairs(centres) do
+        local pocket = COVER.nearest(library, actor, centre, stats)
+        if pocket ~= nil then
+            local key = string.format("%.0f/%.0f", pocket.X, pocket.Y)
+            if not seen[key] then
+                seen[key] = true
+                stats.pockets = stats.pockets + 1
+                local point = {X = pocket.X, Y = pocket.Y, Z = pocket.Z + RESCUE.capsule_height,
+                               lift = RESCUE.capsule_height, cover = pocket.tier, order = #covers}
+                if forward ~= nil and -(pocket.nx * forward.X + pocket.ny * forward.Y) < RESCUE.cover_facing then
+                    stats.facing_away = stats.facing_away + 1
+                elseif inside_deployment(polygon, point) == false or not clear_of(point, authored)
+                    or not clear_of(point, units, true) or (walkable ~= nil and not walkable(point)) then
+                    stats.refused = stats.refused + 1
+                else
+                    covers[#covers + 1] = point
+                end
+            end
+        end
+    end
+    table.sort(covers, function(left, right)
+        if left.cover ~= right.cover then return left.cover > right.cover end
+        return left.order < right.order
+    end)
+
+    local chosen, used = {}, {full = 0, half = 0}
+    for _, list in ipairs({covers, derived}) do
+        for _, point in ipairs(list) do
+            if #chosen >= wanted then break end
+            if clear_of(point, chosen) then
+                chosen[#chosen + 1] = point
+                if point.cover == 2 then used.full = used.full + 1 elseif point.cover == 1 then used.half = used.half + 1 end
+            end
+        end
+    end
+    if not placement_rescue_reported["cover_" .. site] then
+        placement_rescue_reported["cover_" .. site] = true
+        log(string.format("cover site=" .. site .. " queries=%d pockets=%d usable=%d facing_away=%d refused=%d"
+            .. " chosen_full=%d chosen_half=%d of=%d facing=%s errors=%d unreadable=%d",
+            stats.queries, stats.pockets, #covers, stats.facing_away, stats.refused,
+            used.full, used.half, #chosen, forward and "checked" or "unknown",
+            stats.errors, stats.unreadable))
+    end
+    if used.full + used.half == 0 then return derived end
+    for _, point in ipairs(chosen) do point.order = nil end
+    return chosen
 end
 
 -- A rescue point in the profile's own coordinates, drawn in towards the
@@ -1066,7 +1198,7 @@ local function rescue_known_staging(destinations, volume)
     for _, unit in ipairs(units) do unit.rotation = actor_rotation(unit.actor) end
     -- Only as many moves as destinations are missing: four authored points and
     -- six operators means at most two.
-    local missing = math.min(#units, TARGET_SIZE) - #destinations
+    local missing = math.min(#units, RESCUE.max_destinations) - #destinations
     if missing < 1 then return 0 end
 
     local profile, transform, stock_destinations = nil, nil, nil
@@ -1123,8 +1255,11 @@ local function rescue_known_staging(destinations, volume)
     else
         local context = destinations[1].actor
         local unwalkable
+        local walkable = walkable_test(context, authored)
         targets, unwalkable = derive_rescue_points(polygon, authored, units, missing, false,
-            walkable_test(context, authored))
+            walkable, RESCUE.max_destinations)
+        targets = COVER.choose("staging", units[1].actor, polygon, authored, units, missing, targets,
+            walkable, volume, RESCUE.max_destinations)
         local settled, shift = settle_on_floor(context, targets, units)
         floor_note = string.format(" floor_settled=%d/%d largest_shift=%.0f",
             settled, #targets, shift)
@@ -1784,7 +1919,7 @@ local function ensure_player_destinations(area)
     -- the proximity filter.
     local squad_size = stats.squad_size or #members
     if squad_size < #members then squad_size = #members end
-    local desired = math.min(squad_size, TARGET_SIZE)
+    local desired = math.min(squad_size, RESCUE.max_destinations)
 
     if #valid_destinations >= desired then
         return false
@@ -1845,6 +1980,7 @@ local function ensure_player_destinations(area)
     -- was rescued there, prepend points derived from the lane. The off-lane
     -- candidates still follow, since a destination somewhere beats none.
     local missing = desired - #valid_destinations
+    local off_lane_derived = false
     if lane ~= nil and missing > 0 and #candidates > 0 then
         local considered, off_lane_only = 0, true
         for _, candidate in ipairs(candidates) do
@@ -1865,8 +2001,11 @@ local function ensure_player_destinations(area)
             end
         end
         if considered > 0 and off_lane_only then
+            local walkable = walkable_test(area, lane_points)
             local derived, unwalkable = derive_rescue_points(lane, lane_points, members, missing,
-                false, walkable_test(area, lane_points))
+                false, walkable, RESCUE.max_destinations)
+            derived = COVER.choose("off_lane", members[1].actor, lane, lane_points, members, missing, derived,
+                walkable, linked_tactical_area(area), RESCUE.max_destinations)
             local settled, shift = settle_on_floor(area, derived, members)
             if #derived > 0 and not placement_rescue_reported.derived_floor then
                 placement_rescue_reported.derived_floor = true
@@ -1887,6 +2026,39 @@ local function ensure_player_destinations(area)
                 preferred[#preferred + 1] = candidate
             end
             candidates = preferred
+            off_lane_derived = true
+        end
+    end
+    -- A position inside the lane is wherever the game staged someone, cover or
+    -- not. For the destinations a rescue hasn't already filled, the game's
+    -- cover comes first; with no usable cover nothing changes.
+    if lane ~= nil and missing > 0 and not off_lane_derived and #members > 0 then
+        local merged, rescued_count = {}, 0
+        for _, candidate in ipairs(candidates) do
+            if candidate.rescued then
+                rescued_count = rescued_count + 1
+                merged[#merged + 1] = candidate
+            end
+        end
+        local wanted = missing - rescued_count
+        local covered = wanted > 0 and COVER.choose("in_lane", members[1].actor, lane, lane_points,
+            members, wanted, {}, walkable_test(area, lane_points), linked_tactical_area(area),
+            RESCUE.max_destinations) or {}
+        if #covered > 0 then
+            settle_on_floor(area, covered, members)
+            for _, point in ipairs(covered) do
+                merged[#merged + 1] = {
+                    location = {X = point.X, Y = point.Y, Z = point.Z},
+                    rotation = nil,
+                    nearest = 0,
+                    rescued = true,
+                    derived = true,
+                }
+            end
+            for _, candidate in ipairs(candidates) do
+                if not candidate.rescued then merged[#merged + 1] = candidate end
+            end
+            candidates = merged
         end
     end
 

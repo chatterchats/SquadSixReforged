@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- The extra operators are placed in cover where the deployment area has some: full cover first,
+  then half cover, facing the encounter.
+- Story characters who join at the start of a mission get a deployment spot too, so nobody is
+  left standing in the open.
 - Deep Cover takes six operators (it was three), with hand-picked deployment spots for the squad
   plus Rex.
 - Stillwatch: a seventh deployment spot, so a squad of six plus Trick all get one.

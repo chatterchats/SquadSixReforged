@@ -69,10 +69,16 @@ local scan = json.decode(file:read("*a"))
 file:close()
 
 local failures, lines, golden = {}, {}, {}
+-- Three decimals, halves rounded up in Lua first: LuaJIT builds format an exact tie such as
+-- 206.0625 differently (2.1.0 of 2023 prints .063, the 2026 rolling 2.1 prints .062), and the
+-- pinned file must read the same on the release workflow's runner as locally.
+local function fixed(value)
+    return string.format("%.3f", math.floor(value * 1000 + 0.5) / 1000)
+end
 local function points_text(points)
     local text = {}
     for _, point in ipairs(points) do
-        text[#text + 1] = string.format("%.3f/%.3f/%.3f", point.X, point.Y, point.Z)
+        text[#text + 1] = fixed(point.X) .. "/" .. fixed(point.Y) .. "/" .. fixed(point.Z)
     end
     return table.concat(text, " ")
 end

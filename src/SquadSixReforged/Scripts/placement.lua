@@ -1053,7 +1053,8 @@ function COVER.choose(site, actor, polygon, authored, units, wanted, derived, wa
     local found_ok, library = pcall(StaticFindObject, COVER.library)
     if not found_ok or not valid(library) then return derived end
     local forward = COVER.forward(polygon, volume)
-    local stats = {queries = 0, errors = 0, unreadable = 0, pockets = 0, facing_away = 0, refused = 0}
+    local stats = {queries = 0, errors = 0, unreadable = 0, pockets = 0, facing_away = 0, refused = 0,
+                   outside = 0, crowded = 0, unwalkable = 0}
 
     local centres = {}
     for _, point in ipairs(derived) do centres[#centres + 1] = point end
@@ -1082,9 +1083,12 @@ function COVER.choose(site, actor, polygon, authored, units, wanted, derived, wa
                                order = #covers}
                 if facing < RESCUE.cover_facing then
                     stats.facing_away = stats.facing_away + 1
-                elseif inside_deployment(polygon, point) == false or not clear_of(point, authored)
-                    or not clear_of(point, units, true) or (walkable ~= nil and not walkable(point)) then
-                    stats.refused = stats.refused + 1
+                elseif inside_deployment(polygon, point) == false then
+                    stats.refused, stats.outside = stats.refused + 1, stats.outside + 1
+                elseif not clear_of(point, authored) or not clear_of(point, units, true) then
+                    stats.refused, stats.crowded = stats.refused + 1, stats.crowded + 1
+                elseif walkable ~= nil and not walkable(point) then
+                    stats.refused, stats.unwalkable = stats.refused + 1, stats.unwalkable + 1
                 else
                     covers[#covers + 1] = point
                 end
@@ -1111,10 +1115,11 @@ function COVER.choose(site, actor, polygon, authored, units, wanted, derived, wa
     if not placement_rescue_reported["cover_" .. site] then
         placement_rescue_reported["cover_" .. site] = true
         log(string.format("cover site=" .. site .. " queries=%d pockets=%d usable=%d facing_away=%d refused=%d"
-            .. " chosen_full=%d chosen_half=%d of=%d facing=%s errors=%d unreadable=%d",
+            .. " chosen_full=%d chosen_half=%d of=%d facing=%s errors=%d unreadable=%d"
+            .. " refused_outside=%d refused_crowded=%d refused_unwalkable=%d",
             stats.queries, stats.pockets, #covers, stats.facing_away, stats.refused,
             used.full, used.half, #chosen, forward and "checked" or "unknown",
-            stats.errors, stats.unreadable))
+            stats.errors, stats.unreadable, stats.outside, stats.crowded, stats.unwalkable))
     end
     if used.full + used.half == 0 then return derived end
     for _, point in ipairs(chosen) do point.order, point.facing = nil, nil end

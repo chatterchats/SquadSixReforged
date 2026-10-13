@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Deep Cover: hand-picked deployment spots for up to seven units (the squad plus Rex).
+- Deep Cover takes six operators (it was three), with hand-picked deployment spots for the squad
+  plus Rex.
 
 ## [1.2.0]
 

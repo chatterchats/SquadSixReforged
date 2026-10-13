@@ -218,3 +218,15 @@ Reforged 1.2.0 unchanged.
 So seven units alone doesn't hang a save; HM_Jae_020's hang at seven needs another explanation,
 and each scripted-cast mission's cap has to be tested on its own. Deep Cover is authored for
 3 + 2 joiners = 5 units, ran fine at 7.
+
+Rerun at six (same save, `squadsixlimit ... 6`, then the save reloaded):
+
+| Step | Result |
+|------|--------|
+| Start | six + Rex; three operators off the navmesh moved beside squadmates (`spawn_rescue=moved`, `on_navmesh=3`) |
+| Encounter | seven units, five authored destinations, expansion capped at six (`player_destinations=5->6`, `destinations=6`): `WARNING: fewer destinations than deployed operators`, and two units walked to the same spot. The repair passes saw only units still walking |
+| Spots | the user walked all seven onto spots they prefer; their positions, read through ZC Sandbox (`call <unit> K2_GetActorLocation`), became the `DeepCover` fixed layout (5d6551a) |
+| Saves | game saves with seven units, and with eight after Baker joined, both finished |
+
+Deep Cover now ships at six (missions.tsv), with the fixed spots; that layout is still to be
+played.

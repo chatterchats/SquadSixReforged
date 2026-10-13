@@ -30,7 +30,7 @@ Story_Main/MM_04_010_CoilStrikesBack	4	6
 Story_Main/MM_04_030_RetakeLuunata	4	6	
 Story_Main/MM_04_050_ANewOrder	4	6	
 Story_Main/MM_05_002_ImperialSkirmish	4	6	
-Story_Main/MM_05_010_UmbaraRescue	3	3	three-operator mission
+Story_Main/MM_05_010_UmbaraRescue	3	6	"Deep Cover": authored for three; Rex and Baker join through the mission, so six is eight units. Played at five and six, game saves at seven and eight finished (2026-10-12); placement.lua gives its area fixed spots
 Story_Main/MM_05_030_BellyBeast	4	6	
 Story_Main/MM_06_090_FathomFinale	4	6	
 Story_Main/Mission_MainStory_Placeholder	4	6	placeholder, not a playable mission; packed so the runtime has nothing left to raise

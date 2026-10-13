@@ -537,7 +537,16 @@ struct from Lua tables, appending the segment with `segments[1] = {...}`; the
 game crashed at the first marker (access violation reading 0x110000000f,
 SK_Serolonis_030): the appended segment's `CoverActor` pointer, which the table
 didn't name, was left uninitialised, and `VisualizePocket` read it. A marker
-whose pocket doesn't read back one segment is destroyed before it is drawn. Each pocket is marked once per deployment (the first
+whose pocket doesn't read back one segment is destroyed before it is drawn.
+
+The text import didn't stop the crash: the second run crashed at the same
+address, before the staging search's log line. So the markers are now drawn
+outside the hook that finds them (queued, then drawn on the next game-thread
+pass), the marker Blueprint is loaded at mission start rather than with
+`LoadAsset` inside `TriggerPreCombat`, and markers are spawned with the
+engine's deferred spawn, as the hand test did, not UE4SS's `SpawnActor`. The
+first marker of a session logs each step (`debug_markers step=...`), so a third
+failure shows where it stopped. Each pocket is marked once per deployment (the first
 search's verdict), the walls and marker are destroyed after a minute, and the
 log line `debug_markers site=...` counts them; `failed=` says why marking
 stopped, if it did (no class, spawn, or the pocket couldn't be written).

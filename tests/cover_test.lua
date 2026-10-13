@@ -271,9 +271,17 @@ mock.world = mock.object("World /Game/Maps/Test.Test", {}, {
         return marker
     end,
 })
+-- The engine's deferred spawn, which the runtime uses for markers.
+local statics = mock.object("GameplayStatics Default__GameplayStatics", {}, {
+    BeginDeferredActorSpawnFromClass = function(_, world, class, transform)
+        return world:SpawnActor(class, transform.Translation, {})
+    end,
+    FinishSpawningActor = function(_, actor) return actor end,
+})
 local find_marker = StaticFindObject
 StaticFindObject = function(path)
     if path == MARKER_CLASS then return marker_class end
+    if path == "/Script/Engine.Default__GameplayStatics" then return statics end
     return find_marker(path)
 end
 for index = #pockets, 1, -1 do pockets[index] = nil end

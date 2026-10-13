@@ -1067,6 +1067,13 @@ COVER.markers = {
     -- stack markers: the first verdict stands. Reset by begin_deployment.
     shown = {},
     failed = nil,
+    queue = {},
+    scheduled = false,
+    draw_delay_ms = 100,
+    statics = "/Script/Engine.Default__GameplayStatics",
+    -- ESpawnActorCollisionHandlingMethod::AlwaysSpawn, ESpawnActorScaleMethod::MultiplyWithRoot.
+    always_spawn = 1,
+    multiply_with_root = 1,
 }
 
 function COVER.markers.enabled()
@@ -1087,9 +1094,52 @@ function COVER.markers.mark(world, pocket, category)
     if markers.shown[tag] then return end
     markers.shown[tag] = true
     markers.counts[category] = (markers.counts[category] or 0) + 1
-    if markers.failed ~= nil then return end
+    -- Drawn after the hook that found the pocket has returned: the first version spawned
+    -- (and loaded the marker class) inside TriggerPreCombat and crashed the game twice at the
+    -- same address. Queued here, drawn by COVER.markers.flush on the next game-thread pass.
+    markers.queue[#markers.queue + 1] = {world = world, pocket = pocket, color = color}
+    if not markers.scheduled then
+        markers.scheduled = true
+        ExecuteWithDelay(markers.draw_delay_ms, function()
+            ExecuteInGameThread(function()
+                markers.scheduled = false
+                markers.flush()
+            end)
+        end)
+    end
+end
+
+-- Load the marker Blueprint at mission start, outside any hook, when the setting is on.
+function COVER.markers.preload()
+    if not COVER.markers.enabled() or valid(StaticFindObject(COVER.markers.class)) then return end
+    ExecuteWithDelay(COVER.markers.draw_delay_ms, function()
+        ExecuteInGameThread(function()
+            pcall(function() LoadAsset(COVER.markers.package) end)
+        end)
+    end)
+end
+
+-- Draw the queued markers. The first marker of a session logs each step, so a failure in the
+-- game shows where it stopped.
+function COVER.markers.flush()
+    local markers = COVER.markers
+    local queue = markers.queue
+    markers.queue = {}
+    for _, entry in ipairs(queue) do
+        if markers.failed ~= nil then return end
+        markers.draw(entry.world, entry.pocket, entry.color)
+    end
+end
+
+function COVER.markers.draw(world, pocket, color)
+    local markers = COVER.markers
+    local function step(name)
+        if not markers.traced then log("debug_markers step=" .. name) end
+    end
+    step("find_class")
     local class = StaticFindObject(markers.class)
     if not valid(class) then
+        step("load_class")
         pcall(function() LoadAsset(markers.package) end)
         class = StaticFindObject(markers.class)
     end
@@ -1097,29 +1147,43 @@ function COVER.markers.mark(world, pocket, category)
         markers.failed = "no_marker_class"
         return
     end
+    -- Spawned as the hand test through ZC Sandbox did, with the engine's deferred spawn.
+    step("spawn")
     local floor = {X = pocket.X, Y = pocket.Y, Z = pocket.Z}
-    local spawn_ok, marker = pcall(function() return world:SpawnActor(class, floor, {}) end)
+    local transform = {Rotation = {X = 0, Y = 0, Z = 0, W = 1}, Translation = floor,
+                       Scale3D = {X = 1, Y = 1, Z = 1}}
+    local statics = StaticFindObject(markers.statics)
+    local spawn_ok, marker = pcall(function()
+        local actor = statics:BeginDeferredActorSpawnFromClass(world, class, transform,
+            markers.always_spawn, nil, markers.multiply_with_root)
+        return statics:FinishSpawningActor(actor, transform, markers.multiply_with_root)
+    end)
     if not spawn_ok or not valid(marker) then
-        markers.failed = "spawn"
+        markers.failed = "spawn:" .. tostring(spawn_ok and "invalid" or marker)
         return
     end
     -- The pocket goes in through the engine's own text import, as ZC Sandbox's `set` did:
     -- appending a segment from a Lua table left its CoverActor pointer uninitialised, and
     -- VisualizePocket crashed reading it (access violation, Serolonis 030, 2026-10-12).
+    step("find_property")
     local property = markers.pocket_property(marker)
+    step("import")
     local import_ok, import_error = false, "no RepresentedPocket property"
     if property ~= nil then
         import_ok, import_error = pcall(function()
             property:ImportText(markers.pocket_text(pocket), property:ContainerPtrToValuePtr(marker), 0, marker)
         end)
     end
+    step("read_back")
     local count_ok, segments = pcall(function() return marker.RepresentedPocket.PocketSegments:GetArrayNum() end)
     if not import_ok or not count_ok or segments ~= 1 then
         markers.failed = "pocket:" .. tostring(import_ok and ("segments=" .. tostring(segments)) or import_error)
         pcall(function() marker:K2_DestroyActor() end)
         return
     end
+    step("visualize")
     pcall(function() marker:VisualizePocket() end)
+    step("tint")
     local walls = {}
     pcall(function()
         local list = marker.Walls
@@ -1132,6 +1196,8 @@ function COVER.markers.mark(world, pocket, category)
             material:SetScalarParameterValue(marker_name("NormalizedDistance"), 1.0)
         end)
     end
+    step("drawn")
+    markers.traced = true
     ExecuteWithDelay(markers.seconds * 1000, function()
         ExecuteInGameThread(function()
             for _, wall in ipairs(walls) do
@@ -3110,6 +3176,7 @@ local function check_spawned_squad(watch)
 end
 
 local function start_spawn_watch(game_state)
+    COVER.markers.preload()
     local watch = {state = game_state, deployment = deployments_begun,
         elapsed = 0, squad = 0, rescued = 0, positions = {}, still = {}, moved = {}}
     spawn_watch = watch

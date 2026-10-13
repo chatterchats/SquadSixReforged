@@ -518,7 +518,9 @@ maintenance loop.
 
 ### `COVER.markers`
 
-The `debug_cover_markers` setting (off by default). Unreal's DrawDebug calls
+The `debug_cover_markers` setting, development only: the release's settings page
+doesn't list it, so it stays at its default, off. `tools/sandbox_check.py install`
+adds it to a game copy's page from `dev/mxm/debug_settings.lua`. Unreal's DrawDebug calls
 are stripped from the shipping build: a sphere and a box drawn through ZC
 Sandbox in Smugglers' Den showed nothing. A decal with the radial targeting
 material showed, but its colour is the game's global UI colour, not its

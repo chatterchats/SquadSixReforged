@@ -51,6 +51,8 @@ RUNTIME_SOURCE = ROOT / "src" / "SquadSixReforged"
 CORE_SOURCE = ROOT / "src" / "SquadSixReforged_Core"
 CORE_FOLDER = "SquadSixReforged_Core"  # under ~mods, as the release ZIP installs it
 PROBE_SOURCE = ROOT / "dev" / "SquadSixReforgedProbe"
+# Development-only settings page entries (the debug markers), added to the installed page.
+DEV_SETTINGS = ROOT / "dev" / "mxm" / "debug_settings.lua"
 RUNTIME_MOD, PROBE_MOD = "SquadSixReforged", "SquadSixReforgedProbe"
 PAK_FILES = ["pakchunk99-SquadSixReforged_P." + extension for extension in ("pak", "ucas", "utoc")]
 PROBE_OUTPUT = ["squadsix_probe.log", "squadsix_probe.jsonl"]
@@ -208,6 +210,17 @@ def probe_output_dir(instance):
     return ROOT / "dist" / "sandbox" / ("instance%d-probe-output" % instance.number)
 
 
+def add_dev_settings(page):
+    """Insert dev/mxm/debug_settings.lua's entries at the end of the installed page's settings
+    list (the release page leaves them out)."""
+    entries = "".join(line + "\n" for line in DEV_SETTINGS.read_text().splitlines()
+                      if not line.startswith("--"))
+    text = page.read_text()
+    end = "    },\n}\n"
+    assert text.endswith(end), f"{page}: settings list doesn't end as expected"
+    page.write_text(text[:-len(end)] + entries + end)
+
+
 def cmd_install(args):
     instance = Instance(args.instance)
     refuse_unsafe(instance, args.allow_main)
@@ -226,6 +239,7 @@ def cmd_install(args):
     shutil.copytree(RUNTIME_SOURCE, runtime)
     if kept_values is not None:
         values.write_bytes(kept_values)
+    add_dev_settings(runtime / "MXM" / "settings.lua")
     (runtime / "enabled.txt").write_text("")
     # The release keeps the paks in ~mods/SquadSixReforged_Core; never leave a loose copy beside it.
     for name in PAK_FILES:

@@ -16,8 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   area as the enemies' direction, which is wrong where you start at one end of a large map: in
   Best Served Cold the extra operators' cover, and the game spots it moved, faced away from the
   enemies. It now uses the enemy spawn points the game's levels place for each fight.
-- **The extra operators can take cover up to two tiles past the deployment area's edge**, where the
-  only good cover next to the game's spots often is.
+- **Cover up to two tiles past the deployment area's edge can be used**, for the extra operators
+  and for the game's spots that "Move the game's spots into cover" moves. That's often where the
+  only good cover next to the area's corners is.
 - **Cover next to cover is found.** The extra operators could miss a free cover tile right beside
   one already taken, and stand in the open instead.
 - **"Move the game's spots into cover" centres a spot on its cover.** A spot standing between two

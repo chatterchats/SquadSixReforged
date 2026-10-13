@@ -335,7 +335,7 @@ before the runtime's re-sweep. With the missions in the Core pak, startup logs
 | HM_TelRea_010 "Origin of Infection" | six | good, after the direction fix | manual save finished and loaded | yes, back to the Den |
 | HM_Luco_010 "Lord of Betrayal" | six | good | manual save finished | yes, back to the Den (user) |
 | HM_Jae_010 "Distress Call" | six | hand-picked layout: everyone on its spots | manual save finished | yes, back to the Den |
-| HM_Kabb_010 "Buy Cheap, Never Sleep" | six | one added operator in the open; cover up to two tiles out, not yet replayed | manual save finished | yes, back to the Den |
+| HM_Kabb_010 "Buy Cheap, Never Sleep" | six | every operator in cover, after cover up to two tiles out | manual save finished | yes, back to the Den |
 
 Best Served Cold: the deployment lane is at the end of a large tactical volume. The cover direction
 (the volume's centre) was 34 degrees; all seven enemies (Idra Farr and six Pykes, read through ZC
@@ -404,7 +404,14 @@ other on a derived point in the open (6083/-2823): 8 pockets, 3 facing away, 3 h
 1 outside, 1 usable. The user moved Kabb to 6015/-2500 (read with `squadsixprobe`; ZC Sandbox
 refuses commands outside its sandbox campaign), the tile beside a snapped spot that the overlay
 showed red: about a tile past the lane's edge. Added points may now take cover up to two tiles out
-(`RESCUE.cover_outside`). A manual save finished.
+(`RESCUE.cover_outside`). A manual save finished, and the mission completed back to the Den.
+
+Replayed with that: both added operators in half cover (6063/-3362, and Kabb's tile 6015/-2500),
+but Hawks stood on the game's corner spot (6250/-3553) out of cover: the improvement had found cover
+beside it and refused it as outside (`debug_markers site=improve ... outside=1`), the game's spots
+still being held to a tile. The user moved Hawks to 6310/-3650. With the game's spots given the
+same two tiles: `improve_spots kept=1 snapped=2 moved=1 ... 6250/-3560->6310/-3650half`, the
+user's tile exactly, and every operator in cover (confirmed by the user).
 
 Lord of Betrayal: no spawn destinations in its level, so the volume's centre, 351 degrees; the
 probe found the eight enemies at 2. The added two in half cover; the game's four kept.

@@ -156,8 +156,9 @@ RESCUE.same_tile = 75.0
 -- Cover for an added point may lie this far outside the lane: a game spot on the lane's tip has
 -- the cover tile beside it right at the edge, about a tile out. Buy Cheap, Never Sleep and Best
 -- Served Cold each had such a tile refused at a tile's tolerance, and the user picked it
--- (2026-10-13). The repair measures against every current destination, added ones included, so
--- it doesn't pull an operator back off one. The game's own spots keep a tile.
+-- (2026-10-13), and in Buy Cheap, Never Sleep the cover beside the game's corner spot was refused
+-- to the improvement the same way, leaving Hawks out of cover. The repair measures against every
+-- current destination, the added and moved ones included, so it doesn't pull an operator back.
 RESCUE.cover_outside = 200.0
 -- The game's own destinations (the improve_game_spots setting): one already in cover facing the
 -- encounter is kept, found by a search this close to it; otherwise it moves to the best usable
@@ -1558,7 +1559,7 @@ function COVER.improve(area, destinations, valid_destinations, anchors)
     local kept, snapped, moved, unmoved, moves = 0, 0, 0, 0, {}
     -- Why a pocket can't take destination `index`, or nil if it can.
     local function refusal(point, index)
-        if inside_deployment(polygon, point) == false then return "outside" end
+        if COVER.outside_by(polygon, point) > RESCUE.cover_outside then return "outside" end
         if walkable ~= nil and not walkable(point) then return "unwalkable" end
         for other, location in ipairs(points) do
             if other ~= index and xy_distance_squared(point, location) < MIN_DESTINATION_SEPARATION_SQ then

@@ -535,15 +535,18 @@ replay the added operators went into those tiles, and the repair, still
 measuring a whole tile, moved the two operators on the neighbouring game spots
 to derived points in the open.
 
-Cover for the added points may lie up to `RESCUE.cover_outside` (200 uu, two
-tiles) past the lane's edge; the game's own spots keep a tile. A game spot on
+Cover for the added points, and for the game's spots the improvement moves, may
+lie up to `RESCUE.cover_outside` (200 uu, two tiles) past the lane's edge. A game spot on
 the lane's tip has the cover tile beside it about a tile out, and snapping the
 spot onto its own tile can push that just past a tile: in Buy Cheap, Never
 Sleep (HM_Kabb_010, 2026-10-13) the tile beside a snapped spot (6015/-2500) was
 refused as outside, the debug marker red, and the user moved Kabb onto it as
 the best spot; Best Served Cold's tile beside Cly's went the same way. The
 repair measures against every current destination, the added ones included, so
-it doesn't pull an operator back off such a spot.
+it doesn't pull an operator back off such a spot. The game's spots first kept a
+tile, and the replay left Hawks on Buy Cheap, Never Sleep's corner spot out of
+cover with the cover beside it refused as outside; with two tiles that spot
+moved onto the tile the user had picked (6310/-3650).
 
 Besides the derived points, the lane is searched on a tile grid
 (`RESCUE.cover_grid`, at most `cover_grid_max` points), and usable cover is

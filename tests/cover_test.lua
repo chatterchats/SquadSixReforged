@@ -16,10 +16,11 @@
 --   4. improve_game_spots on, a stock squad of four: an authored destination already in cover
 --      facing the encounter stays; one beside cover facing away moves to cover facing it within
 --      two tiles; one whose only nearby cover faces away, and one whose only good cover is
---      outside the lane, stay. The moved one is a new actor; the authored one is unlisted.
+--      too far outside the lane (RESCUE.cover_outside), stay. The moved one is a new actor; the authored one is unlisted.
 --      In the Serolonis Job (its tutorial is scripted around the game's spots) none moves. In an
 --      area directions.lua lists, its enemies' direction is used instead of the volume's. One
 --      in cover but 50 uu off the cover's centre (on the seam between two tiles) moves onto it.
+--      One whose only good cover is 150 uu past the lane's edge moves there.
 --   5. The same with the setting off: nothing moves.
 --   6. debug_cover_markers on: each pocket considered gets one of the game's cover markers, its
 --      pocket set from the cover and its walls recoloured by category (green usable, yellow
@@ -235,7 +236,7 @@ mock.run_until(mock.now() + 30000)
 
 -- 4. The game's own destinations, improve_game_spots on. Corner 1 is in cover facing the
 -- encounter; corner 2 is beside cover facing away, with good cover 117 uu off inside the lane;
--- corner 3's only nearby cover faces away; corner 4's good cover is 150 uu outside the lane.
+-- corner 3's only nearby cover faces away; corner 4's good cover is 250 uu outside the lane, beyond RESCUE.cover_outside.
 cover_available = true
 mock.settings.improve_game_spots = true
 for index = #pockets, 1, -1 do pockets[index] = nil end
@@ -244,7 +245,7 @@ local improve_pockets = {
     {X = B + 400, Y = B, nx = 0, ny = -1, kind = FULL},
     {X = B + 300, Y = B + 60, nx = 0, ny = 1, kind = FULL},
     {X = B + 350, Y = B + 300, nx = 0, ny = -1, kind = FULL},
-    {X = B - 150, Y = B + 400, nx = 0, ny = 1, kind = FULL},
+    {X = B - 250, Y = B + 400, nx = 0, ny = 1, kind = FULL},
 }
 for index, pocket in ipairs(improve_pockets) do pockets[index] = pocket end
 local stock = {on_lane(1), on_lane(2), on_lane(3), on_lane(4)}
@@ -315,6 +316,25 @@ for index = #pockets, 1, -1 do pockets[index] = nil end
 for index, pocket in ipairs(improve_pockets) do pockets[index] = pocket end
 -- Let this deployment's later repair passes run out before the next scenario's.
 mock.run_until(mock.now() + 30000)
+
+-- 4e. Buy Cheap, Never Sleep's corner: corner 4's only cover facing the encounter is 150 uu past the
+-- lane's edge, within RESCUE.cover_outside: it moves there.
+RESCUE.cover_outside = COVER_OUTSIDE
+for index = #pockets, 1, -1 do pockets[index] = nil end
+pockets[1] = {X = B - 150, Y = B + 400, nx = 0, ny = 1, kind = FULL}
+squad({on_lane(1), on_lane(2), on_lane(3), on_lane(4)})
+local edge_area, edge = area("Edge")
+local edge_spots = {}
+for index = 1, 4 do edge_spots[index] = edge[index] end
+mock.hooks[TRIGGER].pre(edge_area)
+mock.run_until(mock.now() + 600)
+if edge[4] == edge_spots[4] or not at(edge[4].at, pockets[1]) then fail("edge: corner 4 didn't move to the cover past the edge") end
+mock.expect("improve_spots kept=0 snapped=0 moved=1 no_better_cover=3 queries=%d+ errors=0 unreadable=0 moves=5000/5400%->4850/5400full",
+    "a game spot moves to cover within two tiles past the lane's edge")
+for index = #pockets, 1, -1 do pockets[index] = nil end
+for index, pocket in ipairs(improve_pockets) do pockets[index] = pocket end
+mock.run_until(mock.now() + 30000)
+RESCUE.cover_outside = 100
 
 -- 5. Setting off: the same area keeps every authored destination.
 mock.settings.improve_game_spots = false

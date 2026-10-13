@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1]
+
 ### Fixed
-- **Fixed Aurelio having too much style in the tutorial, which stopped it from progressing.**
+- **An issue in the tutorial gave Aurelio too much style, which stopped it from progressing.**
   1.3.0's "Move the game's spots into cover" moved a spot in the second fight of The Serolonis
   Job, which threw off the overwatch the tutorial has you set up. Aurelio shot two enemies
   instead of one, so Hawks' shot killed the second, and Aurelio had no one left to hit with his

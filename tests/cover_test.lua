@@ -138,6 +138,7 @@ if on_full ~= 1 or on_half ~= 1 then
 end
 mock.expect("cover site=staging queries=%d+ pockets=%d+ usable=2 facing_away=1 refused=1 chosen_full=1 chosen_half=1 of=3 facing=checked",
     "the staging rescue reports the cover it found and used")
+mock.expect("improve_spots=skipped reason=setting_off", "improve_game_spots off is logged")
 
 -- 2. The same squad staged inside the lane: destinations go to the cover, nobody is moved.
 local inside = {on_lane(1), on_lane(2), on_lane(3), on_lane(4),

@@ -521,6 +521,10 @@ with it off, the enemy survived the shot and the melee worked. The game's
 `BitReactor.Tutorials.Missions` tags all belong to mission 01, so no other map
 is listed.
 
+With the setting off it logs `improve_spots=skipped reason=setting_off` once per
+area. Up to 1.3.1 it logged nothing, so a run couldn't show from the log that
+the setting was really off.
+
 The setting is read through the Mixamoo Mod Config Manager client
 (Scripts/MXM.lua, unmodified, the copy Off Duty, Skip Space Travel and Fast
 Resonance ship). Without the manager the schema's defaults apply. The tests

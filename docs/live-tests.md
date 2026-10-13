@@ -314,8 +314,9 @@ enemy, a Separatist, sets up its own. Hawks flanks and shoots it, and Aurelio is
 | Autosave, Squad Six off (twice) | n/a | off | third enemy survives the shot; melee works |
 | Autosave, Squad Six on | off | off | melee works |
 | Autosave, Squad Six on (twice) | on | off | stuck: Aurelio's overwatch isn't cancelled in time, so the third enemy takes a hit and dies to Hawks' shot, or doesn't move and set up |
+| Autosave, 1.3.1 fix | on | on | melee works (`improve_spots=skipped reason=scripted_map`) |
 
-So the setting caused the reported failure. The failure with it off happened only with the dev
-tools (the probe, the test-limits tool and the dev markers setting) on; which of them caused it
-wasn't narrowed down, and players don't have them. Fixed by `COVER.scripted_maps`: the setting
-leaves the Serolonis Job alone.
+So the setting caused the reported failure. Fixed by `COVER.scripted_maps`: the setting leaves
+the Serolonis Job alone. The dev tools don't break the tutorial: with the fix, the setting on and
+all of them on, the melee works. The second new-campaign failure is unexplained. Nothing in its log
+shows the setting was really off, because `COVER.improve` returns without logging when it is.

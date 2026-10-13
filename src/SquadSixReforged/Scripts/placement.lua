@@ -1405,7 +1405,10 @@ function COVER.improve(area, destinations, valid_destinations, anchors)
     local key = object_key(area)
     if key == "" or COVER.improved[key] or relocation_prehook_ran then return end
     COVER.improved[key] = true
-    if Settings.Get("improve_game_spots", true) ~= true then return end
+    if Settings.Get("improve_game_spots", true) ~= true then
+        log("improve_spots=skipped reason=setting_off")
+        return
+    end
     for _, map in ipairs(COVER.scripted_maps) do
         if string.find(full_name(area), map, 1, true) then
             log("improve_spots=skipped reason=scripted_map map=" .. map)

@@ -280,3 +280,6 @@ campaign; squad Kabb, Hawks, Jae, Trick, Ravin (a custom character), BR-1.
 | Area 2 | 4 authored destinations; 2 added at the trigger (six units then) and a seventh when Tel-Rea joined (`destinations=7/7`). The user saw three on the wrong side of cover: the three the mod placed, in pockets with normal -X, against enemies to +X. The three on authored points (normal +X) were kept. Fixed in 9f42e43 |
 | Spots | the user moved the mod's three into good spots; the authored four plus two of theirs became the `SmugglersDen2` fixed layout |
 | Save | a manual save with seven units finished |
+| End | mission complete, back to the Den, no errors |
+
+Slug HQ now ships at six from the Core pak, off the guard list.

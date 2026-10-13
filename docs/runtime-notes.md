@@ -66,6 +66,11 @@ behavior: six selected operators became eight player units at combat start
 and Tal Rea appeared twice. Keep these exact missions at their authored
 four even when the empty/missing requirements array is readable.
 
+Played since (2026-10-12, build 25134257): Slug HQ at six, Tel-Rea joining
+before the second encounter as the mission's own Char_Hero_TelRea_Jedi_SlugHQ_C
+for seven units, one of her, and a manual save at seven finishing. The
+duplicate didn't reproduce, so Slug HQ left the list and ships at six.
+
 The six AuthoredHero entries are the same shape as Slug HQ, established by
 reading all 125 cooked definitions rather than by guessing:
 

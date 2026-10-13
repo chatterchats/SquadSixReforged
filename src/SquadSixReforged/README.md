@@ -17,11 +17,11 @@ and the hand-picked list of missions behind it. See `CREDITS.md` beside this fil
 
 ## Missions that stay at four
 
-These missions bring story characters in through their own scripting. Deploying six would
-duplicate operators or stop the mission from saving, so they keep their usual four:
+These missions bring story characters in through their own scripting, and Squad Six once saw
+duplicated operators or saves that never finished on missions like them. They keep their usual
+four until each has been played at six:
 
 - The Serolonis Job (the opening tutorial; the game picks the squad)
-- Smugglers' Den
 - Buy Cheap, Never Sleep; Best Served Cold; Origin of Infection; Sisters; No Kings, No Masters
 - Five more hero missions, by mission ID: HM_Cly_020, HM_Jae_010, HM_Kabb_020, HM_Luco_010 and
   HM_Trick_010 (their titles depend on the game's language)

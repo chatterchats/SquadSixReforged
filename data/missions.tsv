@@ -24,7 +24,7 @@ Story_Main/MM_01_010_SerolonisJob	4	4	opening tutorial: the game sets the squad,
 Story_Main/MM_01_030_NotYourTurf	3	3	three-operator mission
 Story_Main/MM_02_010_CoilReunion	4	6	
 Story_Main/MM_02_030_DarkGrotto	4	6	
-Story_Main/MM_02_050_SlugHQ	4	4	Tal Rea joins through mission logic; six became eight units with two Tal Reas (1.1.1 report)
+Story_Main/MM_02_050_SlugHQ	4	6	"Smugglers' Den": Tel-Rea joins through mission logic. Guarded at 4 after a 1.1.1 report of eight units with two Tal Reas; played at six on 25134257 (2026-10-12): seven units, one Tel-Rea, a manual save at seven finished; placement.lua gives area 2 fixed spots
 Story_Main/MM_03_010_Bespin	default	default	solo mission: MaxSquadSize isn't serialized, so it's the class default of 1
 Story_Main/MM_04_010_CoilStrikesBack	4	6	
 Story_Main/MM_04_030_RetakeLuunata	4	6	

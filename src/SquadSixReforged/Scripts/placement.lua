@@ -136,6 +136,11 @@ RESCUE.max_destinations = 8
 RESCUE.cover_range = 250.0
 RESCUE.cover_facing = 0.5
 RESCUE.cover_pool = 8
+-- The lane is also searched on a grid this far apart (a tactical tile), so cover the derived
+-- points don't happen to be near is found too: Smugglers' Den's first area showed three pockets
+-- around the derived points, two facing sideways. At most cover_grid_max grid points.
+RESCUE.cover_grid = 100.0
+RESCUE.cover_grid_max = 80
 -- A volume centre closer than this to the lane's centroid gives no usable direction, so any
 -- cover is taken.
 RESCUE.cover_min_forward = 300.0
@@ -994,6 +999,7 @@ function COVER.choose(site, actor, polygon, authored, units, wanted, derived, wa
     for _, point in ipairs(derived) do centres[#centres + 1] = point end
     local pool = derive_rescue_points(polygon, authored, units, RESCUE.cover_pool, false, walkable, slots)
     for _, point in ipairs(pool) do centres[#centres + 1] = point end
+    for _, point in ipairs(COVER.grid(polygon, authored)) do centres[#centres + 1] = point end
 
     local function clear_of(point, others, location)
         for _, other in ipairs(others) do
@@ -1010,9 +1016,11 @@ function COVER.choose(site, actor, polygon, authored, units, wanted, derived, wa
             if not seen[key] then
                 seen[key] = true
                 stats.pockets = stats.pockets + 1
+                local facing = forward and -(pocket.nx * forward.X + pocket.ny * forward.Y) or 1
                 local point = {X = pocket.X, Y = pocket.Y, Z = pocket.Z + RESCUE.capsule_height,
-                               lift = RESCUE.capsule_height, cover = pocket.tier, order = #covers}
-                if forward ~= nil and -(pocket.nx * forward.X + pocket.ny * forward.Y) < RESCUE.cover_facing then
+                               lift = RESCUE.capsule_height, cover = pocket.tier, facing = facing,
+                               order = #covers}
+                if facing < RESCUE.cover_facing then
                     stats.facing_away = stats.facing_away + 1
                 elseif inside_deployment(polygon, point) == false or not clear_of(point, authored)
                     or not clear_of(point, units, true) or (walkable ~= nil and not walkable(point)) then
@@ -1023,8 +1031,10 @@ function COVER.choose(site, actor, polygon, authored, units, wanted, derived, wa
             end
         end
     end
+    -- Full before half, then cover facing the encounter more squarely.
     table.sort(covers, function(left, right)
         if left.cover ~= right.cover then return left.cover > right.cover end
+        if math.abs(left.facing - right.facing) > 0.01 then return left.facing > right.facing end
         return left.order < right.order
     end)
 
@@ -1047,8 +1057,40 @@ function COVER.choose(site, actor, polygon, authored, units, wanted, derived, wa
             stats.errors, stats.unreadable))
     end
     if used.full + used.half == 0 then return derived end
-    for _, point in ipairs(chosen) do point.order = nil end
+    for _, point in ipairs(chosen) do point.order, point.facing = nil, nil end
     return chosen
+end
+
+-- Search centres covering the lane: tile-spaced points strictly inside it, each at the height of
+-- its nearest authored destination plus a capsule (the search looks around the point anyway).
+function COVER.grid(polygon, authored)
+    local points = {}
+    if polygon == nil or #polygon < 3 then return points end
+    local min_x, max_x, min_y, max_y = math.huge, -math.huge, math.huge, -math.huge
+    for _, corner in ipairs(polygon) do
+        min_x, max_x = math.min(min_x, corner.X), math.max(max_x, corner.X)
+        min_y, max_y = math.min(min_y, corner.Y), math.max(max_y, corner.Y)
+    end
+    local step = RESCUE.cover_grid
+    local x = min_x + step / 2
+    while x < max_x and #points < RESCUE.cover_grid_max do
+        local y = min_y + step / 2
+        while y < max_y and #points < RESCUE.cover_grid_max do
+            local point = {X = x, Y = y}
+            if inside_deployment(polygon, point) == true then
+                local nearest, height = math.huge, 0
+                for _, destination in ipairs(authored) do
+                    local distance = xy_distance_squared(point, destination)
+                    if distance < nearest then nearest, height = distance, destination.Z or 0 end
+                end
+                point.Z = height + RESCUE.capsule_height
+                points[#points + 1] = point
+            end
+            y = y + step
+        end
+        x = x + step
+    end
+    return points
 end
 
 -- A rescue point in the profile's own coordinates, drawn in towards the

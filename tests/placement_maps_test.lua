@@ -250,7 +250,10 @@ for _, area in ipairs(scan.areas) do
                     name, overflow_inside, #overflow, can_rescue))
             end
 
-            -- The relocation strands the overflow operators at the world origin.
+            -- The relocation strands the overflow operators at the world origin. Not where the lane
+            -- reaches the origin (Kith and Kin): there an operator near it may stand on the lane, so
+            -- the runtime doesn't take one there for stranded.
+            local origin_in_lane = P.RESCUE.origin_in_lane
             mock.hooks[RELOCATION].pre(area_object)
             for index, unit in ipairs(units) do
                 if index <= #points then
@@ -258,12 +261,14 @@ for _, area in ipairs(scan.areas) do
                     unit.at = {X = point.X, Y = point.Y, Z = point.Z + CAPSULE}
                 end
             end
-            for index, unit in ipairs(overflow) do unit.at = {X = 40 * index, Y = -30 * index, Z = 261} end
+            if not origin_in_lane then
+                for index, unit in ipairs(overflow) do unit.at = {X = 40 * index, Y = -30 * index, Z = 261} end
+            end
             mock.run_until(mock.now() + 9000)
 
             for i = #points + 1, #units do
                 local unit = units[i]
-                if math.sqrt(unit.at.X ^ 2 + unit.at.Y ^ 2) <= TILE then
+                if not origin_in_lane and math.sqrt(unit.at.X ^ 2 + unit.at.Y ^ 2) <= TILE then
                     fail(string.format("%s: Operator%d left at the world origin", name, i))
                 end
                 for j = 1, #units do

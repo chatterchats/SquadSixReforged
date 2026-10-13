@@ -12,6 +12,8 @@
 --      nearest, is found by searching beside the pocket, and used.
 --   3c. Cover on the tile next to a destination that stands 10 uu off its own tile's centre is
 --      used, though it is under a tile from the destination.
+--   3d. In a lane containing the world origin, cover at the origin is used, not taken for an
+--      operator the placement never reached.
 --   (1-3 run with improve_game_spots off, so the authored destinations stay put.)
 --   4. improve_game_spots on, a stock squad of four: an authored destination already in cover
 --      facing the encounter stays; one beside cover facing away moves to cover facing it within
@@ -232,6 +234,32 @@ list = deploy("NextTile", next_tile)
 if not at(next_tile[5].at, pockets[1]) then
     fail(string.format("next tile: Operator5 at %.0f/%.0f, not on the cover beside corner 1", next_tile[5].at.X, next_tile[5].at.Y))
 end
+mock.run_until(mock.now() + 30000)
+
+-- 3d. Kith and Kin: the lane contains the world origin, with a cover tile on it. The operator
+-- rescued onto it keeps it, and the destination is there, not where the operator was staged.
+for index = #pockets, 1, -1 do pockets[index] = nil end
+pockets[1] = {X = 0, Y = 0, nx = 0, ny = 1, kind = HALF}
+local origin_points = {}
+for index, point in ipairs({{X = -200, Y = -200}, {X = 200, Y = -200}, {X = 200, Y = 200}, {X = -200, Y = 200}}) do
+    origin_points[index] = mock.actor("TacticalPoint Origin" .. index, {X = point.X, Y = point.Y, Z = 0})
+end
+local origin_list = mock.array(origin_points)
+local origin_area = mock.object("BP_CombatPreparationArea_C /Game/Maps/Test.Test:PersistentLevel.Origin",
+    {PlayerDestinations = origin_list}, {
+        GetWorld = function() return mock.world end,
+        GetLinkedTacticalArea = function() return volume end,
+    })
+local origin_squad = {unit("Operator1", -200, -200), unit("Operator2", 200, -200), unit("Operator3", 200, 200),
+    unit("Operator4", -200, 200), unit("Operator5", 2400, 200)}
+squad(origin_squad)
+mock.hooks[TRIGGER].pre(origin_area)
+mock.run_until(mock.now() + 600)
+if not at(origin_squad[5].at, pockets[1]) then
+    fail(string.format("origin: Operator5 at %.0f/%.0f, not on the cover at the origin", origin_squad[5].at.X, origin_squad[5].at.Y))
+end
+if not destination_at(origin_list, pockets[1]) then fail("origin: no destination on the cover at the origin") end
+if destination_at(origin_list, {X = 2400, Y = 200}) then fail("origin: a destination was left where Operator5 was staged") end
 mock.run_until(mock.now() + 30000)
 
 -- 4. The game's own destinations, improve_game_spots on. Corner 1 is in cover facing the

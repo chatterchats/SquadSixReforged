@@ -46,8 +46,7 @@ local SCRIPTED_COMPANION_MISSION_NAMES = {
 -- through mission logic. Their gameplay levels import no ally spawn group (only
 -- enemy bosses: Idra Farr in Cly_010, Geryon in Luco_010), read from the game
 -- files on 2026-10-13. Exempt from the auto-assign rule in
--- guards_authored_maximum. Played at six on 2026-10-13, all but HM_Cly_020 and HM_Kabb_020
--- (docs/live-tests.md).
+-- guards_authored_maximum. Played at six on 2026-10-13, all but HM_Cly_020 (docs/live-tests.md).
 local COMPANION_AT_SIX_MISSION_NAMES = {
     "HM_Cly_010", "HM_Cly_020", "HM_Jae_010", "HM_Kabb_010",
     "HM_Kabb_020", "HM_Luco_010", "HM_Telrea_010",

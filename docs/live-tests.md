@@ -335,6 +335,7 @@ before the runtime's re-sweep. With the missions in the Core pak, startup logs
 | HM_TelRea_010 "Origin of Infection" | six | good, after the direction fix | manual save finished and loaded | yes, back to the Den |
 | HM_Luco_010 "Lord of Betrayal" | six | good | manual save finished | yes, back to the Den (user) |
 | HM_Jae_010 "Distress Call" | six | hand-picked layout: everyone on its spots | manual save finished | yes, back to the Den |
+| HM_Kabb_020 "Kith and Kin" | six | good enough after the world-origin fix (no good cover on the map) | manual save finished | yes, back to the Den |
 | HM_Kabb_010 "Buy Cheap, Never Sleep" | six | every operator in cover, after cover up to two tiles out | manual save finished | yes, back to the Den |
 
 Best Served Cold: the deployment lane is at the end of a large tactical volume. The cover direction
@@ -412,6 +413,15 @@ beside it and refused it as outside (`debug_markers site=improve ... outside=1`)
 still being held to a tile. The user moved Hawks to 6310/-3650. With the game's spots given the
 same two tiles: `improve_spots kept=1 snapped=2 moved=1 ... 6250/-3560->6310/-3650half`, the
 user's tile exactly, and every operator in cover (confirmed by the user).
+
+Kith and Kin (HM_Kabb_020): direction 136 degrees, the probe's enemies at 134 (the volume said
+253). The lane contains the world origin, with a cover tile at 0/0; the rescue put an added
+operator on it, the runtime took the spot for "never placed", the destination fell back to the
+operator's staging position 2,400 uu east (`player_destinations ... outside_lane=1`, added2
+2628/199), and the repair moved the operator at 0/-27 (`origin:lane`). The origin rule is now off
+where the lane reaches the origin. Replayed: the operator kept the tile at 0/0, its destination there
+(`outside_lane=0`), the repair left everyone alone, and both added operators were in half cover.
+The user: good enough, the map has no really good spots.
 
 Lord of Betrayal: no spawn destinations in its level, so the volume's centre, 351 degrees; the
 probe found the eight enemies at 2. The added two in half cover; the game's four kept.

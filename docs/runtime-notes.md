@@ -535,6 +535,17 @@ replay the added operators went into those tiles, and the repair, still
 measuring a whole tile, moved the two operators on the neighbouring game spots
 to derived points in the open.
 
+An operator within `ORIGIN_RADIUS` (100 uu) of the world origin is taken for
+one the placement never reached, which the repair moves. Kith and Kin
+(HM_Kabb_020) is the one area of 90 whose lane contains the origin, with a
+cover tile at 0/0: the staging rescue put an added operator there, the
+destination for it fell back to where that operator had been staged, 2,400 uu
+east (`outside_lane=1`), and the repair moved the operator again (2026-10-13).
+While the current lane comes within `RESCUE.origin_lane_margin` (300 uu) of the
+origin the rule is off (`RESCUE.origin_in_lane`); the next nearest lane, Rescue
+Jae Mordant's, is 450 uu away. The map test doesn't strand operators at the
+origin on that area, since the runtime can't tell them from ones on the lane.
+
 Cover for the added points, and for the game's spots the improvement moves, may
 lie up to `RESCUE.cover_outside` (200 uu, two tiles) past the lane's edge. A game spot on
 the lane's tip has the cover tile beside it about a tile out, and snapping the

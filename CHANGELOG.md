@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   area as the enemies' direction, which is wrong where you start at one end of a large map: in
   Best Served Cold the extra operators' cover, and the game spots it moved, faced away from the
   enemies. It now uses the enemy spawn points the game's levels place for each fight.
+- **Kith and Kin's deployment works at six.** Its deployment area sits on the map's origin point,
+  which the mod took for an operator the game never placed, so one operator started far from the
+  rest.
 - **Cover up to two tiles past the deployment area's edge can be used**, for the extra operators
   and for the game's spots that "Move the game's spots into cover" moves. That's often where the
   only good cover next to the area's corners is.

@@ -160,6 +160,11 @@ RESCUE.same_tile = 75.0
 -- to the improvement the same way, leaving Hawks out of cover. The repair measures against every
 -- current destination, the added and moved ones included, so it doesn't pull an operator back.
 RESCUE.cover_outside = 200.0
+-- Where the current deployment lane comes this close to the world origin, standing near the
+-- origin doesn't mean an operator was never placed (at_world_origin). Only Kith and Kin's lane does
+-- (it contains the origin); the next nearest, Rescue Jae Mordant's, stays 450 uu away.
+RESCUE.origin_lane_margin = 300.0
+RESCUE.origin_in_lane = false
 -- The game's own destinations (the improve_game_spots setting): one already in cover facing the
 -- encounter is kept, found by a search this close to it; otherwise it moves to the best usable
 -- cover within cover_improve_range, searched around it at cover_improve_offsets in eight
@@ -393,10 +398,13 @@ local restored_positions = {}
 local deployments_begun = 0
 
 -- An actor the placement never reached sits at the world origin, plus its
--- capsule height, so the test ignores Z. No authored destination is within 224
--- uu of the XY origin.
+-- capsule height, so the test ignores Z. Unless the deployment lane itself
+-- reaches the origin (RESCUE.origin_in_lane): Kith and Kin's (HM_Kabb_020)
+-- contains it, with a cover tile at 0/0. An operator put there was taken for
+-- one never placed, its destination fell back to where it had been staged,
+-- 2,400 uu away, and the repair moved it again (2026-10-13).
 local function at_world_origin(location)
-    if location == nil then return false end
+    if location == nil or RESCUE.origin_in_lane then return false end
     return location.X * location.X + location.Y * location.Y <= ORIGIN_RADIUS_SQ
 end
 
@@ -2511,6 +2519,9 @@ local function ensure_player_destinations(area)
         end
     end
     if #valid_destinations < 1 then return false end
+    local lane = deployment_polygon(anchors)
+    RESCUE.origin_in_lane = lane ~= nil
+        and COVER.outside_by(lane, {X = 0, Y = 0, Z = 0}) <= RESCUE.origin_lane_margin
 
     local fixed = FIXED.applied[object_key(area)]
     if fixed then return false end

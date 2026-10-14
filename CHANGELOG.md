@@ -7,29 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0]
+
+### Fixed
+- **Every mission supported.** Every hero mission now takes six operators, including the ten that
+  were kept at four, and each was played through at six. Only the opening tutorial, whose squad
+  the game picks, stays at four.
+
+### Added
+- **Smart spawn point selection.** The extra operators' spots go into cover facing where each
+  fight actually places its enemies, find free cover right beside cover that's already taken, and
+  can sit up to two tiles past the deployment area's edge.
+
 ### Changed
-- **Every hero mission takes six operators.** The ten that were kept at four now take six: Best
-  Served Cold, Without Honor or Humanity, Distress Call, Buy Cheap, Never Sleep, Kith and Kin, Lord
-  of Betrayal, Origin of Infection, Sisters, No Kings, No Masters and No Clone Left Behind. The
-  hero and Hawks (and in No Kings, No Masters, Trick and Luco) fill their slots as before; Rex still
-  joins No Kings, No Masters and Sergeant Sawtooth is still rescued in No Clone Left Behind. Distress
-  Call has hand-picked deployment spots.
-- **Cover faces where the enemies come from.** The mod used to take the middle of the fight's
-  area as the enemies' direction, which is wrong where you start at one end of a large map: in
-  Best Served Cold the extra operators' cover, and the game spots it moved, faced away from the
-  enemies. It now uses the enemy spawn points the game's levels place for each fight.
-- **Kith and Kin's deployment works at six.** Its deployment area sits on the map's origin point,
-  which the mod took for an operator the game never placed, so one operator started far from the
-  rest.
-- **Cover up to two tiles past the deployment area's edge can be used**, for the extra operators
-  and for the game's spots that "Move the game's spots into cover" moves. That's often where the
-  only good cover next to the area's corners is.
-- **Cover next to cover is found.** The extra operators could miss a free cover tile right beside
-  one already taken, and stand in the open instead.
-- **"Move the game's spots into cover" centres a spot on its cover.** A spot standing between two
-  cover tiles blocked both from the extra operators; it now moves onto the tile it's in.
-- With "Move the game's spots into cover" off, the log now says so
-  (`improve_spots=skipped reason=setting_off`).
+- **"Move the game's spots into cover" positioning and logging.** The game's spots can move to
+  cover up to two tiles past the deployment area's edge, a spot standing between two cover tiles
+  moves onto the one it's in, and the log says when the setting is off.
 
 ## [1.3.1]
 

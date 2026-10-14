@@ -1,4 +1,4 @@
-# Squad Six Reforged v1.3.1 — Six-Operator Squads for Star Wars: Zero Company
+# Squad Six Reforged v1.4.0 — Six-Operator Squads for Star Wars: Zero Company
 
 Squad Six Reforged raises the deployable squad size from four to six operators.
 
@@ -15,20 +15,27 @@ and the hand-picked list of missions behind it. See `CREDITS.md` beside this fil
   operators 5 and 6 there if the game leaves them stuck or outside it. Story characters who join
   at the start of a mission get a spot too.
 - **Spots in cover.** The added spots go into cover facing the enemies where the area has some,
-  full cover first. By default the game's own spots move into such cover too when theirs faces
-  away (see Settings).
+  full cover first. The mod knows which way the enemies are from where each fight places them.
+  By default the game's own spots move into such cover too when theirs faces away, or centre on
+  the cover tile they stand in (see Settings). Cover up to two tiles past the deployment area's
+  edge can be used.
 - It doesn't change classes, progression, abilities, equipment, enemies or your saves.
 
-## Missions that stay at four
+## Which missions take six
 
-These missions bring story characters in through their own scripting, and Squad Six once saw
-duplicated operators or saves that never finished on missions like them. They keep their usual
-four until each has been played at six:
+Every mission that normally takes four takes six, including every hero mission, with one
+exception:
 
-- The Serolonis Job (the opening tutorial; the game picks the squad)
-- Buy Cheap, Never Sleep; Best Served Cold; Origin of Infection; Sisters; No Kings, No Masters
-- Five more hero missions, by mission ID: HM_Cly_020, HM_Jae_010, HM_Kabb_020, HM_Luco_010 and
-  HM_Trick_010 (their titles depend on the game's language)
+- **The Serolonis Job** (the opening tutorial) keeps four: the game picks that squad.
+
+Solo and three-operator missions keep their own limits, except Deep Cover, which takes six.
+
+In hero missions, the characters the mission assigns (Hawks and the hero; Hawks, Trick and Luco in
+No Kings, No Masters) fill their slots as usual, and you pick the rest. Characters a mission
+brings in itself still come, so you can have more than six on the field: Rex in Deep Cover and No
+Kings, No Masters, Baker in Deep Cover, Sergeant Sawtooth in No Clone Left Behind, Jae in You
+Can't Go Home Again, Tel-Rea in Smugglers' Den and Trick in Stillwatch. Each of these missions was
+played through at six, including saving.
 
 ## What you need
 
@@ -46,7 +53,8 @@ installed, Squad Six Reforged has an in-game settings page:
 
 - **Move the game's spots into cover** (on by default): at the start of an encounter, a
   deployment spot whose cover faces away from the enemies, or that has none, moves to cover
-  facing them within two tiles. It applies to every squad size, from the next encounter. Turn it
+  facing them within two tiles, and one standing off the centre of its cover tile moves onto it.
+  It applies to every squad size except in the opening tutorial, from the next encounter. Turn it
   off to keep the game's own spots.
 
 Without the settings manager, the defaults apply.

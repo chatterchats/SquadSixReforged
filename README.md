@@ -7,9 +7,10 @@
 Squad Six Reforged raises the deployable squad size in **Star Wars: Zero Company** from four to
 six. It combines an IoStore data override with a UE4SS Lua runtime that adds six activity slots, a
 six-model lineup, a six-entry squad-selection layout and in-map placement for the extra operators.
-Extra operators deploy in cover facing the enemies where the area has some, and a few maps have
-hand-picked deployment spots. Missions that inject scripted characters keep their authored limit
-of four until each has been played at six.
+Extra operators deploy in cover facing the enemies where the area has some, the enemies' direction
+coming from where each fight places them (`Scripts/directions.lua`, generated from the levels), and
+a few maps have hand-picked deployment spots. Every hero mission takes six; only the opening
+tutorial, whose squad the game sets, keeps four.
 
 > **A continuation of Squad Six by arctco.** arctco created Squad Six, discontinued it, and gave
 > permission for others to continue it with credit. Most of the runtime is still their code, and
@@ -18,9 +19,10 @@ of four until each has been played at six.
 
 ## Status
 
-**1.3.0** (2026-10-13): cover-aware deployment, a settings page, and six operators in Deep Cover,
-Rescue Jae Mordant and Smugglers' Den; see [CHANGELOG.md](CHANGELOG.md). **1.2.0** (2026-10-12)
-was the first release of Squad Six Reforged.
+**1.4.0** (2026-10-14): six operators in every hero mission, cover that faces where each fight
+places its enemies, and better use of the cover beside the game's spots; see
+[CHANGELOG.md](CHANGELOG.md). **1.3.0** (2026-10-13) added cover-aware deployment and a settings
+page. **1.2.0** (2026-10-12) was the first release of Squad Six Reforged.
 It continues from arctco's final release of Squad Six, **1.1.4** (2026-09-03), which is imported unmodified at tag
 `upstream-1.1.4`. See [docs/upstream.md](docs/upstream.md) for what that release contains and
 [docs/core-pak-analysis.md](docs/core-pak-analysis.md) for exactly what the cooked pak changes.

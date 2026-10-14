@@ -335,6 +335,7 @@ before the runtime's re-sweep. With the missions in the Core pak, startup logs
 | HM_TelRea_010 "Origin of Infection" | six | good, after the direction fix | manual save finished and loaded | yes, back to the Den |
 | HM_Luco_010 "Lord of Betrayal" | six | good | manual save finished | yes, back to the Den (user) |
 | HM_Jae_010 "Distress Call" | six | hand-picked layout: everyone on its spots | manual save finished | yes, back to the Den |
+| HM_TrickLuco_020 "No Kings, No Masters" | six (three picked; Rex joins: seven) | good | manual save finished | yes, back to the Den |
 | HM_Telrea_020 "Sisters" | six | good | manual save finished | yes, back to the Den |
 | HM_Cly_020 "Without Honor or Humanity" | six | good | manual save finished | yes, back to the Den |
 | HM_Kabb_020 "Kith and Kin" | six | good enough after the world-origin fix (no good cover on the map) | manual save finished | yes, back to the Den |
@@ -436,6 +437,12 @@ living units against a number, so it was held back. Two runs at six: direction 8
 played both times. The first run (operators set to 1 hp) completed back to the Den; in the second a
 manual save finished, and the other enemies were killed through ZC Sandbox (`kill`, twice: six,
 then a wave of four reinforcements) leaving the Second Sister, and the outro played. No errors.
+
+No Kings, No Masters (HM_TrickLuco_020, added 2026-10-14): Hawks, Trick and Luco auto-assigned, Rex
+joins partway through. No spawn destinations in its level: direction from the volume, 242 degrees,
+the probe's enemies at 224. One game spot snapped, three kept; both added operators in half cover;
+4 destinations to 6. The user played it through with Rex: spawns, a manual save and the playthrough
+good, mission complete back to the Den. No errors.
 
 Lord of Betrayal: no spawn destinations in its level, so the volume's centre, 351 degrees; the
 probe found the eight enemies at 2. The added two in half cover; the game's four kept.

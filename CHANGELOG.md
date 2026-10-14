@@ -8,9 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- **Eight more hero missions take six operators** (they were kept at four): Best Served Cold, Without
+- **Nine more hero missions take six operators** (they were kept at four): Best Served Cold, Without
   Honor or Humanity, Distress Call, Buy Cheap, Never Sleep, Kith and Kin, Lord of Betrayal, Origin
-  of Infection and Sisters. Hawks and the hero fill two of the six slots as before. Distress Call has
+  of Infection, Sisters and No Kings, No Masters (where Rex still joins, for seven). Hawks and the hero fill two of the six slots as before. Distress Call has
   hand-picked deployment spots.
 - **Cover faces where the enemies come from.** The mod used to take the middle of the fight's
   area as the enemies' direction, which is wrong where you start at one end of a large map: in

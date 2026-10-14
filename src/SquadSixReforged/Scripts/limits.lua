@@ -25,9 +25,9 @@ local AUTO_ASSIGN_PROPERTY = "bAutoAssign"
 -- selected operators would add bodies the deployment area wasn't built for.
 -- Normally caught by reflection in guards_authored_maximum; this exact-name
 -- list is the fallback when the requirements can't be read.
-local GUARDED_MISSION_NAMES = {
-    "HM_TrickLuco_020",
-}
+-- Empty since every hero mission that auto-assigns a second character was played at six
+-- (COMPANION_AT_SIX_MISSION_NAMES); kept for any a game update adds.
+local GUARDED_MISSION_NAMES = {}
 
 -- Missions whose story characters join through mission logic rather than
 -- through CharacterRequirements, so six selected operators become seven or
@@ -53,6 +53,9 @@ local COMPANION_AT_SIX_MISSION_NAMES = {
     -- Its turn tracker counts a team's living units (GetLivingUnitsByTeam against a number);
     -- played at six on 2026-10-14, the Second Sister's scenes played as authored.
     "HM_Telrea_020",
+    -- Auto-assigns Hawks, Trick and Luco, and Rex joins partway through (SG_Rex), so six
+    -- selected are seven units (Deep Cover runs at eight). Played at six on 2026-10-14.
+    "HM_TrickLuco_020",
 }
 -- Missions whose squad the player doesn't choose. The Serolonis Job is the
 -- opening tutorial: its squad is set by the game, so six slots add nothing

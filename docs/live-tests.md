@@ -335,6 +335,7 @@ before the runtime's re-sweep. With the missions in the Core pak, startup logs
 | HM_TelRea_010 "Origin of Infection" | six | good, after the direction fix | manual save finished and loaded | yes, back to the Den |
 | HM_Luco_010 "Lord of Betrayal" | six | good | manual save finished | yes, back to the Den (user) |
 | HM_Jae_010 "Distress Call" | six | hand-picked layout: everyone on its spots | manual save finished | yes, back to the Den |
+| HM_Trick_010 "No Clone Left Behind" | six | good | manual save finished | yes, back to the Den |
 | HM_TrickLuco_020 "No Kings, No Masters" | six (three picked; Rex joins: seven) | good | manual save finished | yes, back to the Den |
 | HM_Telrea_020 "Sisters" | six | good | manual save finished | yes, back to the Den |
 | HM_Cly_020 "Without Honor or Humanity" | six | good | manual save finished | yes, back to the Den |
@@ -443,6 +444,12 @@ joins partway through. No spawn destinations in its level: direction from the vo
 the probe's enemies at 224. One game spot snapped, three kept; both added operators in half cover;
 4 destinations to 6. The user played it through with Rex: spawns, a manual save and the playthrough
 good, mission complete back to the Den. No errors.
+
+No Clone Left Behind (HM_Trick_010, added 2026-10-14): played from a fresh campaign, where it
+appears early (every older campaign had it done by cycle 5 or 10). Direction 100 degrees from the
+spawn destinations, the probe's enemies at 98; one game spot snapped onto full cover, one moved into
+half cover; the added two in full and half cover. The user: spawns, a manual save, the rescue,
+mission complete and the return to the Den all good. No errors.
 
 Lord of Betrayal: no spawn destinations in its level, so the volume's centre, 351 degrees; the
 probe found the eight enemies at 2. The added two in half cover; the game's four kept.

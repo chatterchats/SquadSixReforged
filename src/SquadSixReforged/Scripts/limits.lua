@@ -33,14 +33,11 @@ local GUARDED_MISSION_NAMES = {}
 -- through CharacterRequirements, so six selected operators become seven or
 -- eight units: duplicated named operators, or a save that never finishes
 -- writing. Kept at their authored four by exact name, so they stay guarded
--- even where reflection can't read their requirements: HM_Trick_010, where
--- Sergeant Sawtooth is rescued and joins. HM_Jae_020 and Slug HQ left the list
--- once they were played at six with saves at seven units finishing, and no
--- duplicate (docs/live-tests.md); the missions in
--- COMPANION_AT_SIX_MISSION_NAMES left it because no ally joins them.
-local SCRIPTED_COMPANION_MISSION_NAMES = {
-    "HM_Trick_010",
-}
+-- even where reflection can't read their requirements. Empty now: HM_Jae_020
+-- and Slug HQ left it once they were played at six with saves at seven units
+-- finishing, and no duplicate (docs/live-tests.md); the hero missions in
+-- COMPANION_AT_SIX_MISSION_NAMES left it as they were played at six.
+local SCRIPTED_COMPANION_MISSION_NAMES = {}
 -- Hero missions that auto-assign a companion beside Hawks but take six anyway:
 -- the companion fills one of the six slots, as Hawks does, and no ally joins
 -- through mission logic. Their gameplay levels import no ally spawn group (only
@@ -56,6 +53,9 @@ local COMPANION_AT_SIX_MISSION_NAMES = {
     -- Auto-assigns Hawks, Trick and Luco, and Rex joins partway through (SG_Rex), so six
     -- selected are seven units (Deep Cover runs at eight). Played at six on 2026-10-14.
     "HM_TrickLuco_020",
+    -- Sergeant Sawtooth is rescued partway through (SG_Rescue_Sawtooth and a rescue spawner,
+    -- like Baker in Deep Cover). Played at six on 2026-10-14.
+    "HM_Trick_010",
 }
 -- Missions whose squad the player doesn't choose. The Serolonis Job is the
 -- opening tutorial: its squad is set by the game, so six slots add nothing

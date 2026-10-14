@@ -14,7 +14,7 @@ mock.install({missions = {
     m("MM_04_050_ANewOrder", 6, 1),
     m("SK_Ryloth_035", 4, 0),            -- left at 4: the runtime raises it
     m("SK_Reflected_010", 4, 2),         -- auto-assigns two: guarded by reflection
-    m("HM_Trick_010", 6, 2),             -- guarded by name; must be put back to 4
+    m("HM_Trick_010", 6, 2),             -- No Clone Left Behind: takes six
     m("HM_Kabb_010", 4, 2),              -- auto-assigns a companion but takes six
     m("HM_Jae_010", 6, 2),
     m("HM_Jae_020", 6, 1),               -- no longer guarded: played at six
@@ -55,7 +55,7 @@ expect("selfcheck phase=startup ok=23 missing=none unchecked=none", "every start
 expect("selfcheck phase=squad_select ok=2 missing=none unchecked=none", "the squad screen's names resolve")
 expect("selfcheck phase=mission ok=3 missing=none unchecked=none", "every mission name resolves")
 expect("SK_Ryloth_035=6", "a mission left at 4 is raised at runtime")
-expect("HM_Trick_010=4", "a guarded mission is put back to 4")
+expect("HM_Trick_010=6", "No Clone Left Behind keeps six")
 expect("HM_Kabb_010=6", "a hero mission cleared for six is raised despite its companion")
 expect("HM_Jae_010=6", "a hero mission cleared for six keeps six")
 expect("HM_Jae_020=6", "Rescue Jae Mordant keeps six")

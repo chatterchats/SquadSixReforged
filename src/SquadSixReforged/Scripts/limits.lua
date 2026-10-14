@@ -26,7 +26,7 @@ local AUTO_ASSIGN_PROPERTY = "bAutoAssign"
 -- Normally caught by reflection in guards_authored_maximum; this exact-name
 -- list is the fallback when the requirements can't be read.
 local GUARDED_MISSION_NAMES = {
-    "HM_Telrea_020", "HM_TrickLuco_020",
+    "HM_TrickLuco_020",
 }
 
 -- Missions whose story characters join through mission logic rather than
@@ -50,6 +50,9 @@ local SCRIPTED_COMPANION_MISSION_NAMES = {
 local COMPANION_AT_SIX_MISSION_NAMES = {
     "HM_Cly_010", "HM_Cly_020", "HM_Jae_010", "HM_Kabb_010",
     "HM_Kabb_020", "HM_Luco_010", "HM_Telrea_010",
+    -- Its turn tracker counts a team's living units (GetLivingUnitsByTeam against a number);
+    -- played at six on 2026-10-14, the Second Sister's scenes played as authored.
+    "HM_Telrea_020",
 }
 -- Missions whose squad the player doesn't choose. The Serolonis Job is the
 -- opening tutorial: its squad is set by the game, so six slots add nothing

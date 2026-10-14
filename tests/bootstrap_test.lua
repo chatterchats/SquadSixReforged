@@ -13,7 +13,7 @@ mock.install({missions = {
     m("SK_Vandor_010", 6, 0),
     m("MM_04_050_ANewOrder", 6, 1),
     m("SK_Ryloth_035", 4, 0),            -- left at 4: the runtime raises it
-    m("HM_Telrea_020", 4, 2),            -- guarded by reflection
+    m("HM_TrickLuco_020", 4, 3),         -- guarded by reflection
     m("HM_Trick_010", 6, 2),             -- guarded by name; must be put back to 4
     m("HM_Kabb_010", 4, 2),              -- auto-assigns a companion but takes six
     m("HM_Jae_010", 6, 2),
@@ -60,7 +60,7 @@ expect("HM_Kabb_010=6", "a hero mission cleared for six is raised despite its co
 expect("HM_Jae_010=6", "a hero mission cleared for six keeps six")
 expect("HM_Jae_020=6", "Rescue Jae Mordant keeps six")
 expect("MM_02_050_SlugHQ=6", "Smugglers' Den is raised to six")
-expect("HM_Telrea_020=4", "a reflection-guarded mission stays at 4")
+expect("HM_TrickLuco_020=4", "a reflection-guarded mission stays at 4")
 expect("SK_Dantooine_025=3", "a three-operator mission is untouched")
 expect("MM_03_010_Bespin=1", "a solo mission is untouched")
 expect("MM_01_010_SerolonisJob=4", "the tutorial keeps its authored four")

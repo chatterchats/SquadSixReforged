@@ -17,7 +17,7 @@ AuthoredHero/HM_Kabb_010	4	6	"Buy Cheap, Never Sleep": auto-assigns Hawks plus a
 AuthoredHero/HM_Kabb_020	4	6	"Kith and Kin": auto-assigns Hawks plus a companion, who fills one of the six slots; no ally joins through mission logic (game files read 2026-10-13). played at six on 25134257 (2026-10-13): save and mission complete; its lane contains the world origin (RESCUE.origin_in_lane)
 AuthoredHero/HM_Luco_010	4	6	"Lord of Betrayal": auto-assigns Hawks plus a companion, who fills one of the six slots; no ally joins through mission logic (game files read 2026-10-13). played at six on 25134257 (2026-10-13): save and mission complete
 AuthoredHero/HM_Telrea_010	4	6	"Origin of Infection": auto-assigns Hawks plus a companion, who fills one of the six slots; no ally joins through mission logic (game files read 2026-10-13). played at six on 25134257 (2026-10-13): save, load and mission complete
-AuthoredHero/HM_Telrea_020	4	4	hero mission: auto-assigns Hawks plus a companion; limits.lua guards it at 4
+AuthoredHero/HM_Telrea_020	4	6	"Sisters": auto-assigns Hawks plus Tel-Rea, who fill two of the six slots; no ally joins through mission logic, but its turn tracker counts a team's living units. played at six on 25134257 (2026-10-14): the Second Sister's intro and outro played, save and mission complete
 AuthoredHero/HM_TrickLuco_020	4	4	hero mission: auto-assigns Hawks plus two companions; limits.lua guards it at 4
 AuthoredHero/HM_Trick_010	4	4	hero mission: auto-assigns Hawks plus a companion; limits.lua guards it at 4
 Story_Main/MM_01_010_SerolonisJob	4	4	opening tutorial: the game sets the squad, so the player can't pick operators; limits.lua guards it at 4

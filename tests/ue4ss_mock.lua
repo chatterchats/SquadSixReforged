@@ -114,12 +114,12 @@ function mock.actor(name, location)
         end,
         GetActorScale3D = function() return {X = self.scale.X, Y = self.scale.Y, Z = self.scale.Z} end,
         SetActorScale3D = function(_, scale) self.scale = {X = scale.X, Y = scale.Y, Z = scale.Z} end,
-        IsHidden = function() return self.hidden end,
-        SetActorHiddenInGame = function(_, hidden) self.hidden = hidden end,
+        -- No IsHidden: AActor::IsHidden isn't reflected, so UE4SS can't call it. bHidden is a property.
+        SetActorHiddenInGame = function(_, hidden) self.bHidden = hidden end,
     })
     rawset(self, "at", {X = location.X, Y = location.Y, Z = location.Z})
     rawset(self, "scale", {X = 1, Y = 1, Z = 1})
-    rawset(self, "hidden", false)
+    self.bHidden = false
     rawset(self, "halts", 0)
     return self
 end

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1]
+
+### Added
+- **ZC Unlocked compatibility.** With ZC Unlocked's Squad row switched off, the two work together,
+  and the squad screen shows all six models even though ZC Unlocked still hides the fifth and sixth.
+  The log warns while its squad extension is on.
+
 ## [1.4.0]
 
 ### Fixed

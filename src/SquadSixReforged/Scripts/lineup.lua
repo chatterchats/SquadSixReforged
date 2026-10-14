@@ -54,6 +54,10 @@ local slot_widget_reported = false
 local fitted_scales = {}
 local lineup_layouts = {}
 local proxies_hidden_by_mod = {}
+-- Per owner key: the indexes past the authored four that the last lineup pass wants shown, and
+-- the generation of the watch that keeps them shown (keep_extra_models_shown).
+local extra_models_wanted = {}
+local extra_models_watch = {}
 local fitted_slot_boxes = {}
 local lineup_reentry = {}
 -- The old probes appended null UObject references after construction. Here we
@@ -342,11 +346,14 @@ local function trim_lineup_proxies(activity_slots, proxies, owner_key, used)
     end
 
     local hidden = 0
+    local extra_wanted = {}
+    extra_models_wanted[owner_key] = extra_wanted
     for index = 1, proxy_count do
         local actor = unwrap(proxies[index])
         if valid(actor) then
             local wanted = index <= used
                 and (assignments == nil or assignments[index] == true)
+            if wanted and index > AUTHORED_SLOTS then extra_wanted[index] = true end
             if not wanted then
                 if pcall(function() actor:SetActorHiddenInGame(true) end) then
                     hidden_here[index] = true
@@ -371,6 +378,15 @@ end
 -- Diagnostics only, and kept to plain indexed reads: calling
 -- GetClonedFromCharacter or TArray:ForEach from here crashed the game inside
 -- UE4SS, where pcall can't catch it.
+-- Whether an actor is hidden, or nil if that can't be read. AActor::IsHidden isn't a reflected
+-- function, so UE4SS can't call it (every call failed, and the lineup's hidden count always read
+-- 0); bHidden is a property.
+local function actor_hidden(actor)
+    local ok, hidden = pcall(function() return unwrap(actor:GetPropertyValue("bHidden")) end)
+    if ok and type(hidden) == "boolean" then return hidden end
+    return nil
+end
+
 local function describe_proxies(proxies, proxy_count)
     local counts = {valid = 0, hidden = 0}
     local positions, scales = {}, {}
@@ -380,8 +396,7 @@ local function describe_proxies(proxies, proxy_count)
         local actor = read_ok and unwrap(element) or nil
         if valid(actor) then
             counts.valid = counts.valid + 1
-            local hidden_ok, hidden = pcall(function() return actor:IsHidden() end)
-            if hidden_ok and hidden then counts.hidden = counts.hidden + 1 end
+            if actor_hidden(actor) == true then counts.hidden = counts.hidden + 1 end
             -- Copies, read now: the pass is about to move these actors. They
             -- are only turned into text if the line is logged.
             local location = actor_location(actor)
@@ -401,6 +416,86 @@ local function vectors_text(vectors, format)
     return table.concat(text, ",")
 end
 
+local function squad_slot_box()
+    local boxes = FindAllOf(SLOT_BOX_CLASS)
+    if boxes == nil then return nil end
+    for _, box in pairs(boxes) do
+        local name = full_name(box)
+        if string.find(name, "WBP_Menu_MissionSquadSelect", 1, true)
+            and string.find(name, "CharacterSlots", 1, true) then
+            return box
+        end
+    end
+    return nil
+end
+
+-- Another mod can hide the fifth and sixth models after this mod has laid them out: ZC Unlocked
+-- trims the lineup to four even with its squad extension off (squad=0 still arms it at size 4),
+-- so two operators had no model on the squad screen (2026-10-14). For a while after each pass,
+-- while the squad screen is open, a hidden extra model the pass wants shown is shown again.
+-- Only the models past the authored four, and only while the screen's slot box is valid and
+-- visible: the game's own hiding of the lineup, and any model this mod hid, are left alone.
+local KEEP_SHOWN = {interval_ms = 250, seconds = 15}
+
+-- Whether a squad-select slot box is on screen now. Looked up each time: the first lineup pass
+-- runs before the screen is shown, and an earlier screen's box can still exist, not visible.
+local function squad_screen_visible()
+    local boxes = FindAllOf(SLOT_BOX_CLASS)
+    if boxes == nil then return false end
+    for _, box in pairs(boxes) do
+        local name = full_name(box)
+        if string.find(name, "WBP_Menu_MissionSquadSelect", 1, true)
+            and string.find(name, "CharacterSlots", 1, true) then
+            local open_ok, open = pcall(function() return box:IsVisible() end)
+            if open_ok and open == true then return true end
+        end
+    end
+    return false
+end
+
+local function keep_extra_models_shown(owner, owner_key)
+    if next(extra_models_wanted[owner_key] or {}) == nil then return end
+    local generation = (extra_models_watch[owner_key] or 0) + 1
+    extra_models_watch[owner_key] = generation
+    if not reported_layout_results["keep_shown"] then
+        reported_layout_results["keep_shown"] = true
+        local indexes = {}
+        for index in pairs(extra_models_wanted[owner_key]) do indexes[#indexes + 1] = index end
+        table.sort(indexes)
+        log("lineup_keep_shown indexes=" .. table.concat(indexes, ",") .. " screen_visible="
+            .. tostring(squad_screen_visible()))
+    end
+    local ticks = 0
+    LoopAsync(KEEP_SHOWN.interval_ms, function()
+        ticks = ticks + 1
+        if extra_models_watch[owner_key] ~= generation
+            or ticks * KEEP_SHOWN.interval_ms > KEEP_SHOWN.seconds * 1000 then
+            return true
+        end
+        ExecuteInGameThread(function()
+            -- Nothing is shown while the squad screen isn't on screen, before it opens or after
+            -- it closes; the watch waits rather than stopping.
+            if extra_models_watch[owner_key] ~= generation or not valid(owner)
+                or not squad_screen_visible() then
+                return
+            end
+            local proxies = proxy_array(owner)
+            for index in pairs(extra_models_wanted[owner_key] or {}) do
+                local actor = unwrap(proxies[index])
+                if valid(actor) and actor_hidden(actor) == true and not (proxies_hidden_by_mod[owner_key] or {})[index]
+                    and pcall(function() actor:SetActorHiddenInGame(false) end) then
+                    if not reported_layout_results["reshown:" .. index] then
+                        reported_layout_results["reshown:" .. index] = true
+                        log("lineup_reshown index=" .. index .. " after_ms=" .. (ticks * KEEP_SHOWN.interval_ms)
+                            .. " (something else hid a model this lineup shows)")
+                    end
+                end
+            end
+        end)
+        return false
+    end)
+end
+
 local function run_lineup_pass(owner, activity_slots_param, used, source)
     if not valid(owner) then return end
     if used == nil or used < 1 then return end
@@ -415,6 +510,7 @@ local function run_lineup_pass(owner, activity_slots_param, used, source)
 
     local applied, result = place_lineup_models(owner, proxies, used, true)
     local trimmed = trim_lineup_proxies(activity_slots_param, proxies, owner_key, used)
+    keep_extra_models_shown(owner, owner_key)
 
 
     local report_key = source .. ":" .. tostring(used) .. ":" .. tostring(result)
@@ -479,19 +575,6 @@ local function lineup_prehook(context, activity_slots_param, clear_previous_para
                 lineup_widths[owner_key], "deferred")
         end)
     end)
-end
-
-local function squad_slot_box()
-    local boxes = FindAllOf(SLOT_BOX_CLASS)
-    if boxes == nil then return nil end
-    for _, box in pairs(boxes) do
-        local name = full_name(box)
-        if string.find(name, "WBP_Menu_MissionSquadSelect", 1, true)
-            and string.find(name, "CharacterSlots", 1, true) then
-            return box
-        end
-    end
-    return nil
 end
 
 local function fit_squad_screen(box)

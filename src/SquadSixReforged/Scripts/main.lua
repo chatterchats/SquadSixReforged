@@ -1,4 +1,4 @@
-local VERSION = "1.4.0"
+local VERSION = "1.4.1"
 -- Squad Six Reforged's runtime (a continuation of arctco's Squad Six). This file loads the modules and keeps registering hooks until every
 -- target exists; the work itself is in limits.lua (mission squad limits), lineup.lua (squad
 -- selection) and placement.lua (tactical deployment), with shared helpers in common.lua.
@@ -156,6 +156,42 @@ for _, other in ipairs({{"ZCOMSquadSix", "arctco's original Squad Six"}, {"Squad
         file:close()
         log("WARNING: " .. other[2] .. " is also installed (ue4ss/Mods/" .. other[1] .. ")."
             .. " Remove or disable it: two squad-size mods both act on every deployment.")
+    end
+end
+
+-- ZC Unlocked (a C++ mod) has its own squad extension. Its squad=0 (the Squad row off in its menu)
+-- arms it at size 4 anyway: it rewrites mission limits back to four, shows "4 operators" on the
+-- mission board and trims the squad-screen lineup to four, which lineup.lua undoes by showing the
+-- fifth and sixth models again. Played at six with squad=0 alone (2026-10-14): its placement did
+-- nothing, all six deployed, and saving and completing worked. Its undocumented squad_limit_text=0
+-- removes the board text. Its paks share no file with the Core pak.
+do
+    local file = io.open(directory .. "../../ZCUnlocked/dlls/settings.ini", "r")
+    if file then
+        local section, values = nil, {}
+        for line in file:lines() do
+            line = line:gsub("^\239\187\191", "")   -- a UTF-8 byte-order mark
+            local header = line:match("^%s*%[([^%]]+)%]")
+            if header then
+                section = header
+            elseif section == "Squad" then
+                local key, value = line:match("^%s*([%w_]+)%s*=%s*(%-?%d+)")
+                if key then values[key] = tonumber(value) end
+            end
+        end
+        file:close()
+        local settings = "ue4ss/Mods/ZCUnlocked/dlls/settings.ini, [Squad]"
+        if values.squad ~= 0 then
+            log("WARNING: ZC Unlocked's squad extension is on (" .. settings .. " squad="
+                .. tostring(values.squad or "unset, default on") .. "). Switch the Squad row off in ZC"
+                .. " Unlocked Menu (squad=0) and restart: two squad-size mods both act on squad select and"
+                .. " every deployment.")
+        else
+            log("ZC Unlocked is installed with its squad extension off (squad=0). It still trims the squad"
+                .. " screen to four models, which this mod shows again"
+                .. (values.squad_limit_text == 0 and "."
+                    or ", and may show \"4 operators\" on the mission board (squad_limit_text=0 hides that)."))
+        end
     end
 end
 

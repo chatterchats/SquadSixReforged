@@ -453,3 +453,29 @@ mission complete and the return to the Den all good. No errors.
 
 Lord of Betrayal: no spawn destinations in its level, so the volume's centre, 351 degrees; the
 probe found the eight enemies at 2. The added two in half cover; the game's four kept.
+
+## ZC Unlocked alongside (9f4841d + uncommitted, 2026-10-14)
+
+ZC Unlocked 1.4.75 (a C++ mod, Nexus) has its own squad extension. Its paks share no file with the
+Core pak. With `squad=0` it still arms its squad code at size 4 (`squad: size=4 from ini key 'squad
+(off)'`): it rewrote 71 missions' limits to four (`limits_resweep ... at_target`), ran its placement,
+showed "4 operators" on the mission board, and trimmed the squad-select lineup to four, hiding
+Squad Six Reforged's fifth and sixth models (`trim slot characters ... hid 2 now, hidden mask=30`;
+read through ZC Sandbox: those two proxies had `bHidden = True`). Its undocumented `[Squad]` keys
+`squad_lineup=0`, `squad_placement=0` and `squad_limit_text=0` turn off its lineup, placement and
+limit text; the trim and the limit resweep stay, and six still deploy.
+
+Squad Six Reforged now shows the fifth and sixth models again while the squad screen is visible
+(`lineup_keep_shown`, `lineup_reshown`). Two fixes on the way: `AActor::IsHidden` isn't reflected,
+so the watch read nothing until it read `bHidden`; and the first lineup pass runs before the screen
+is visible, so the watch now waits instead of stopping. The user: all six models show, with a brief
+flash when the menu refreshes (ZC Unlocked hiding them, this mod showing them again). Back in the
+Den no model was left showing.
+
+Then with ZC Unlocked at plain `squad=0` (the state its menu leaves, which most players will use):
+all six models showed (with the flash), all six deployed onto good spots, a save finished and the
+mission completed. ZC Unlocked's log showed its placement loaded but doing nothing; its limit
+resweep still rewrote 71 missions to four and its limit text was on, neither stopping six from
+deploying. So `squad=0` is all that's needed; `squad_limit_text=0` is optional, for the board's
+"4 operators".
+

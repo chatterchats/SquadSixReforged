@@ -19,7 +19,8 @@ tutorial, whose squad the game sets, keeps four.
 
 ## Status
 
-**1.4.0** (2026-10-14): six operators in every hero mission, cover that faces where each fight
+**1.4.1** (2026-10-14): works alongside ZC Unlocked with its squad code switched off. **1.4.0**
+(2026-10-14): six operators in every hero mission, cover that faces where each fight
 places its enemies, and better use of the cover beside the game's spots; see
 [CHANGELOG.md](CHANGELOG.md). **1.3.0** (2026-10-13) added cover-aware deployment and a settings
 page. **1.2.0** (2026-10-12) was the first release of Squad Six Reforged.

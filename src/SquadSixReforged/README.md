@@ -1,4 +1,4 @@
-# Squad Six Reforged v1.4.0 — Six-Operator Squads for Star Wars: Zero Company
+# Squad Six Reforged v1.4.1 — Six-Operator Squads for Star Wars: Zero Company
 
 Squad Six Reforged raises the deployable squad size from four to six operators.
 
@@ -43,6 +43,11 @@ played through at six, including saving.
 - UE4SS for Star Wars Zero Company (Nexus Mods)
 - No other squad-size mod, including arctco's original Squad Six or Squad Expansion: they change
   the same things. The log warns if one is installed alongside.
+- **ZC Unlocked** works alongside with its own squad extension switched off: turn the Squad row
+  off in ZC Unlocked Menu (`squad=0` in its `dlls/settings.ini`) and restart. The log warns while
+  it's on. ZC Unlocked still hides the fifth and sixth models on the squad screen, so they flash
+  briefly when the menu updates as Squad Six Reforged shows them again, and the mission board may
+  say "4 operators" (add `squad_limit_text=0` under `[Squad]` to fix that); six still deploy.
 - Optional: [Mixamoo Mod Config Manager](https://www.nexusmods.com/starwarszerocompany/mods/149),
   for the settings page
 

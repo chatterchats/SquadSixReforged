@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.3]
+
 ### Fixed
 - **Squad select no longer stutters.** Since 1.4.1, opening squad select caused frametime spikes
   for about 15 seconds (and again after each squad change), from a check that searched every

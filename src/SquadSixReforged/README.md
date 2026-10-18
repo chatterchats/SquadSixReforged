@@ -1,4 +1,4 @@
-# Squad Six Reforged v1.4.2 — Six-Operator Squads for Star Wars: Zero Company
+# Squad Six Reforged v1.4.3 — Six-Operator Squads for Star Wars: Zero Company
 
 Squad Six Reforged raises the deployable squad size from four to six operators.
 

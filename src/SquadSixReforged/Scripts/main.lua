@@ -1,4 +1,4 @@
-local VERSION = "1.4.2"
+local VERSION = "1.4.3"
 -- Squad Six Reforged's runtime (a continuation of arctco's Squad Six). This file loads the modules and keeps registering hooks until every
 -- target exists; the work itself is in limits.lua (mission squad limits), lineup.lua (squad
 -- selection), placement.lua (tactical deployment) and holotable.lua (the mission panel's squad

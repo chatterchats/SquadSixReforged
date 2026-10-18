@@ -2,7 +2,7 @@ return {
     id = "SquadSixReforged",
     name = "Squad Six Reforged",
     author = "arctco, continued by Chats",
-    version = "1.4.2",
+    version = "1.4.3",
     description = "Six-operator squads. Deployment options.",
     settings = {
         {key = "improve_game_spots", type = "bool", name = "Move the game's spots into cover", default = true,

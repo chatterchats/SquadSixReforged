@@ -169,11 +169,20 @@ end
 mock.run_until(mock.now() + 30000)
 
 -- 3. Mission start.
+-- The watch reads the game state it was notified of; FindFirstOf walks the object array, and
+-- calling it every check hitched mission loads.
+local find_first, state_lookups = FindFirstOf, 0
+FindFirstOf = function(class)
+    if class == "TacticalGameState" then state_lookups = state_lookups + 1 end
+    return find_first(class)
+end
 local function mission(units)
     squad(units)
-    mock.notify("/Script/BitReactorGame.TacticalGameState")
+    mock.notify("/Script/BitReactorGame.TacticalGameState", mock.first_of["TacticalGameState"])
     mock.run_until(mock.now())
+    state_lookups = 0
     mock.run_loops(6)
+    if state_lookups > 0 then fail("the spawn watch looked the game state up " .. state_lookups .. " times") end
 end
 local stuck = unit("Stuck", HOLE.X, HOLE.Y)
 local start = {unit("Start1", 2000, 0), unit("Start2", 2000, 200), unit("Start3", 2200, 0),
@@ -192,4 +201,16 @@ mission({unit("Intro1", 2000, 0, 5000), unit("Intro2", 2000, 200, 5000), unit("I
     unit("Intro4", 2200, 200, 5000), unit("Intro5", 1800, 0, 5000), unit("Intro6", HOLE.X, HOLE.Y, 5000)})
 mission({unit("Four1", 2000, 0), unit("Four2", 2000, 200), unit("Four3", 2200, 0), unit("Four4", HOLE.X, HOLE.Y)})
 if count("spawn_rescue=") ~= 1 then fail("only the first mission's operator should have been moved") end
+
+-- 4. A deployment in a mission whose game state was notified reads that state: TriggerPreCombat used
+-- to look it up four or more times in one frame, each a walk of the object array.
+local notified = {on_lane(1), on_lane(2), on_lane(3), on_lane(4), unit("Operator5", B + 200, B - 600),
+    unit("Operator6", B + 1000, B + 200)}
+mission(notified)
+local rescues = count("placement_rescue=deployment_lane")
+state_lookups = 0
+mock.hooks[TRIGGER].pre(area("Notified"))
+mock.run_until(mock.now() + 600)
+if state_lookups > 0 then fail("the deployment looked the game state up " .. state_lookups .. " times") end
+if count("placement_rescue=deployment_lane") ~= rescues + 1 then fail("the notified mission's deployment wasn't rescued") end
 io.stdout:write("ok\n")

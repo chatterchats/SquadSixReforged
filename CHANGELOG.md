@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Squad select no longer stutters.** Since 1.4.1, opening squad select caused frametime spikes
+  for about 15 seconds (and again after each squad change), from a check that searched every
+  object in the game four times a second. It now checks the squad screen directly.
+- **Less stutter while a mission loads and when the squad deploys.** The check that rescues an
+  operator spawned off the navmesh searched the game's objects every 2 seconds, from the mission
+  loading until the first deployment, and the deployment searched them again several times in a
+  single frame. Both now reuse what the game handed the mod when the mission started.
+
 ## [1.4.2]
 
 ### Added

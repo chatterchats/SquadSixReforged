@@ -509,6 +509,19 @@ local function squads_near(area_world_name, anchors, volume, stats)
     return result
 end
 
+-- The mission's tactical game state, kept from its construction notification (start_spawn_watch),
+-- else looked up. FindFirstOf walks the object array: a deployment looked the state up at least four
+-- times inside TriggerPreCombat, and its log lines there came ~30 ms apart (2026-10-18). A looked-up
+-- state isn't kept: only the notification says which mission's state is current.
+local kept_game_state = nil
+
+local function tactical_game_state()
+    if valid(kept_game_state) then return kept_game_state end
+    kept_game_state = nil
+    local ok, found = pcall(function() return FindFirstOf(TACTICAL_GAME_STATE_CLASS) end)
+    return ok and found or nil
+end
+
 local function player_squad_members(area, anchors)
     local stats = {raw = 0, valid = 0, in_world = 0, located = 0, near = 0, route = "none"}
     if anchors == nil or #anchors < 1 then return {}, stats end
@@ -521,8 +534,8 @@ local function player_squad_members(area, anchors)
     end)
     if volume_ok and valid(linked) then volume = linked end
 
-    local state_ok, state = pcall(function() return FindFirstOf(TACTICAL_GAME_STATE_CLASS) end)
-    if state_ok and valid(state) then
+    local state = tactical_game_state()
+    if valid(state) then
         local squad_ok, squad = pcall(function()
             return unwrap(state:GetPropertyValue(PLAYER_SQUAD_PROPERTY))
         end)
@@ -566,8 +579,8 @@ end
 -- operators the proximity filter throws away, because being thrown away is
 -- exactly the symptom it exists to fix.
 local function every_player_unit()
-    local state_ok, state = pcall(function() return FindFirstOf(TACTICAL_GAME_STATE_CLASS) end)
-    if not state_ok or not valid(state) then return {} end
+    local state = tactical_game_state()
+    if not valid(state) then return {} end
     local squad_ok, squad = pcall(function()
         return unwrap(state:GetPropertyValue(PLAYER_SQUAD_PROPERTY))
     end)
@@ -3380,6 +3393,7 @@ local function check_spawned_squad(watch)
 end
 
 local function start_spawn_watch(game_state)
+    kept_game_state = game_state
     COVER.markers.preload()
     local watch = {state = game_state, deployment = deployments_begun,
         elapsed = 0, squad = 0, rescued = 0, positions = {}, still = {}, moved = {}}

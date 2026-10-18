@@ -3,7 +3,8 @@
 -- same ratio, and log one line describing the pool as it was before the pass. When another mod
 -- hides the fifth or sixth model afterwards (ZC Unlocked's lineup trim), it is shown again while
 -- the squad screen is open, and not once the screen has closed; a four-slot lineup's hidden extra
--- models stay hidden.
+-- models stay hidden. The watch scans for the screen's slot box at most once, and not at all once
+-- the box's construction notification has handed it over: every scan walks every object.
 --   luajit tests/lineup_test.lua <Scripts dir>
 local scripts = assert(arg[1], "usage: lineup_test.lua <Scripts dir>")
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
@@ -15,8 +16,12 @@ local screen_open = true
 local slot_box = mock.object("MDVMDynamicEntryBox /Engine/Transient.WBP_Menu_MissionSquadSelect_C_0.WidgetTree.CharacterSlots",
     {}, {IsVisible = function() return screen_open end})
 local find_all = FindAllOf
+local box_scans = 0
 FindAllOf = function(class)
-    if class == "MDVMDynamicEntryBox" then return {slot_box} end
+    if class == "MDVMDynamicEntryBox" then
+        box_scans = box_scans + 1
+        return {slot_box}
+    end
     return find_all(class)
 end
 mock.load(scripts)
@@ -78,6 +83,25 @@ if not proxies[6].bHidden then fail("a model was shown again after the squad scr
 screen_open = true
 mock.run_loops(1)
 if proxies[6].bHidden then fail("the watch stopped while the screen wasn't visible yet") end
+if box_scans > 1 then fail("the watch scanned for the slot box " .. box_scans .. " times, expected at most once") end
+
+-- A new squad screen: its box's notification replaces the kept one, and the watch follows it
+-- without scanning.
+local next_open = false
+local next_box = mock.object("MDVMDynamicEntryBox /Engine/Transient.WBP_Menu_MissionSquadSelect_C_1.WidgetTree.CharacterSlots",
+    {}, {IsVisible = function() return next_open end})
+box_scans = 0
+mock.notify("/Script/MDViewModel.MDVMDynamicEntryBox", next_box)
+mock.run_until(mock.now() + 2000)
+mock.hooks[show].pre(manager, mock.array(slots), false)
+mock.run_until(mock.now() + 100)
+proxies[5].bHidden = true
+mock.run_loops(2)
+if not proxies[5].bHidden then fail("a model was shown again while the new screen's box wasn't visible") end
+next_open = true
+mock.run_loops(1)
+if proxies[5].bHidden then fail("the watch didn't follow the new screen's box") end
+if box_scans > 0 then fail("the watch scanned although the notification handed over the box") end
 
 -- A four-slot lineup: this mod hides the extra two itself, and nothing shows them again.
 screen_open = true

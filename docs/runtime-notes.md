@@ -282,6 +282,18 @@ crash dump from 1.1.0 records "TArray index out of range" at unwrap()
 after source=pre and before source=deferred, which is the exact lifetime
 failure produced by reading a hook-owned RemoteParam after return.
 
+### `squad_screen_visible`
+
+1.4.1's keep-shown watch looked the squad screen's slot box up with
+`FindAllOf("MDVMDynamicEntryBox")` on every 250 ms tick for 15 seconds after
+each lineup pass. FindAllOf walks every object in this build (see
+`mission_limits`), so squad select hitched four times a second for every
+user, whether or not ZC Unlocked was installed (report with a frametime
+graph, 2026-10-18). The box is now kept from its construction
+notification, which `register_layout_notification` already receives, and
+the watch only reads its visibility. Without a kept box (Lua loaded after the
+screen opened) a watch scans once, and keeps a visible box it finds.
+
 ## holotable.lua: the mission panel
 
 Not arctco's: added after 1.4.1, when players reported the holotable still saying "4 operators"
@@ -1142,6 +1154,18 @@ engine declines returns false silently, leaving the point
 at the origin it was spawned at -- which is where
 EvilPoptart1987's fifth operator was found, at 0/0/261.
 
+### `tactical_game_state`
+
+Placement and the spawn watch read the squad through the tactical game state
+kept from its construction notification (`start_spawn_watch`). Through 1.4.2
+every read found it again with `FindFirstOf`, which in UE4SS walks the object
+array until it finds a match: the spawn watch every 2 s from the map load to
+the first deployment (up to five minutes), and the deployment itself 19 times
+in its first 600 ms in `tests/live_fixes_test.lua`, at least four of them in
+the TriggerPreCombat frame, whose log lines came ~30 ms apart (stutter report
+and a main-instance log, 2026-10-18). A looked-up state isn't kept: only the
+notification says which mission's state is current.
+
 ### `report_mission_placement`
 
 Read-only. A second reporter hit an out-of-bounds spawn on an ordinary
@@ -1149,7 +1173,7 @@ mission, so the auto-assign guard alone does not explain every case. This
 records the numbers needed to decide the real fix: how many units the squad
 actually has, how many destinations the deployment area authored, and where
 each unit ended up. It writes nothing and hooks nothing; the gate is a
-single FindFirstOf so it costs almost nothing outside a mission.
+single FindFirstOf, run once at the end of a deployment.
 
 ### `register_rescue_command`
 

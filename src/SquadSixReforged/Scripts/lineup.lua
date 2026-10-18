@@ -416,15 +416,23 @@ local function vectors_text(vectors, format)
     return table.concat(text, ",")
 end
 
+local function is_squad_slot_box(box)
+    local name = full_name(box)
+    return string.find(name, "WBP_Menu_MissionSquadSelect", 1, true) ~= nil
+        and string.find(name, "CharacterSlots", 1, true) ~= nil
+end
+
+-- The squad screen's slot box, kept from its construction notification (register_layout_notification)
+-- or a scan. FindAllOf walks every object in this build (no FUObjectHashTables): the keep-shown
+-- watch scanning every tick hitched the squad screen four times a second for 15 seconds (1.4.1,
+-- 2026-10-18).
+local squad_box = nil
+
 local function squad_slot_box()
     local boxes = FindAllOf(SLOT_BOX_CLASS)
     if boxes == nil then return nil end
     for _, box in pairs(boxes) do
-        local name = full_name(box)
-        if string.find(name, "WBP_Menu_MissionSquadSelect", 1, true)
-            and string.find(name, "CharacterSlots", 1, true) then
-            return box
-        end
+        if is_squad_slot_box(box) then return box end
     end
     return nil
 end
@@ -437,17 +445,25 @@ end
 -- visible: the game's own hiding of the lineup, and any model this mod hid, are left alone.
 local KEEP_SHOWN = {interval_ms = 250, seconds = 15}
 
--- Whether a squad-select slot box is on screen now. Looked up each time: the first lineup pass
--- runs before the screen is shown, and an earlier screen's box can still exist, not visible.
-local function squad_screen_visible()
+local function box_visible(box)
+    local open_ok, open = pcall(function() return box:IsVisible() end)
+    return open_ok and open == true
+end
+
+-- Whether the squad screen's slot box is on screen now. The first lineup pass runs before the
+-- screen is shown, and an earlier screen's box can still exist, not visible; the newest box's
+-- notification replaces the kept one. Without a kept box, `scan` allows one object scan, which
+-- keeps a visible box it finds.
+local function squad_screen_visible(scan)
+    if valid(squad_box) then return box_visible(squad_box) end
+    squad_box = nil
+    if not scan then return false end
     local boxes = FindAllOf(SLOT_BOX_CLASS)
     if boxes == nil then return false end
     for _, box in pairs(boxes) do
-        local name = full_name(box)
-        if string.find(name, "WBP_Menu_MissionSquadSelect", 1, true)
-            and string.find(name, "CharacterSlots", 1, true) then
-            local open_ok, open = pcall(function() return box:IsVisible() end)
-            if open_ok and open == true then return true end
+        if is_squad_slot_box(box) and box_visible(box) then
+            squad_box = box
+            return true
         end
     end
     return false
@@ -463,9 +479,11 @@ local function keep_extra_models_shown(owner, owner_key)
         for index in pairs(extra_models_wanted[owner_key]) do indexes[#indexes + 1] = index end
         table.sort(indexes)
         log("lineup_keep_shown indexes=" .. table.concat(indexes, ",") .. " screen_visible="
-            .. tostring(squad_screen_visible()))
+            .. tostring(squad_screen_visible(false)) .. " box_kept=" .. tostring(squad_box ~= nil))
     end
     local ticks = 0
+    -- At most one scan per watch, and none once a box is kept.
+    local scanned = false
     LoopAsync(KEEP_SHOWN.interval_ms, function()
         ticks = ticks + 1
         if extra_models_watch[owner_key] ~= generation
@@ -475,10 +493,10 @@ local function keep_extra_models_shown(owner, owner_key)
         ExecuteInGameThread(function()
             -- Nothing is shown while the squad screen isn't on screen, before it opens or after
             -- it closes; the watch waits rather than stopping.
-            if extra_models_watch[owner_key] ~= generation or not valid(owner)
-                or not squad_screen_visible() then
-                return
-            end
+            if extra_models_watch[owner_key] ~= generation or not valid(owner) then return end
+            local visible = squad_screen_visible(not scanned)
+            scanned = true
+            if not visible then return end
             local proxies = proxy_array(owner)
             for index in pairs(extra_models_wanted[owner_key] or {}) do
                 local actor = unwrap(proxies[index])
@@ -652,11 +670,8 @@ local function register_layout_notification()
     local ok = pcall(function()
         NotifyOnNewObject(SLOT_BOX_CLASS_PATH, function(box)
             local candidate = unwrap(box)
-            local name = full_name(candidate)
-            if not string.find(name, "WBP_Menu_MissionSquadSelect", 1, true)
-                or not string.find(name, "CharacterSlots", 1, true) then
-                return
-            end
+            if not is_squad_slot_box(candidate) then return end
+            squad_box = candidate
             local delays = {100, 250, 750, 1500}
             for attempt = 1, #delays do
                 local delay = delays[attempt]

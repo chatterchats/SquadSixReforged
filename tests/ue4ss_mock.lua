@@ -80,6 +80,10 @@ mock.game_properties = {
     ["/Script/BitReactorGame.TacticalPoint"] = {"OwningTeam"},
     ["/Script/BitReactorGame.BitReactorGameSquad"] = {"SquadMembers"},
     ["/Script/BitReactorGame.TacticalGameState"] = {"PlayerSquad"},
+    ["/Script/Bruno.BrunoMissionViewModel"] = {"MinSquadSize", "MaxSquadSize"},
+    ["/Game/Game/UI/Strategy/GalaxyMap/Widgets/WBP_GalaxyMap_LocationInfoPanel.WBP_GalaxyMap_LocationInfoPanel_C"] =
+        {"OperatorCount", "RequiredUnitList"},
+    ["/Game/Game/UI/Strategy/_Common/BPs/VM_CurrentActivity.VM_CurrentActivity_C"] = {"CurrentMissionVM"},
 }
 
 -- A world that can spawn actors (SpawnActor(class, location, rotation)).

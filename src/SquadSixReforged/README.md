@@ -1,4 +1,4 @@
-# Squad Six Reforged v1.4.1 — Six-Operator Squads for Star Wars: Zero Company
+# Squad Six Reforged v1.4.2 — Six-Operator Squads for Star Wars: Zero Company
 
 Squad Six Reforged raises the deployable squad size from four to six operators.
 
@@ -10,6 +10,8 @@ and the hand-picked list of missions behind it. See `CREDITS.md` beside this fil
 
 - **Squad select holds six:** six slots, all six operators in the lineup, and six nameplates.
 - **Missions take six** wherever the game can handle it.
+- **The holotable shows the range:** a mission's panel reads "4 - 6 Operators", with the two
+  optional operators' icons in orange.
 - **The extra two are placed properly in missions.** The game only marks four spots in each
   deployment area. Squad Six Reforged adds two more inside the area, on the floor, and moves
   operators 5 and 6 there if the game leaves them stuck or outside it. Story characters who join

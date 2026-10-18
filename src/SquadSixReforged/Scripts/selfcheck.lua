@@ -22,10 +22,13 @@ local valid = Common.valid
 
 -- Names that only exist once something loads are checked a few seconds after it appears, retried
 -- while Blueprints stream in: the mission's (BP_CombatPreparationArea, with the mission level) and
--- squad selection's (VM_ActivitySlotList, when the squad screen first opens).
+-- squad selection's (VM_ActivitySlotList, when the squad screen first opens), and the holotable
+-- mission panel's (WBP_GalaxyMap_LocationInfoPanel, with the galaxy map).
 local PHASE_TRIGGERS = {
     mission = "/Script/BitReactorGame.TacticalGameState",
     squad_select = Common.SLOT_LIST_ASSET .. ".VM_ActivitySlotList_C",
+    holotable = "/Game/Game/UI/Strategy/GalaxyMap/Widgets/WBP_GalaxyMap_LocationInfoPanel"
+        .. ".WBP_GalaxyMap_LocationInfoPanel_C",
 }
 local PHASE_DELAYS_MS = {3000, 10000, 30000}
 
@@ -149,7 +152,7 @@ end
 local function register_phase_checks()
     if phases_registered then return end
     phases_registered = true
-    for _, phase in ipairs({"squad_select", "mission"}) do
+    for _, phase in ipairs({"holotable", "squad_select", "mission"}) do
         if phases[phase] then register_phase(phase, phases[phase]) end
     end
 end

@@ -282,6 +282,49 @@ crash dump from 1.1.0 records "TArray index out of range" at unwrap()
 after source=pre and before source=deferred, which is the exact lifetime
 failure produced by reading a hook-owned RemoteParam after return.
 
+## holotable.lua: the mission panel
+
+Not arctco's: added after 1.4.1, when players reported the holotable still saying "4 operators"
+with the Core pak installed.
+
+### `PANEL_EVENTS`
+
+The panel under the holotable (WBP_GalaxyMap_LocationInfoPanel) shows a mission's
+`MinSquadSize`, not its maximum: its MinSquadSize field-notify event writes the number into
+`OperatorCount` and creates that many WBP_UnitRequired icons in `RequiredUnitList`, a dynamic
+entry box (read from the 1.2 Blueprint, 2026-10-17). The game authors minimum and maximum equal,
+so the panel read as the squad size; the Core pak raises only the maximum, so it kept saying four.
+Raising the minimum as well would make six compulsory, and the panel's "too few operators"
+warning reads the same value.
+
+The events are every one after which the Blueprint may have rebuilt the row: the minimum
+changing, the mission view model changing, the current mission changing, and SetupTypeState,
+which switches the panel between mission and operation and resets the row. The deferred pass is
+idempotent, so running after several of them changes nothing.
+
+### `show_range`
+
+The row is extended only while `OperatorCount` holds the mission's minimum (or the range this
+pass wrote): operations (field tasks) use the same panel with their own text, OperatorCountText,
+and their own icons. Missions whose minimum is their maximum (the tutorial, three-operator
+missions) are left as the game draws them.
+
+`GetAllEntries` comes back from UE4SS as a plain Lua table, not a TArray: the first in-game run
+read it with GetArrayNum, found "-1" icons and never extended the row (log, 2026-10-17). The
+entry box also pools its widgets, so when the Blueprint rebuilds the row a tinted icon can come
+back as a required one; every pass restores the icons this module tinted that are no longer
+extras.
+
+### `mission_limits`
+
+The first working build found the mission through `FindAllOf("VM_CurrentActivity_C")` on every
+pass, and switching missions hitched by 350-450 ms (frametime graph, 2026-10-17). UE4SS can't
+find FUObjectHashTables in this build ("Failed to find FUObjectHashTables::Get()" in its log),
+so each FindAllOf walks every object, and one switch fired up to eight passes. Now the panel's
+Changed event supplies the mission view model (MDViewModel's view-model-changed delegate is
+`(OldViewModel, NewViewModel)`); the scan remains only as a fallback, its result is kept, and a
+burst of panel events shares one pass per delay.
+
 ## placement.lua: tactical deployment
 
 ### `MOVE_UNITS_FUNCTIONS`

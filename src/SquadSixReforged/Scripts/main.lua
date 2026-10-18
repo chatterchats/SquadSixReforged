@@ -1,7 +1,8 @@
-local VERSION = "1.4.1"
+local VERSION = "1.4.2"
 -- Squad Six Reforged's runtime (a continuation of arctco's Squad Six). This file loads the modules and keeps registering hooks until every
 -- target exists; the work itself is in limits.lua (mission squad limits), lineup.lua (squad
--- selection) and placement.lua (tactical deployment), with shared helpers in common.lua.
+-- selection), placement.lua (tactical deployment) and holotable.lua (the mission panel's squad
+-- range), with shared helpers in common.lua.
 -- selfcheck.lua logs whether every game name those modules use still resolves.
 --
 -- Explicit path: never resolve another mod's module of the same name. Clearing the cache makes
@@ -9,13 +10,14 @@ local VERSION = "1.4.1"
 local source = debug.getinfo(1, "S").source:gsub("^@", "")
 local directory = assert(source:match("^(.*[/\\])"), "Scripts directory unavailable")
 package.path = directory .. "?.lua;" .. package.path
-for _, module in ipairs({"common", "limits", "lineup", "placement", "selfcheck"}) do
+for _, module in ipairs({"common", "limits", "lineup", "placement", "holotable", "selfcheck"}) do
     package.loaded[module] = nil
 end
 local Common = require("common")
 local Limits = require("limits")
 local Lineup = require("lineup")
 local Placement = require("placement")
+local Holotable = require("holotable")
 local Selfcheck = require("selfcheck")
 -- The Mixamoo Mod Config Manager page (MXM/settings.lua). Registering at load lists the mod in
 -- the menu before the first mission; without the menu installed the defaults apply.
@@ -85,6 +87,7 @@ local function register_hooks()
     register_placement_triggers()
     register_proxy_hook()
     register_lineup_hook()
+    Holotable.register_panel_hooks()
 end
 
 local function register_early_slot_notification()
@@ -196,6 +199,7 @@ do
 end
 
 register_early_slot_notification()
+Holotable.register_panel_notification()
 register_layout_notification()
 register_area_notification()
 register_spawn_watch()
@@ -203,6 +207,7 @@ register_rescue_command()
 Selfcheck.add(Limits.game_names)
 Selfcheck.add(Lineup.game_names)
 Selfcheck.add(Placement.game_names)
+Selfcheck.add(Holotable.game_names)
 Selfcheck.register_phase_checks()
 
 ExecuteWithDelay(1000, function()

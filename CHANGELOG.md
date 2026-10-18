@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.2]
+
+### Added
+- **The holotable shows the squad range.** A mission's panel now reads "4 - 6 OPERATORS", with an
+  orange icon for each optional operator after the four required ones. It used to show only the
+  minimum, so it said four even though squad select takes six.
+
+### Fixed
+- **Updated for the game's 1.2 Update.** The Core pak is rebuilt from 1.2's missions, so Belly of
+  the Beast and Fathom and Finale keep the 1.2 changes to their mission data instead of reverting
+  to 1.1's.
+
 ## [1.4.1]
 
 ### Added

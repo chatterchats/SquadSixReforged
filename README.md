@@ -41,6 +41,7 @@ src/SquadSixReforged/        the UE4SS mod ("Squad Six Reforged")  -> ue4ss/Mods
     limits.lua      mission squad limits at runtime, and the scripted-cast guards
     lineup.lua      squad selection: six slots, extra proxies, six-model lineup, nameplates
     placement.lua   tactical deployment: extra destinations, rescue, repair, squadsixrescue
+    holotable.lua   the holotable's mission panel: the squad range and the optional operators' icons
     selfcheck.lua   logs whether every game name the other modules use still resolves
     directions.lua  generated: which way each deployment area's enemies are (tools/encounter_directions.py)
     common.lua      shared constants and reflection/vector helpers
@@ -57,7 +58,7 @@ dev/            never shipped: SquadSixReforgedProbe (in-game checks of placemen
 docs/           upstream notes, file hashes, pak analysis, runtime-notes.md (why each rule exists),
                 placement-coverage.md (how placement does on every map)
 tests/          runtime tests under a UE4SS stand-in (ue4ss_mock.lua): startup, self-check,
-                lineup, rescue, probe, cover (cover choice, the game-spot improvement, debug markers),
+                lineup, holotable, rescue, probe, cover (cover choice, the game-spot improvement, debug markers),
                 placement_maps (placement.lua over every deployment area in data/mapscan.json,
                 including the fixed layouts)
 tools/          build_core.py, inspect_core.py, map_scan.py, encounter_directions.py, sandbox_check.py, package.py,
@@ -95,7 +96,8 @@ changed, and lists what to review. See [docs/core-pak-analysis.md](docs/core-pak
 1. `python3 tools/build_core.py ... --check`: stops if the game's missions or squad limits changed.
 2. Start the game and open squad select, then start a mission. In `UE4SS.log`, look for:
    ```
-   [SQUAD_SIX_REFORGED] selfcheck phase=startup ok=23 missing=none unchecked=none
+   [SQUAD_SIX_REFORGED] selfcheck phase=startup ok=25 missing=none unchecked=none
+   [SQUAD_SIX_REFORGED] selfcheck phase=holotable ok=7 missing=none unchecked=none
    [SQUAD_SIX_REFORGED] selfcheck phase=squad_select ok=2 missing=none unchecked=none
    [SQUAD_SIX_REFORGED] selfcheck phase=mission ok=3 missing=none unchecked=none
    ```

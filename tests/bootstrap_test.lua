@@ -32,6 +32,7 @@ mock.transcript[#mock.transcript + 1] = "loops_stopped=" .. tostring(stopped)
 -- after its trigger appears.
 mock.notify("/Game/Game/UI/Strategy/GalaxyMap/BPs/VM_ActivitySlotList.VM_ActivitySlotList_C")
 mock.notify("/Script/BitReactorGame.TacticalGameState")
+mock.notify("/Game/Game/UI/Strategy/GalaxyMap/Widgets/WBP_GalaxyMap_LocationInfoPanel.WBP_GalaxyMap_LocationInfoPanel_C")
 mock.run_until(mock.now() + 40000)
 local limits = {}
 for _, value in ipairs(mock.missions) do
@@ -51,9 +52,11 @@ expect("hook /Game/Game/UI/AC_HologramManager%.AC_HologramManager_C:ShowLineupHo
 expect("hook /Script/BitReactorGame%.CombatPreparationArea:TriggerPreCombat", "placement trigger")
 expect("command squadsixrescue", "rescue command")
 expect("status version=[%d.]+ complete=true data_container=partial", "status line")
-expect("selfcheck phase=startup ok=23 missing=none unchecked=none", "every startup name resolves")
+expect("selfcheck phase=startup ok=25 missing=none unchecked=none", "every startup name resolves")
 expect("selfcheck phase=squad_select ok=2 missing=none unchecked=none", "the squad screen's names resolve")
 expect("selfcheck phase=mission ok=3 missing=none unchecked=none", "every mission name resolves")
+expect("selfcheck phase=holotable ok=7 missing=none unchecked=none", "the mission panel's names resolve")
+expect("holotable_hooks=4/4", "every mission panel event is hooked")
 expect("SK_Ryloth_035=6", "a mission left at 4 is raised at runtime")
 expect("HM_Trick_010=6", "No Clone Left Behind keeps six")
 expect("HM_Kabb_010=6", "a hero mission cleared for six is raised despite its companion")

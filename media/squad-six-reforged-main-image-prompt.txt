@@ -1,0 +1,18 @@
+Generated using the built-in image_gen tool.
+
+Final export: proportionally resized and center-cropped to exactly
+1920x1080 pixels. No stretching.
+
+Use case: ads-marketing.
+Asset type: Nexus Mods main image / thumbnail for the Star Wars: Zero Company mod Squad Six Reforged.
+Primary request: create the matching 16:9 main-image version of the supplied Squad Six Reforged banner, following the established thumbnail layout of Enhanced Databank and Skip Space Travel.
+Input images: Image 1 is the Squad Six Reforged header, PRIMARY DESIGN REFERENCE for the correct title, exact six-operator emblem, typography, cyan palette, and HUD framing; Image 2 is the Enhanced Databank main image, primary COMPOSITION REFERENCE for the 1920x1080 series layout; Image 3 is the Skip Space Travel main image, secondary COMPOSITION REFERENCE. Create a new matching asset; do not include references as insets or mockups.
+Output: exactly 1920x1080 pixels, full-bleed landscape 16:9, no external margins or letterboxing.
+Scene/backdrop: near-black midnight navy with subtle cloudy blue texture. Match the symmetrical fine cyan HUD framing with angular side borders, short restrained side ticks, faint large concentric radar circles, and delicate central crosshair.
+Subject: reproduce the cyan six-operator emblem from Image 1 faithfully. EXACTLY SIX separate head-and-shoulders silhouettes: three slightly smaller busts in the upper row and three larger busts in the lower row. Keep all six round heads separately visible with clean spacing, no seventh head. Smooth geometric silhouettes, no faces or weapons; same soft cyan luminous edges and restrained metallic depth as the header. Center the emblem prominently in the upper-middle region at roughly x=960 y=350, surrounded by the same radar arc. Emblem height roughly 250 pixels; naturally balance with the title below.
+Text (verbatim): "SQUAD SIX REFORGED". Exactly these three words in one straight horizontal line centered below the emblem at roughly y=620. No other text.
+Typography: match the header's tall bold condensed uppercase sans-serif with cool silver-white vertical metallic gradient, crisp edges, understated texture and subtle dark depth. Title should occupy approximately 75 percent of image width with generous side margins, and remain easy to read at thumbnail size. Match Enhanced Databank's title-panel placement and scale. Never wrap words.
+Composition: use the 16:9 canvas naturally, enlarge emblem and title relative to the wide header. Bring cyan side rails inward around upper emblem and lower title panel, preserve symmetrical dark negative space above and below, and use faint radar rings to fill the canvas. Keep icon and letters fully within safe margins.
+Color palette: black, midnight navy, cool silver-white, luminous cyan only.
+Constraints: visually consistent with the supplied header and reference thumbnail series. Accurate spelling, exactly six operators, clean restrained polished science-fiction graphic design. No subtitle, tagline, version, badges, brand logos, watermark, rainbow colors, illustrated battle scene, spacecraft, inset reference images, or mockup.
+

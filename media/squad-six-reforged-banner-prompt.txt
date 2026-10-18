@@ -1,0 +1,17 @@
+Generated using the built-in image_gen tool.
+
+Final export: proportionally resized to 1300 pixels wide and center-cropped
+to exactly 1300x372 pixels. No stretching.
+
+Use case: ads-marketing.
+Asset type: Nexus Mods header / banner for the Star Wars: Zero Company mod Squad Six Reforged.
+Primary request: create a finished new header in the same established visual series as the supplied reference banners. Follow Enhanced Databank and Skip Space Travel particularly closely.
+Input images: Image 1 is the Enhanced Databank banner, primary STYLE AND LAYOUT REFERENCE; Image 2 is the Skip Space Travel banner, secondary STYLE AND LAYOUT REFERENCE; Image 3 is the Colors+ banner, supplementary STYLE REFERENCE. These are references, not artwork to reproduce as insets.
+Output: exactly 1300x372 pixels, wide aspect ratio 3.494623656:1. Full-bleed artwork, no letterboxing, no external margins.
+Scene/backdrop: near-black midnight navy with subtle cloudy blue texture, very fine cyan technical linework, faint centered concentric radar rings, delicate central crosshair, symmetrical angular HUD borders entering from all four corners, short side ticks, and the same horizontal title panel. Keep the existing background and framing design closely matched, restrained and spacious.
+Subject: replace the existing reference icon with a small, crisp cyan squad emblem centered above the title in the same upper-center region. The emblem depicts EXACTLY SIX stylized head-and-shoulders operator silhouettes, arranged as two neat rows of three: three slightly smaller rear busts above, and three front busts below. Six separate visible round heads, no seventh head. Simple geometric silhouettes, no facial details, no weapons, no character portraits. Their soft cyan luminous edges and restrained metallic dimensionality should match the database icon's finish. The emblem fits cleanly within the radar arc at approximately x=650 y=85 and remains immediately readable.
+Text (verbatim): "SQUAD SIX REFORGED". Exactly these three words in one horizontal line, centered in the middle title panel. No other text.
+Typography: same tall bold condensed uppercase sans-serif as the references, cool silver-white vertical metallic gradient, crisp clean letter edges, subtle texture and restrained dark depth. Title height and baseline closely match Enhanced Databank. Fit comfortably with generous side margins; never wrap or crop letters.
+Color palette: black, midnight navy, cool silver-white, luminous cyan only.
+Constraints: closely match this polished symmetrical science-fiction mod artwork series. Correct spelling; exact six-person icon; all essential content inside safe margins. No subtitle, tagline, version, badges, brand logos, watermark, rainbow, illustrated battle scene, spacecraft, inset reference image, or mockup.
+

@@ -1,0 +1,20 @@
+{
+    "FileVersion": 3,
+    "Version": 1,
+    "VersionName": "0.1.0",
+    "FriendlyName": "Squad Six Reforged (Game Feature trial)",
+    "Description": "Squad Six Reforged without UE4SS: a Game Feature plugin whose AddComponents action puts a Blueprint brain on the game state.",
+    "Category": "Game Features",
+    "CreatedBy": "Chats",
+    "CreatedByURL": "https://github.com/chatterchats/SquadSixReforged",
+    "CanContainContent": true,
+    "IsBetaVersion": true,
+    "IsExperimentalVersion": false,
+    "Installed": false,
+    "ExplicitlyLoaded": true,
+    "BuiltInInitialFeatureState": "Active",
+    "Plugins": [
+        { "Name": "GameFeatures", "Enabled": true },
+        { "Name": "ModularGameplay", "Enabled": true }
+    ]
+}

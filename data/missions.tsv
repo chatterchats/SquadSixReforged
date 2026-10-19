@@ -21,7 +21,7 @@ AuthoredHero/HM_Telrea_020	4	6	"Sisters": auto-assigns Hawks plus Tel-Rea, who f
 AuthoredHero/HM_TrickLuco_020	4	6	"No Kings, No Masters": auto-assigns Hawks, Trick and Luco; Rex joins through mission logic (SG_Rex), so six is seven units. played at six on 25134257 (2026-10-14): save, playthrough with Rex and mission complete
 AuthoredHero/HM_Trick_010	4	6	"No Clone Left Behind": auto-assigns Hawks plus Trick; Sergeant Sawtooth is rescued partway through (SG_Rescue_Sawtooth), like Baker in Deep Cover. played at six on 25134257 (2026-10-14) in a fresh campaign: rescue, save and mission complete
 Story_Main/MM_01_010_SerolonisJob	4	4	opening tutorial: the game sets the squad, so the player can't pick operators; limits.lua guards it at 4
-Story_Main/MM_01_030_NotYourTurf	3	3	three-operator mission
+Story_Main/MM_01_030_NotYourTurf	3	6	three-operator mission, raised to six as well (2026-10-18)
 Story_Main/MM_02_010_CoilReunion	4	6	
 Story_Main/MM_02_030_DarkGrotto	4	6	
 Story_Main/MM_02_050_SlugHQ	4	6	"Smugglers' Den": Tel-Rea joins through mission logic. Guarded at 4 after a 1.1.1 report of eight units with two Tal Reas; played at six on 25134257 (2026-10-12): seven units, one Tel-Rea, a manual save at seven finished; placement.lua gives area 2 fixed spots
@@ -78,7 +78,7 @@ Optional/SK_Dantooine_010	4	6
 Optional/SK_Dantooine_015	4	6	
 Optional/CrisisMissions/SK_Dantooine_015_Crisis	4	6	
 Optional/SK_Dantooine_020	4	6	
-Optional/SK_Dantooine_025	3	3	three-operator mission
+Optional/SK_Dantooine_025	3	6	three-operator mission, raised to six as well (2026-10-18)
 Optional/SK_Florrum_010	4	6	
 Optional/CrisisMissions/SK_Florrum_010_Crisis	4	6	
 Optional/SK_Florrum_015	4	6	
@@ -92,7 +92,7 @@ Optional/CrisisMissions/SK_Florrum_035_Crisis	4	6
 Optional/SK_Kaller_020	4	6	
 Optional/SK_Kaller_025	4	6	
 Optional/CrisisMissions/SK_Kaller_025_Crisis	4	6	
-Optional/SK_Kaller_030	3	3	three-operator mission
+Optional/SK_Kaller_030	3	6	three-operator mission, raised to six as well (2026-10-18)
 Optional/SK_Kaller_035	4	6	
 Optional/SK_Kaller_040	4	6	
 Optional/SK_Kaller_045	4	6	

@@ -479,3 +479,21 @@ resweep still rewrote 71 missions to four and its limit text was on, neither sto
 deploying. So `squad=0` is all that's needed; `squad_limit_text=0` is optional, for the board's
 "4 operators".
 
+
+## 2026-10-19 — v2 per-area cover readiness, Belly of the Beast
+
+Rebuilt the pending `gf.py` change and installed the own-manifest Game Feature pak after backing up the previous installed files under `dist/belly-before-install/`. Launched using Lutris game ID 2 and used ZC Sandbox's throwaway baseline campaign for two independent launches of `MM_05_030_BellyBeast`. UE4SS remained enabled for observation.
+
+Both runs: six squad members, two preparation areas expanded to six destinations each, four added destinations with three selected from cover, four authored spots kept and one snapped. Both encounter directions applied. No spawn overlap, destination overlap, distance or floor flags. Destination coordinates were identical between runs. Authoring and cook succeeded; the game loaded the brain successfully.
+
+This validates repeatable destination preparation on two mission launches, not movement through both encounters or a new UE4SS-disabled play-through. The game is left in the second mission with the tested build installed. Raw results: `dist/belly-codex-1.json` and `dist/belly-codex-2.json` (local ignored artifacts).
+
+## 2026-10-19 — Belly of the Beast second encounter: late cover availability
+
+User reached encounter 2 with Kabb in open ground. Live inspection confirmed he was exactly on the generated sixth destination `(6518.8, 68297.5)`, not stuck. A pocket at `(6349.34, 68405)` facing south became queryable after reaching the encounter; the brain's native QueryAndConsider accepted it (score 1096.59). The same query returned false at mission start. Passing the output struct back through Lua ConsiderPocket gave a misleading rejection; the native Blueprint call is the valid check.
+
+Added a bounded 7x7 tile grid with 120-unit queries alongside the original broad queries and cover-line search. Two mission-start tests still yielded 3/4 covered additions: search breadth alone did not solve the streaming timing.
+
+Added AreaNearby: unprocessed areas wait until a squad member is within 10000 units (3D) of a destination before NavReady starts its per-area cover wait. Rebuilt, installed, launched via Lutris and ZC Sandbox. At mission start, encounter 1 has six destinations with both additions from cover; encounter 2 retains its four authored destinations and is not marked done. This verifies deferral, not that the chosen approach distance guarantees full cover availability. User approach/deployment test remains required. Game left at mission start for that test.
+
+User follow-up: played through to Belly of the Beast encounter 2 with the approach-gated build and confirmed everyone was in cover. This validates actual deployment for that encounter, including the operator previously left on the open-ground fallback. Broader regression testing of approach-gated preparation on other maps remains outstanding.

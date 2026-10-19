@@ -13,7 +13,6 @@ Reforged matches layouts under any level-instance translation or yaw; every layo
 coordinates on a map that isn't instanced, so the brain matches them as they stand.
 """
 import json
-import subprocess
 from pathlib import Path
 
 from gf_graph import Graph, KSL, KML, KAL, GS, TARGET
@@ -25,9 +24,8 @@ SEPARATION = 100.0
 
 
 def _data():
-    out = subprocess.run(["luajit", str(REPO / "tools/export_placement_data.lua"),
-                          str(REPO / "src/SquadSixReforged/Scripts")], capture_output=True, text=True, check=True)
-    return json.loads(out.stdout)
+    # Frozen v2 data: rebuilding the plugin no longer depends on the archived v1 runtime.
+    return json.loads((REPO / "data/placement.json").read_text())
 
 
 DATA = _data()

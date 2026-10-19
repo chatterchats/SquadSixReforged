@@ -54,6 +54,10 @@ TILE = 100
 OFFSETS = [(TILE, 0), (-TILE, 0), (0, TILE), (0, -TILE),
            (TILE, TILE), (TILE, -TILE), (-TILE, TILE), (-TILE, -TILE),
            (2 * TILE, 0), (-2 * TILE, 0), (0, 2 * TILE), (0, -2 * TILE)]
+# A bounded local grid supplements the broad nearest-pocket queries. A smaller query radius
+# exposes free pockets hidden behind a nearer occupied pocket (Belly of the Beast, area 2).
+COVER_GRID = [(x * TILE, y * TILE) for x in range(-3, 4) for y in range(-3, 4)]
+COVER_GRID_RANGE = 120.0
 SAME_TILE = 75.0        # closer than this to another point is the same tile
 SNAP = 30.0             # the navmesh may move a candidate this far sideways
 STEP = 100.0            # most a candidate's floor may differ from its neighbour's
@@ -154,9 +158,12 @@ def event_graph():
     g.chain("area", "isnew")
     # The navmesh streams in after the level: an area waits until its first destination projects onto it,
     # else every candidate fails and the area would be written off (seen in SK_Brentaal_030, 2026-10-18).
+    g.call("near", "self:AreaNearby")
+    g.node("isnear", "branch")
     g.call("ready", "self:NavReady")
     g.node("isready", "branch")
-    g.chain("isnew.else", "ready", "isready")
+    g.chain("isnew.else", "near", "isnear")
+    g.chain("isnear", "ready", "isready")
     g.chain("isready", "remember", "setareas", "expand")
     acast = "area.AsCombat Preparation Area"
     g.wire(("areas.OutActors", "arealoop.Array"), ("arealoop.Array Element", "area.Object"),
@@ -164,7 +171,8 @@ def event_graph():
            ("seen_before.ReturnValue", "isnew.Condition"), ("getdone2.Done", "remember.TargetArray"),
            (acast, "remember.NewItem"), ("getareas.AreasSeen", "addareas.A"),
            ("addareas.ReturnValue", "setareas.AreasSeen"), (acast, "expand.Area"), (acast, "ready.Area"), ("ready.Ready", "isready.Condition"),
-           ("getpasses.DeployPasses", "addpasses.A"), ("addpasses.ReturnValue", "setpasses.DeployPasses"))
+           ("getpasses.DeployPasses", "addpasses.A"), ("addpasses.ReturnValue", "setpasses.DeployPasses"),
+           (acast, "near.Area"), ("near.Nearby", "isnear.Condition"))
     return g.spec()
 
 
@@ -716,26 +724,12 @@ def try_base():
     return {"name": "TryBase", "inputs": [{"name": "Base", "type": "vector"}], "outputs": [], **g.spec()}
 
 
-def try_cover():
-    """TryCover(Base): the nearest cover pocket around every offset of one taken point; keeps the best in Best/BestScore.
-
-    Reforged's COVER.choose, minus its lane polygon (approximated by NEAR_GROUP) and grid search: a pocket counts when
-    it is low or high cover facing the encounter, a tile from every point, with the group and on the navmesh. Score:
-    high cover 2000, low 1000, plus 100 x facing, minus a hundredth of its distance to the centroid. The query's moving
-    actor is the area's first destination (same pockets as an operator, tested in SK_Brentaal_030).
-    """
+def consider_pocket():
+    """ConsiderPocket(Found, Pocket): a cover pocket kept in Best/BestScore when it is low or high cover facing the
+    encounter, a tile from every point, with the group, on the navmesh and better than the best so far. Score: high
+    cover 2000, low 1000, plus 100 x facing, minus a hundredth of its distance to the centroid (Reforged's COVER.choose
+    order: full before half, then facing, then nearer)."""
     g = Graph()
-    g.call("basefloor", f"{NAV}:K2_ProjectPointToNavigation", {"QueryExtent": f"{SNAP + 20},{SNAP + 20},250"})
-    g.node("onmesh", "branch")
-    g.call("basebreak", f"{KML}:BreakVector")
-    g.call("floorbreak", f"{KML}:BreakVector")
-    g.call("lift", f"{KML}:Subtract_DoubleDouble")
-    g.node("setlift", "set", var="Lift")
-    g.node("getoffsets", "get", var="Offsets")
-    g.node("offloop", "macro", macro="ForEachLoop")
-    g.call("cand", f"{KML}:Add_VectorVector")
-    g.node("gettemplate", "get", var="Template")
-    g.call("cover", f"{TARGETING}:GetNearestCoverForPoint", {"SearchRange": COVER_RANGE})
     g.node("pocket", "break_struct", struct="/Script/BitReactorGame.CoverPocketResult")
     g.call("mindist", "self:MinDistance2D")
     # Tier from EBrunoCoverPointType's flags: 1 LowCover, 2 HighCover.
@@ -749,7 +743,7 @@ def try_cover():
     g.call("high2", f"{KML}:Multiply_DoubleDouble", {"B": 2})
     g.call("tier", f"{KML}:Add_DoubleDouble")
     g.call("hascover", f"{KML}:Greater_DoubleDouble", {"B": 0})
-    # Facing: the pocket's normal against the encounter's direction (always passes when the area has no volume).
+    # Facing: the pocket's normal against the encounter's direction (always passes when the area has no direction).
     g.node("getforward", "get", var="Forward")
     g.call("dot", f"{KML}:Dot_VectorVector")
     g.node("getmissing", "get", var="Missing")
@@ -768,12 +762,8 @@ def try_cover():
     g.call("score", f"{KML}:Add_DoubleDouble")
     g.node("getbestscore", "get", var="BestScore")
     g.call("better", f"{KML}:Greater_DoubleDouble")
-    g.call("and1", f"{KML}:BooleanAND")
-    g.call("and2", f"{KML}:BooleanAND")
-    g.call("and3", f"{KML}:BooleanAND")
-    g.call("and4", f"{KML}:BooleanAND")
-    g.call("and5", f"{KML}:BooleanAND")
-    g.call("and6", f"{KML}:BooleanAND")
+    for i in range(1, 7):
+        g.call(f"and{i}", f"{KML}:BooleanAND")
     g.node("accept", "branch")
     g.node("setbestscore", "set", var="BestScore")
     g.call("floorxyz", f"{KML}:BreakVector")
@@ -781,17 +771,10 @@ def try_cover():
     g.call("standz", f"{KML}:Add_DoubleDouble")
     g.call("bestpoint", f"{KML}:MakeVector")
     g.node("setbest", "set", var="Best")
-    g.chain("entry", "onmesh")
-    g.chain("onmesh", "setlift", "offloop.Exec")
-    g.chain("offloop.LoopBody", "cover", "mindist", "accept")
+    g.chain("entry", "mindist", "accept")
     g.chain("accept", "setbestscore", "setbest")
     p = "pocket"
-    g.wire(("entry.Base", "basefloor.Point"), ("basefloor.ReturnValue", "onmesh.Condition"),
-           ("entry.Base", "basebreak.InVec"), ("basefloor.ProjectedLocation", "floorbreak.InVec"),
-           ("basebreak.Z", "lift.A"), ("floorbreak.Z", "lift.B"), ("lift.ReturnValue", "setlift.Lift"),
-           ("getoffsets.Offsets", "offloop.Array"), ("entry.Base", "cand.A"), ("offloop.Array Element", "cand.B"),
-           ("gettemplate.Template", "cover.MovingActor"), ("cand.ReturnValue", "cover.MoveToLocation"),
-           ("cover.NearestCover", f"{p}.CoverPocketResult"), (f"{p}.FloorLocation", "mindist.Point"),
+    g.wire(("entry.Pocket", f"{p}.CoverPocketResult"), (f"{p}.FloorLocation", "mindist.Point"),
            (f"{p}.PocketPointType", "typeint.InByte"), ("typeint.ReturnValue", "highbit.A"),
            ("typeint.ReturnValue", "lowbit.A"), ("highbit.ReturnValue", "ishigh.A"), ("lowbit.ReturnValue", "islow.A"),
            ("ishigh.ReturnValue", "highval.InBool"), ("islow.ReturnValue", "lowval.InBool"),
@@ -806,7 +789,7 @@ def try_cover():
            ("tocentre.ReturnValue", "distscore.A"), ("tierscore.ReturnValue", "score1.A"),
            ("facescore.ReturnValue", "score1.B"), ("score1.ReturnValue", "score.A"), ("distscore.ReturnValue", "score.B"),
            ("score.ReturnValue", "better.A"), ("getbestscore.BestScore", "better.B"),
-           ("cover.ReturnValue", "and1.A"), ("hascover.ReturnValue", "and1.B"),
+           ("entry.Found", "and1.A"), ("hascover.ReturnValue", "and1.B"),
            ("and1.ReturnValue", "and2.A"), ("faces.ReturnValue", "and2.B"),
            ("and2.ReturnValue", "and3.A"), ("apart.ReturnValue", "and3.B"),
            ("and3.ReturnValue", "and4.A"), ("withgroup.ReturnValue", "and4.B"),
@@ -816,6 +799,89 @@ def try_cover():
            (f"{p}.FloorLocation", "floorxyz.InVec"), ("floorxyz.Z", "standz.A"), ("getlift.Lift", "standz.B"),
            ("floorxyz.X", "bestpoint.X"), ("floorxyz.Y", "bestpoint.Y"), ("standz.ReturnValue", "bestpoint.Z"),
            ("bestpoint.ReturnValue", "setbest.Best"))
+    return {"name": "ConsiderPocket", "inputs": [{"name": "Found", "type": "bool"},
+                                                 {"name": "Pocket", "type": "struct:/Script/BitReactorGame.CoverPocketResult"}],
+            "outputs": [], **g.spec()}
+
+
+def query_and_consider():
+    """QueryAndConsider(Point, Range): the cover pocket nearest Point within Range, through ConsiderPocket."""
+    g = Graph()
+    g.node("gettemplate", "get", var="Template")
+    g.call("cover", f"{TARGETING}:GetNearestCoverForPoint")
+    g.call("consider", "self:ConsiderPocket")
+    g.chain("entry", "cover", "consider")
+    g.wire(("gettemplate.Template", "cover.MovingActor"), ("entry.Point", "cover.MoveToLocation"),
+           ("entry.Range", "cover.SearchRange"), ("cover.ReturnValue", "consider.Found"),
+           ("cover.NearestCover", "consider.Pocket"))
+    return {"name": "QueryAndConsider", "inputs": [{"name": "Point", "type": "vector"}, {"name": "Range", "type": "float"}],
+            "outputs": [], **g.spec()}
+
+
+def line_search():
+    """LineSearch(Base): the tiles beside the cover Base stands in, along that cover (Reforged's cover-line search). The
+    game returns only the nearest pocket to a point, so beside an authored spot it returns that spot's own cover, and the
+    free tile next to it along the same crate never came up: an added operator stood in the open (2026-10-18, as Best
+    Served Cold did for Reforged on 2026-10-13)."""
+    g = Graph()
+    g.node("gettemplate", "get", var="Template")
+    g.call("here", f"{TARGETING}:GetNearestCoverForPoint", {"SearchRange": HERE_RANGE})
+    g.node("incover", "branch")
+    g.node("pocket", "break_struct", struct="/Script/BitReactorGame.CoverPocketResult")
+    g.call("normal", f"{KML}:BreakVector")
+    g.call("negy", f"{KML}:Multiply_DoubleDouble", {"B": -1})
+    g.call("along", f"{KML}:MakeVector", {"Z": 0})
+    steps = []
+    for i, t in enumerate((TILE, -TILE, 2 * TILE, -2 * TILE)):
+        g.call(f"shift{i}", f"{KML}:Multiply_VectorFloat", {"B": t})
+        g.call(f"point{i}", f"{KML}:Add_VectorVector")
+        g.call(f"try{i}", "self:QueryAndConsider", {"Range": HERE_RANGE})
+        g.wire(("along.ReturnValue", f"shift{i}.A"), ("pocket.FloorLocation", f"point{i}.A"),
+               (f"shift{i}.ReturnValue", f"point{i}.B"), (f"point{i}.ReturnValue", f"try{i}.Point"))
+        steps.append(f"try{i}")
+    g.chain("entry", "here", "incover")
+    g.chain("incover", *steps)
+    g.wire(("gettemplate.Template", "here.MovingActor"), ("entry.Base", "here.MoveToLocation"),
+           ("here.ReturnValue", "incover.Condition"), ("here.NearestCover", "pocket.CoverPocketResult"),
+           ("pocket.CoverNormal", "normal.InVec"), ("normal.Y", "negy.A"),
+           ("negy.ReturnValue", "along.X"), ("normal.X", "along.Y"))
+    return {"name": "LineSearch", "inputs": [{"name": "Base", "type": "vector"}], "outputs": [], **g.spec()}
+
+
+def try_cover():
+    """TryCover(Base): cover pockets around one taken point into Best/BestScore (ConsiderPocket): the nearest pocket
+    around every offset a tile or two off it, a 7-by-7 tile grid with shorter queries, then the cover line (LineSearch). Lift
+    (the point's height above its floor) is kept for the chosen pocket's height. The query's moving actor is the area's
+    first destination (same pockets as an operator, tested in SK_Brentaal_030)."""
+    g = Graph()
+    g.call("basefloor", f"{NAV}:K2_ProjectPointToNavigation", {"QueryExtent": f"{SNAP + 20},{SNAP + 20},250"})
+    g.node("onmesh", "branch")
+    g.call("basebreak", f"{KML}:BreakVector")
+    g.call("floorbreak", f"{KML}:BreakVector")
+    g.call("lift", f"{KML}:Subtract_DoubleDouble")
+    g.node("setlift", "set", var="Lift")
+    g.node("getoffsets", "get", var="Offsets")
+    g.node("offloop", "macro", macro="ForEachLoop")
+    g.call("cand", f"{KML}:Add_VectorVector")
+    g.call("query", "self:QueryAndConsider", {"Range": COVER_RANGE})
+    g.node("getgrid", "get", var="CoverGrid")
+    g.node("gridloop", "macro", macro="ForEachLoop")
+    g.call("gridpoint", f"{KML}:Add_VectorVector")
+    g.call("gridquery", "self:QueryAndConsider", {"Range": COVER_GRID_RANGE})
+    g.call("line", "self:LineSearch")
+    g.chain("entry", "onmesh")
+    g.chain("onmesh", "setlift", "offloop.Exec")
+    g.chain("offloop.LoopBody", "query")
+    g.chain("offloop.Completed", "gridloop.Exec")
+    g.chain("gridloop.LoopBody", "gridquery")
+    g.chain("gridloop.Completed", "line")
+    g.wire(("entry.Base", "basefloor.Point"), ("basefloor.ReturnValue", "onmesh.Condition"),
+           ("entry.Base", "basebreak.InVec"), ("basefloor.ProjectedLocation", "floorbreak.InVec"),
+           ("basebreak.Z", "lift.A"), ("floorbreak.Z", "lift.B"), ("lift.ReturnValue", "setlift.Lift"),
+           ("getoffsets.Offsets", "offloop.Array"), ("entry.Base", "cand.A"), ("offloop.Array Element", "cand.B"),
+           ("cand.ReturnValue", "query.Point"), ("entry.Base", "line.Base"),
+           ("getgrid.CoverGrid", "gridloop.Array"), ("entry.Base", "gridpoint.A"),
+           ("gridloop.Array Element", "gridpoint.B"), ("gridpoint.ReturnValue", "gridquery.Point"))
     return {"name": "TryCover", "inputs": [{"name": "Base", "type": "vector"}], "outputs": [], **g.spec()}
 
 
@@ -846,8 +912,9 @@ def nav_ready():
     """NavReady(Area) -> Ready: the area has a destination, the first one projects onto the navmesh, and the game's
     cover data is in (a cover query beside that destination succeeded, here or for an earlier area). Cover arrives after
     the navmesh: SK_Brentaal_030's first pass found the mesh but no pockets, and both added points went to open ground
-    (2026-10-18). Any of the area's destinations will do: in HM_Cly_010 cover arrives 4 s after the mission loads. After COVER_WAIT_PASSES Deploy passes the cover condition is dropped, so an area with no cover nearby
-    still gets its open-ground points.
+    (2026-10-18). Any of the area's own destinations will do: in HM_Cly_010 cover arrives 4 s after the mission loads.
+    COVER_WAIT_PASSES Deploy passes after the area was first seen the cover condition is dropped, so an area with no
+    cover nearby still gets its open-ground points.
     """
     g = Graph()
     g.node("getpd", "get", var=f"{AREA}:PlayerDestinations")
@@ -858,28 +925,109 @@ def nav_ready():
     g.call("floor", f"{NAV}:K2_ProjectPointToNavigation", {"QueryExtent": f"{SNAP + 20},{SNAP + 20},250"})
     g.node("anydest", "branch")
     g.call("probe", "self:ProbeCover")
-    g.node("getcoverup", "get", var="CoverUp")
-    g.node("getpasses", "get", var="DeployPasses")
+    g.call("wait", "self:AreaWait")
+    g.node("getcoverup", "get", var="AreaCoverOk")
+    g.node("getpasses", "get", var="AreaWaited")
     g.call("waited", f"{KML}:GreaterEqual_IntInt", {"B": COVER_WAIT_PASSES})
     g.call("coverok", f"{KML}:BooleanOR")
     g.call("both", f"{KML}:BooleanAND")
     g.call("all", f"{KML}:BooleanAND")
     g.chain("entry", "anydest")
-    g.chain("anydest", "probe", "result")
+    g.chain("anydest", "wait", "probe", "result")
     g.chain("anydest.else", "result")
     g.wire(("entry.Area", "getpd.self"), ("getpd.PlayerDestinations", "len.TargetArray"),
            ("len.ReturnValue", "hasany.A"), ("hasany.ReturnValue", "anydest.Condition"),
            ("getpd.PlayerDestinations", "first.TargetArray"), ("first.Item", "loc.self"),
-           ("loc.ReturnValue", "floor.Point"), ("entry.Area", "probe.Area"),
-           ("getcoverup.CoverUp", "coverok.A"), ("getpasses.DeployPasses", "waited.A"), ("waited.ReturnValue", "coverok.B"),
+           ("loc.ReturnValue", "floor.Point"), ("entry.Area", "probe.Area"), ("entry.Area", "wait.Area"),
+           ("getcoverup.AreaCoverOk", "coverok.A"), ("getpasses.AreaWaited", "waited.A"), ("waited.ReturnValue", "coverok.B"),
            ("hasany.ReturnValue", "both.A"), ("floor.ReturnValue", "both.B"),
            ("both.ReturnValue", "all.A"), ("coverok.ReturnValue", "all.B"), ("all.ReturnValue", "result.Ready"))
     return {"name": "NavReady", "inputs": [{"name": "Area", "type": f"object:{AREA}"}],
             "outputs": [{"name": "Ready", "type": "bool"}], **g.spec()}
 
 
+def area_nearby():
+    """AreaNearby: defer distant encounters until a squad member is within 10000 uu of a destination.
+
+    A late encounter can have navmesh and some cover at mission start while other cover pockets
+    remain streamed out (Belly of the Beast area 2). Starting its cover wait only on approach
+    prevents freezing an open-ground fallback a whole encounter before that cover loads.
+    """
+    g = Graph()
+    g.node("reset", "set", var="NearbyArea", defaults={"NearbyArea": "false"})
+    g.call("states", f"{GS}:GetAllActorsOfClass", {"ActorClass": gf_unstack.TACTICAL_STATE})
+    g.node("statesloop", "macro", macro="ForEachLoop")
+    g.node("state", "cast", **{"class": gf_unstack.TACTICAL_STATE})
+    g.node("squad", "get", var=f"{gf_unstack.TACTICAL_STATE}:PlayerSquad")
+    g.call("valid", f"{KSL}:IsValid")
+    g.node("hassquad", "branch")
+    g.call("members", f"{gf_unstack.SQUAD}:GetSquadMembers")
+    g.node("units", "macro", macro="ForEachLoop")
+    g.call("unitloc", "/Script/Engine.Actor:K2_GetActorLocation")
+    g.node("dests", "get", var=f"{AREA}:PlayerDestinations")
+    g.node("points", "macro", macro="ForEachLoop")
+    g.call("pointloc", "/Script/Engine.Actor:K2_GetActorLocation")
+    g.call("dist", f"{KML}:Vector_Distance")
+    g.call("close", f"{KML}:Less_DoubleDouble", {"B": 10000})
+    g.node("isclose", "branch")
+    g.node("yes", "set", var="NearbyArea", defaults={"NearbyArea": "true"})
+    g.node("getnear", "get", var="NearbyArea")
+    g.chain("entry", "reset", "states", "statesloop.Exec")
+    g.chain("statesloop.LoopBody", "state")
+    g.chain("state", "hassquad")
+    g.chain("hassquad", "units.Exec")
+    g.chain("units.LoopBody", "points.Exec")
+    g.chain("points.LoopBody", "isclose")
+    g.chain("isclose", "yes")
+    g.chain("statesloop.Completed", "result")
+    g.wire(("states.OutActors", "statesloop.Array"), ("statesloop.Array Element", "state.Object"),
+           ("state.AsTactical Game State", "squad.self"), ("squad.PlayerSquad", "valid.Object"),
+           ("valid.ReturnValue", "hassquad.Condition"), ("squad.PlayerSquad", "members.self"),
+           ("members.ReturnValue", "units.Array"), ("units.Array Element", "unitloc.self"),
+           ("entry.Area", "dests.self"), ("dests.PlayerDestinations", "points.Array"),
+           ("points.Array Element", "pointloc.self"), ("pointloc.ReturnValue", "dist.V1"),
+           ("unitloc.ReturnValue", "dist.V2"), ("dist.ReturnValue", "close.A"),
+           ("close.ReturnValue", "isclose.Condition"), ("getnear.NearbyArea", "result.Nearby"))
+    return {"name": "AreaNearby", "inputs": [{"name": "Area", "type": f"object:{AREA}"}],
+            "outputs": [{"name": "Nearby", "type": "bool"}], **g.spec()}
+
+
+def area_wait():
+    """AreaWait(Area): AreaWaited = Deploy passes since the area was first seen (SeenAreas/SeenAt), so an area that
+    loads late still gets its own wait for cover."""
+    g = Graph()
+    g.node("getseen", "get", var="SeenAreas")
+    g.node("find", "array_call", function=f"{KAL}:Array_Find")
+    g.call("isnew", f"{KML}:Less_IntInt", {"B": 0})
+    g.node("new", "branch")
+    g.node("getseen2", "get", var="SeenAreas")
+    g.node("addarea", "array_call", function=f"{KAL}:Array_Add")
+    g.node("getat", "get", var="SeenAt")
+    g.node("getpasses", "get", var="DeployPasses")
+    g.node("addat", "array_call", function=f"{KAL}:Array_Add")
+    g.node("getseen3", "get", var="SeenAreas")
+    g.node("find2", "array_call", function=f"{KAL}:Array_Find")
+    g.node("getat2", "get", var="SeenAt")
+    g.node("since", "array_call", function=f"{KAL}:Array_Get")
+    g.call("waited", f"{KML}:Subtract_IntInt")
+    g.node("setwaited", "set", var="AreaWaited")
+    g.chain("entry", "new")
+    g.chain("new", "addarea", "addat", "setwaited")
+    g.chain("new.else", "setwaited")
+    g.wire(("getseen.SeenAreas", "find.TargetArray"), ("entry.Area", "find.ItemToFind"), ("find.ReturnValue", "isnew.A"),
+           ("isnew.ReturnValue", "new.Condition"), ("getseen2.SeenAreas", "addarea.TargetArray"),
+           ("entry.Area", "addarea.NewItem"), ("getat.SeenAt", "addat.TargetArray"), ("getpasses.DeployPasses", "addat.NewItem"),
+           ("getseen3.SeenAreas", "find2.TargetArray"), ("entry.Area", "find2.ItemToFind"),
+           ("getat2.SeenAt", "since.TargetArray"), ("find2.ReturnValue", "since.Index"),
+           ("getpasses.DeployPasses", "waited.A"), ("since.Item", "waited.B"), ("waited.ReturnValue", "setwaited.AreaWaited"))
+    return {"name": "AreaWait", "inputs": [{"name": "Area", "type": f"object:{AREA}"}], "outputs": [], **g.spec()}
+
+
 def probe_cover():
-    """ProbeCover(Area): CoverUp once a cover query beside any of the area's destinations succeeds (the first may have
+    """ProbeCover(Area): AreaCoverOk when a cover query beside any of the area's own destinations succeeds. Per area:
+    a second area's cover streams in with its part of the map, and a mission-wide flag set by the first area let
+    MM_05_030_BellyBeast's second area expand with no cover data (0 of 4 points in cover one run, 3 of 4 the next).
+    The first destination (the first may have
     none nearby; in HM_Cly_010 cover arrives 4 s after the mission loads). Its own function: the same loop inline in
     NavReady cooked into a brain the game couldn't load ("Bad name index" in CaptureLayout, 2026-10-18)."""
     g = Graph()
@@ -889,8 +1037,9 @@ def probe_cover():
     g.call("loc", "/Script/Engine.Actor:K2_GetActorLocation")
     g.call("cover", f"{TARGETING}:GetNearestCoverForPoint", {"SearchRange": COVER_RANGE})
     g.node("hascover", "branch")
-    g.node("setcoverup", "set", var="CoverUp", defaults={"CoverUp": "true"})
-    g.chain("entry", "loop.Exec")
+    g.node("setcoverup", "set", var="AreaCoverOk", defaults={"AreaCoverOk": "true"})
+    g.node("clearcover", "set", var="AreaCoverOk", defaults={"AreaCoverOk": "false"})
+    g.chain("entry", "clearcover", "loop.Exec")
     g.chain("loop.LoopBody", "cover", "hascover")
     g.chain("hascover", "setcoverup")
     g.wire(("entry.Area", "getpd.self"), ("getpd.PlayerDestinations", "first.TargetArray"),
@@ -924,6 +1073,7 @@ def brain():
             {"name": "Team", "type": "class:/Script/BitReactorGame.TeamGameFlag"},
             {"name": "Taken", "type": "vector[]"},
             {"name": "Offsets", "type": "vector[]"},
+            {"name": "CoverGrid", "type": "vector[]"},
             {"name": "Centroid", "type": "vector"},
             {"name": "Best", "type": "vector"},
             {"name": "BestDist", "type": "float"},
@@ -935,6 +1085,11 @@ def brain():
             {"name": "Need", "type": "int"},
             {"name": "CoveredPoints", "type": "int", "default": "0"},
             {"name": "CoverUp", "type": "bool", "default": "false"},
+            {"name": "AreaCoverOk", "type": "bool", "default": "false"},
+            {"name": "NearbyArea", "type": "bool", "default": "false"},
+            {"name": "AreaWaited", "type": "int", "default": "0"},
+            {"name": "SeenAreas", "type": f"object:{AREA}[]"},
+            {"name": "SeenAt", "type": "int[]"},
             {"name": "DeployPasses", "type": "int", "default": "0"},
             {"name": "Origin", "type": "vector"},
             {"name": "ImproveOffsets", "type": "vector[]"},
@@ -948,11 +1103,12 @@ def brain():
             *gf_unstack.variables(),
         ],
         # Functions first: the event graph calls ExpandArea, which calls the others.
-        "functions": [probe_cover(), nav_ready(), min_distance(), usable(), move_destination(), try_base(), try_cover(), try_improve(), improve_one(), improve_points(), add_one_point(), add_points(), group(), expand_area(),
+        "functions": [area_nearby(), area_wait(), probe_cover(), nav_ready(), min_distance(), usable(), move_destination(), try_base(), consider_pocket(), query_and_consider(), line_search(),
+                      try_cover(), try_improve(), improve_one(), improve_points(), add_one_point(), add_points(), group(), expand_area(),
                       *gf_lineup.functions(), *gf_holotable.functions(),
                       *gf_maps.functions(), *gf_unstack.functions()],
         "graph": event_graph(),
-        "defaults": {"Offsets": f"({offsets})", "ImproveOffsets": f"({improve})", **gf_maps.defaults(),
+        "defaults": {"CoverGrid": "(" + ",".join(f"(X={x},Y={y},Z=0)" for x,y in COVER_GRID) + ")", "Offsets": f"({offsets})", "ImproveOffsets": f"({improve})", **gf_maps.defaults(),
                      "RaiseNames": "(" + ",".join(f'"{n}"' for n in raised_missions()) + ")"},
     }
 

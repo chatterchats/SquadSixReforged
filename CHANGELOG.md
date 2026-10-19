@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-10-19
+
+### Changed
+- **UE4SS is no longer required.** Squad limits, the six-model lineup, nameplates,
+  holotable range and deployment logic now run in a Game Feature pak.
+- **Upgrade support for v1 installations.** The download retains the existing Core
+  container filenames and includes a harmless main.lua stub with the original runtime
+  manifests so mod managers can replace the previous runtime.
+- **Three-operator missions now allow six:** Not Your Turf, Dantooine 025 and Kaller 030.
+  Bespin remains solo and the opening tutorial keeps its authored squad.
+
+### Fixed
+- **Fixed the build-version installation block.** Build 25898267 is now included in the
+  compatibility manifests; managers previously rejected it because only older builds
+  were declared. This corrects the install check, not a separate gameplay issue.
+- **Better cover selection.** Added a wider local grid and searches along cover lines
+  to find free cover beside occupied spots, while keeping the facing-cover rules.
+- **Late-loading encounter cover.** Distant areas are prepared as the squad approaches,
+  so later encounters can use cover that was not available at mission start. Confirmed
+  with all six operators in cover in Belly of the Beast's second encounter.
+
+
 ## [1.4.3]
 
 ### Fixed

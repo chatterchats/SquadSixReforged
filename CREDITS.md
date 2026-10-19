@@ -14,8 +14,9 @@ arctco discontinued the mod and gave permission for others to continue it:
 > If you want to experiment with it or improve it yourself, go ahead, I'd appreciate credit for
 > the manual work and hand picked missions that went into it.
 
-Most of Squad Six Reforged's runtime is still arctco's code. It's used here under that permission;
-no licence has been chosen yet.
+The archived v1 runtime retains arctco's code under that permission. V2 reimplements the gameplay
+logic as generated Blueprints and preserves the established mission choices and placement work.
+No licence has been chosen yet.
 
 Players who reported the bugs that shaped the mission guards (named in
 [docs/runtime-notes.md](docs/runtime-notes.md)): MortisVenunum, Tesel, FoxFlight.

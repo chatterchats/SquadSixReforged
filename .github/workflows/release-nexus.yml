@@ -32,36 +32,10 @@ jobs:
           from pathlib import Path
           from tools.nexus_changelog import nexus_changelog
 
-          metadata_files = (
-              Path("src/SquadSixReforged/modinfo.json"),
-              Path("src/SquadSixReforged/zcom-mod.json"),
-              Path("src/SquadSixReforged_Core/modinfo.json"),
-              Path("src/SquadSixReforged_Core/zcom-mod.json"),
-          )
-          versions = {}
-          for metadata_file in metadata_files:
-              with metadata_file.open(encoding="utf-8") as stream:
-                  version = json.load(stream).get("version")
-              if not isinstance(version, str) or not version.strip():
-                  raise SystemExit(f"Missing version in {metadata_file}")
-              versions[metadata_file] = version.strip()
-
-          if len(set(versions.values())) != 1:
-              details = ", ".join(f"{path}: {version}" for path, version in versions.items())
-              raise SystemExit(f"Metadata versions do not match: {details}")
-
-          version = next(iter(versions.values()))
+          release = json.loads(Path("release.json").read_text(encoding="utf-8"))
+          version = release["version"]
           if not re.fullmatch(r"\d+\.\d+\.\d+", version):
-              raise SystemExit(f"Version must use #.#.# format, got {version!r}")
-
-          main_text = Path("src/SquadSixReforged/Scripts/main.lua").read_text(encoding="utf-8")
-          main_match = re.search(r'^local VERSION = "([^"]+)"$', main_text, re.MULTILINE)
-          if main_match is None or main_match.group(1) != version:
-              raise SystemExit("main.lua VERSION does not match package metadata")
-
-          readme_title = Path("src/SquadSixReforged/README.md").read_text(encoding="utf-8").splitlines()[0]
-          if not readme_title.startswith(f"# Squad Six Reforged v{version} "):
-              raise SystemExit("README.md title does not match package metadata")
+              raise SystemExit(f"Invalid release version: {version!r}")
 
           changelog_text = Path("CHANGELOG.md").read_text(encoding="utf-8")
           try:
@@ -70,11 +44,10 @@ jobs:
               raise SystemExit(str(error)) from error
 
           # The Nexus page's numeric ID, recorded once the first file has been uploaded by hand.
-          manifest = json.loads(Path("src/SquadSixReforged/zcom-mod.json").read_text(encoding="utf-8"))
-          nexus_mod = (manifest.get("nexus") or {}).get("modId")
+          nexus_mod = release["nexusModId"]
           if not isinstance(nexus_mod, int):
               raise SystemExit(
-                  "src/SquadSixReforged/zcom-mod.json has no nexus.modId: upload the first file to the "
+                  "release.json has no nexusModId: upload the first file to the "
                   "new Nexus page by hand, then record the page's mod ID there"
               )
 
@@ -91,6 +64,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq luajit
           tools/run-tests.sh
+          python3 tools/validate_v2_release.py
 
       - name: Resolve Nexus IDs
         id: nexus

@@ -1,0 +1,529 @@
+{
+  "directions": {
+    "Blank_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": 0.2822,
+      "Y": 0.9594
+    },
+    "HM_Cly_010_Gameplay:BP_CombatPreparationArea_C_1": {
+      "X": -0.9996,
+      "Y": 0.0269
+    },
+    "HM_Cly_020_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": 0.5329,
+      "Y": -0.8462
+    },
+    "HM_Jae_010_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": -0.3543,
+      "Y": -0.9351
+    },
+    "HM_Jae_020_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": 0.9981,
+      "Y": 0.0614
+    },
+    "HM_Kabb_010_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": -0.9079,
+      "Y": -0.4192
+    },
+    "HM_Kabb_020_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": -0.721,
+      "Y": 0.6929
+    },
+    "HM_TelRea_010_Gameplay:BP_CombatPreparationArea_C_1": {
+      "X": 0.1364,
+      "Y": 0.9907
+    },
+    "HM_TelRea_020_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": 0.106,
+      "Y": 0.9944
+    },
+    "HM_Trick_010_Gameplay_Real:BP_CombatPreparationArea_C_0": {
+      "X": -0.182,
+      "Y": 0.9833
+    },
+    "MM_01_010_TheSerolonisJob_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": 0.1736,
+      "Y": -0.9848
+    },
+    "MM_01_010_TheSerolonisJob_Gameplay:BP_CombatPreparationArea_C_2": {
+      "X": -0.103,
+      "Y": -0.9947
+    },
+    "MM_01_010_TheSerolonisJob_Gameplay:BP_CombatPreparationArea_C_3": {
+      "X": 0.1778,
+      "Y": -0.9841
+    },
+    "MM_02_010_CoilReunion_Gameplay:BP_CombatPreparationArea_C_1": {
+      "X": 0.9329,
+      "Y": -0.3602
+    },
+    "MM_02_030_TheDarkGrotto_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": 0.9986,
+      "Y": -0.0525
+    },
+    "MM_02_050_SlugHQ_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": -0.0745,
+      "Y": 0.9972
+    },
+    "MM_02_050_SlugHQ_Gameplay:BP_CombatPreparationArea_C_2": {
+      "X": 0.9852,
+      "Y": 0.1716
+    },
+    "MM_03_010_Bespin_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": 0.4838,
+      "Y": 0.8752
+    },
+    "MM_03_010_Bespin_Gameplay:BP_CombatPreparationArea_C_1": {
+      "X": -0.2068,
+      "Y": -0.9784
+    },
+    "MM_03_010_Bespin_Gameplay:BP_CombatPreparationArea_C_2": {
+      "X": -0.9959,
+      "Y": -0.09
+    },
+    "MM_04_010_CoilStrikesBack_Gameplay:BP_CombatPreparationArea_C_1": {
+      "X": -0.9998,
+      "Y": -0.0198
+    },
+    "MM_04_030_RetakeLuunata_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": -0.8362,
+      "Y": -0.5484
+    },
+    "MM_04_030_RetakeLuunata_Gameplay:BP_CombatPreparationArea_C_3": {
+      "X": -0.0189,
+      "Y": -0.9998
+    },
+    "MM_04_050_DenBattle_Gameplay:BP_CombatPreparationArea_C_1": {
+      "X": -0.2312,
+      "Y": 0.9729
+    },
+    "MM_05_030_BellyOfTheBeast_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": -0.0789,
+      "Y": 0.9969
+    },
+    "MM_05_030_BellyOfTheBeast_Gameplay:BP_CombatPreparationArea_C_1": {
+      "X": -0.0085,
+      "Y": -1
+    },
+    "MM_06_090_FathomAndFinale_Gameplay:BP_CombatPreparationArea_C_3": {
+      "X": -0.2102,
+      "Y": -0.9777
+    },
+    "SK_Brentaal_020_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": -0.3168,
+      "Y": -0.9485
+    },
+    "SK_Courtsilius_015_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": 0.6556,
+      "Y": -0.7551
+    },
+    "SK_Courtsilius_020_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": -0.2256,
+      "Y": -0.9742
+    },
+    "SK_Dantooine_010_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": -0.0034,
+      "Y": -1
+    },
+    "SK_Dantooine_025_gameplay:BP_CombatPreparationArea_C_1": {
+      "X": -0.2169,
+      "Y": -0.9762
+    },
+    "SK_Florrum_020_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": 0.5395,
+      "Y": 0.842
+    },
+    "SK_Lothal_030_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": 1,
+      "Y": 0.0069
+    },
+    "SK_Mapuzo_010_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": -0.5497,
+      "Y": -0.8353
+    },
+    "SK_Ryloth_030_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": 0.9902,
+      "Y": -0.1399
+    },
+    "SK_Serolonis_020_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": -0.934,
+      "Y": 0.3573
+    },
+    "SK_Vandor_020_Gameplay:BP_CombatPreparationArea_C_1": {
+      "X": 0.9199,
+      "Y": -0.3922
+    },
+    "TestRepeatable_Gameplay:BP_CombatPreparationArea_C_0": {
+      "X": 0.2822,
+      "Y": 0.9594
+    }
+  },
+  "fixed": [
+    {
+      "destinations": [
+        {
+          "X": -1350,
+          "Y": -1060,
+          "Z": 224.753
+        },
+        {
+          "X": -1600,
+          "Y": -1070,
+          "Z": 220.563
+        },
+        {
+          "X": -1994.73,
+          "Y": -660.889,
+          "Z": 336.141
+        },
+        {
+          "X": -2554.776,
+          "Y": -232.604,
+          "Z": 400
+        },
+        {
+          "X": -1800,
+          "Y": -696.672,
+          "Z": 211.157
+        }
+      ],
+      "name": "DeepCover",
+      "spots": [
+        {
+          "X": -320.771,
+          "Y": -340.116,
+          "Z": 227
+        },
+        {
+          "X": -849.179,
+          "Y": -555.74,
+          "Z": 31
+        },
+        {
+          "X": -1549.245,
+          "Y": -410,
+          "Z": 132
+        },
+        {
+          "X": -1800,
+          "Y": -696.672,
+          "Z": 211.157
+        },
+        {
+          "X": -751.056,
+          "Y": -1060,
+          "Z": 220
+        },
+        {
+          "X": -1600,
+          "Y": -1070,
+          "Z": 220.563
+        },
+        {
+          "X": -1350,
+          "Y": -1060,
+          "Z": 224.753
+        }
+      ]
+    },
+    {
+      "destinations": [
+        {
+          "X": 3177.759,
+          "Y": 7543.714,
+          "Z": -700
+        },
+        {
+          "X": 2172.991,
+          "Y": 7556.39,
+          "Z": -691.807
+        },
+        {
+          "X": 2908.868,
+          "Y": 7947.725,
+          "Z": -700
+        },
+        {
+          "X": 2100,
+          "Y": 8000,
+          "Z": -700
+        },
+        {
+          "X": 3485.689,
+          "Y": 8044.545,
+          "Z": -700
+        },
+        {
+          "X": 2856.959,
+          "Y": 7351.71,
+          "Z": -700
+        }
+      ],
+      "name": "Stillwatch",
+      "spots": [
+        {
+          "X": 3177.759,
+          "Y": 7543.714,
+          "Z": -700
+        },
+        {
+          "X": 2172.991,
+          "Y": 7556.39,
+          "Z": -691.807
+        },
+        {
+          "X": 2908.868,
+          "Y": 7947.725,
+          "Z": -700
+        },
+        {
+          "X": 2100,
+          "Y": 8000,
+          "Z": -700
+        },
+        {
+          "X": 3485.689,
+          "Y": 8044.545,
+          "Z": -700
+        },
+        {
+          "X": 2856.959,
+          "Y": 7351.71,
+          "Z": -700
+        },
+        {
+          "X": 2700,
+          "Y": 7847,
+          "Z": -700
+        }
+      ]
+    },
+    {
+      "destinations": [
+        {
+          "X": 2400,
+          "Y": 12100,
+          "Z": -400
+        },
+        {
+          "X": 2100,
+          "Y": 12300,
+          "Z": -400
+        },
+        {
+          "X": 2350,
+          "Y": 12650,
+          "Z": -400
+        },
+        {
+          "X": 2550,
+          "Y": 13000,
+          "Z": -400
+        }
+      ],
+      "name": "SmugglersDen2",
+      "spots": [
+        {
+          "X": 2400,
+          "Y": 12100,
+          "Z": -400
+        },
+        {
+          "X": 2100,
+          "Y": 12300,
+          "Z": -400
+        },
+        {
+          "X": 2350,
+          "Y": 12650,
+          "Z": -400
+        },
+        {
+          "X": 2550,
+          "Y": 13000,
+          "Z": -400
+        },
+        {
+          "X": 2034.652,
+          "Y": 12956.393,
+          "Z": -400
+        },
+        {
+          "X": 2440,
+          "Y": 12448.3,
+          "Z": -400
+        }
+      ]
+    },
+    {
+      "destinations": [
+        {
+          "X": -540,
+          "Y": -2065,
+          "Z": 2350
+        },
+        {
+          "X": -255,
+          "Y": -2065,
+          "Z": 2350
+        },
+        {
+          "X": -1000,
+          "Y": -2335,
+          "Z": 2350
+        },
+        {
+          "X": -455,
+          "Y": -2445,
+          "Z": 2350
+        }
+      ],
+      "name": "DistressCall",
+      "spots": [
+        {
+          "X": -540,
+          "Y": -2065,
+          "Z": 2350
+        },
+        {
+          "X": -255,
+          "Y": -2065,
+          "Z": 2350
+        },
+        {
+          "X": -901.955,
+          "Y": -2340,
+          "Z": 2340.4
+        },
+        {
+          "X": 250,
+          "Y": -2028.157,
+          "Z": 2350
+        },
+        {
+          "X": -350,
+          "Y": -1640,
+          "Z": 2350
+        },
+        {
+          "X": -1448.258,
+          "Y": -1920,
+          "Z": 2456.3
+        }
+      ]
+    }
+  ],
+  "inset": 0.15,
+  "match_radius": 50,
+  "profiles": [
+    {
+      "destinations": [
+        {
+          "X": 700,
+          "Y": -2500,
+          "Z": 30
+        },
+        {
+          "X": 950,
+          "Y": -2150,
+          "Z": 0
+        },
+        {
+          "X": 950,
+          "Y": -1650,
+          "Z": 0
+        },
+        {
+          "X": 650,
+          "Y": -1350,
+          "Z": 0
+        }
+      ],
+      "name": "ColdMetal",
+      "outside_volume_only": true,
+      "rescues": [
+        {
+          "X": 150,
+          "Y": -1650,
+          "Z": 100
+        }
+      ]
+    },
+    {
+      "destinations": [
+        {
+          "X": 5000,
+          "Y": -1140,
+          "Z": 400
+        },
+        {
+          "X": 5460,
+          "Y": -1200,
+          "Z": 400
+        },
+        {
+          "X": 5000,
+          "Y": -1500,
+          "Z": 400
+        },
+        {
+          "X": 5450,
+          "Y": -1700,
+          "Z": 400
+        }
+      ],
+      "inset_rescues": true,
+      "name": "Kaller025",
+      "rescues": [
+        {
+          "X": 5000,
+          "Y": -1320,
+          "Z": 500
+        },
+        {
+          "X": 5455,
+          "Y": -1450,
+          "Z": 500
+        }
+      ]
+    },
+    {
+      "destinations": [
+        {
+          "X": 22650,
+          "Y": 9150,
+          "Z": 27130
+        },
+        {
+          "X": 22650,
+          "Y": 10250,
+          "Z": 27130
+        },
+        {
+          "X": 22296.464466,
+          "Y": 9603.535534,
+          "Z": 27130
+        },
+        {
+          "X": 22296.464466,
+          "Y": 9796.464466,
+          "Z": 27130
+        }
+      ],
+      "inset_rescues": true,
+      "name": "FathomFinale",
+      "rescues": [
+        {
+          "X": 22473.232233,
+          "Y": 9376.767767,
+          "Z": 27200
+        },
+        {
+          "X": 22473.232233,
+          "Y": 10023.232233,
+          "Z": 27200
+        }
+      ]
+    }
+  ],
+  "same_point": 5
+}

@@ -148,6 +148,7 @@ def build(version, compat, text_only=False, main_only=False):
     variant = 'MainOnly-Experiment' if main_only else 'TextOnly-Experiment' if text_only else 'Compatibility' if compat else 'Clean'
     name = f'SquadSixReforged-{version}.zip' if compat and '-' not in version else f'SquadSixReforged-{version}-{variant}.zip'
     target = ROOT / 'dist' / name
+    target.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(target, 'w', zipfile.ZIP_DEFLATED) as z:
         for name, data in sorted(files.items()):
             entry = zipfile.ZipInfo(name, date_time=(2026, 10, 19, 0, 0, 0))

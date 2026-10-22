@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-10-22
+
+### Fixed
+- Added a pak-only mission-start spawn rescue for expanded squads. After three
+  stationary checks, an operator off the navigation mesh can move beside a nearby
+  walkable squadmate. Requires at least half the squad on navigation, tries each
+  operator once, and stops at the first combat preparation or after five minutes.
+  Shipping-game tests confirmed two rescues in Deep Cover and one in Retake
+  Luunata, with connected navigation after first deployment. Squad-select model
+  glitches are a separate unresolved report.
+
+### Validation
+- Passed 19 compiled Blueprint rescue checks and startup/first-deployment checks
+  in Deep Cover, Retake Luunata, The Infinite Coil and Brentaal 035. Coil Strikes
+  Back passed startup navigation checks; its terminal conversation stalled both
+  with six and with Squad Six removed at four, so combat activation is not counted
+  as a pass. These checks were not full mission playthroughs.
+
+### Changed
+- Updated the Nexus description source for the pak-only runtime, current mission
+  limits, upgrade instructions and known limitations.
+
 ## [2.0.0] - 2026-10-19
 
 ### Changed

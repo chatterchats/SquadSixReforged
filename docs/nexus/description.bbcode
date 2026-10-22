@@ -1,9 +1,15 @@
-[center][size=6]Squad Six Reforged 2.0.0[/size]
+[center][size=6]Squad Six Reforged 2.0.1[/size]
 [size=4]Six operators. No UE4SS required.[/size][/center]
 
 Raises squads to six using the game's Game Feature system, with a six-model lineup, readable nameplates, a holotable operator range and cover-aware deployment. Continues arctco's original Squad Six with credit for their work, testing and hand-picked missions.
 
-[b]What's new in 2.0.0[/b]
+[quote][b]What's new in 2.0.1[/b]
+[list]
+[*][b]Restored mission-start spawn rescue.[/b] An operator standing still off walkable ground can move beside a nearby squadmate. Confirmed with two rescues in Deep Cover and one in Retake Luunata.[/*]
+[*]Rescue only runs for expanded squads, waits for stable positions and available navigation, and stops at first deployment or after five minutes.[/*]
+[/list]
+
+[b]The 2.0.0 pak-only update[/b]
 [list]
 [*]Gameplay runs entirely from the pak. UE4SS is no longer required.[/*]
 [*]Wider cover searches and delayed preparation of distant encounters improve placement when cover loads later.[/*]
@@ -17,12 +23,136 @@ Install both components and choose Update/Replace:
 [*][b]Squad Six Reforged[/b] replaces the old runtime entry point with a harmless stub. Keep this upgrade component even though gameplay no longer needs UE4SS.[/*]
 [*][b]Squad Size Reforged - Core[/b] contains the v2 pak files.[/*]
 [/list]
-Zero Mod Manager and Mod Command upgrade matching was tested. Vortex retains the combined archive layout but has not been verified for v2. For manual installation, extract into SWZeroCompany and replace existing files. Do not remove UE4SS if other mods need it.
+Zero Mod Manager and Mod Command upgrade matching was tested. Vortex retains the combined archive layout but has not been verified for v2. For manual installation, extract into SWZeroCompany and replace existing files. Do not remove UE4SS if other mods need it.[/quote]
 
-Remove any development SquadSixGF_P containers before installing. Do not deploy the mod through two managers at once. Keep all three Core container files together.
 
-[b]Placement[/b]
-Prefers free cover facing the encounter, then open ground if suitable cover isn't available. It does not create cover. Other squad-size extensions should be disabled. The old MXM page and squadsixrescue command are not part of v2.
+This is a continuation of [url=https://www.nexusmods.com/starwarszerocompany/mods/44][b]Squad Six[/b][/url] by [b]arctco[/b], shared with their permission. Their original squad expansion, testing and hand-picked mission list are the foundation of Reforged. Version 2 rebuilds the runtime using the game's Game Feature system.
 
-[b]Credits[/b]
-Original Squad Six by [url=https://www.nexusmods.com/starwarszerocompany/mods/44]arctco[/url], continued by Chatter Chats. Thanks to the players who reported bugs and tested the layouts.
+[heading]What You Get[/heading]
+[list]
+[*][b]A squad of six.[/b] Bring two extra operators on missions that support the larger squad.[/*]
+[*][b]Room for everyone on squad select.[/b] Choose all six operators and see them together in the lineup, with a nameplate for each.[/*]
+[*][b]The holotable shows the range.[/b] A mission's panel reads "4 - 6 OPERATORS", with an orange icon for each optional operator.[/*]
+[*][b]Better deployment for the extra two.[/b] Added deployment spots help them start alongside the rest of your squad. Startup checks can separate overlapping operators and rescue stationary operators spawned off walkable ground beside a nearby squadmate. Story characters who join at the start of a mission get a spot too.[/*]
+[*][b]Spots in cover.[/b] The added spots go into cover facing the enemies where the area has some, full cover first. The mod knows which way the enemies are from where each fight places them. By default the game's own spots move into such cover too when theirs faces away.[/*]
+[*][b]The same classes, abilities and equipment.[/b] Build your team using the game's existing options. Progression and enemies keep their usual rules.[/*]
+[/list]
+
+[heading]Improvements Over Squad Six 1.1.4[/heading]
+[list]
+[*][b]Pak-only gameplay.[/b] Squad limits, lineup, nameplates, holotable text and deployment run without UE4SS.[/*]
+[*][b]More mission support.[/b] Every hero mission, Deep Cover, Smugglers' Den and the previously restricted three-operator missions can take six.[/*]
+[*][b]Cover-aware deployment.[/b] Searches use encounter directions and hand-picked layouts for difficult areas. Both added and original deployment spots can use suitable cover.[/*]
+[*][b]Later encounters prepare as you approach.[/b] This lets the mod find cover that was not loaded at mission start.[/*]
+[/list]
+
+[heading]Which Missions Support Six?[/heading]
+Every mission that normally allows four operators is expanded to six, [b]including every hero mission[/b]. The one exception is [b]The Serolonis Job[/b], the opening tutorial, which keeps four because the game picks that squad for you.
+
+[b]Not Your Turf, Dantooine 025 and Kaller 030 now also allow six.[/b] Bespin stays solo. You do not need to change any settings.
+
+In hero missions, the characters the mission assigns (Hawks and the hero, or Hawks, Trick and Luco in No Kings, No Masters) fill their slots as usual, and you choose the rest. Characters a mission brings in itself still arrive, so you can have more than six on the field: Rex in Deep Cover and No Kings, No Masters, Baker in Deep Cover, Sergeant Sawtooth in No Clone Left Behind, Jae in You Can't Go Home Again, Tel-Rea in Smugglers' Den and Trick in Stillwatch.
+
+[heading]Tested Missions[/heading]
+[b]Earlier Lua-version playthroughs[/b] on game build [b]25134257[/b] covered the following missions through to the end with saving. These are historical results, not full playthroughs repeated on v2:
+[list]
+[*][b]Story missions:[/b] Retake Luunata, Dark Waters, Unfinished Business, The Infinite Coil (the finale), Deep Cover, Stillwatch and Smugglers' Den[/*]
+[*][b]Every hero mission:[/b] Best Served Cold; Without Honor or Humanity; Distress Call; You Can't Go Home Again; Buy Cheap, Never Sleep; Kith and Kin; Lord of Betrayal; Origin of Infection; Sisters; No Clone Left Behind; and No Kings, No Masters[/*]
+[*]A crisis mission and several skirmishes[/*]
+[/list]
+
+[b]Version 2 checks[/b] include the six-model lineup at 1280×720 and 1920×1080, holotable text, deployment and later-encounter cover placement. All six were confirmed in cover in Belly of the Beast's second encounter. Automated mission-start checks do not establish that every encounter can be completed.
+
+The manifests now allow [b]build 25898267[/b], fixing the mod-manager installation block. That metadata fix alone does not establish a full gameplay test on that build. Please report problems using the details below.
+
+[b]2.0.1 startup and first-deployment checks[/b] passed in Deep Cover, Retake Luunata, The Infinite Coil and Brentaal 035. Coil Strikes Back had connected navigation at startup, but its terminal conversation stalled both with six and with the mod removed at four. Its combat activation is not counted as passed. These were focused checks, not complete playthroughs. The reported squad-select model glitches remain unresolved.
+
+[heading]Requirements[/heading]
+[list]
+[*][b]Star Wars: Zero Company[/b][/*]
+[/list]
+[b]UE4SS and Mixamoo Mod Config Manager are not required.[/b] V2 has no Mixamoo settings page. Cover-aware placement is built in; the old Lua setting and rescue console command are not included.
+
+[heading]Compatibility[/heading]
+Use only one squad-size mod at a time. Remove arctco's original [b]Squad Six[/b], [b]Squad Expansion[/b] or any other squad-size mod before installing Reforged.
+
+If you use [b]ZC Unlocked[/b], disable its squad extension before using Reforged. Earlier versions also changed lineup visibility and holotable text; compatibility with the current v2 release has not been fully rechecked. If the fifth and sixth models disappear or the operator text is wrong, include your ZC Unlocked version in the report.
+
+[heading]Switching From Squad Six[/heading]
+You can continue your existing campaign, but [b]remove the original Squad Six before installing Reforged[/b]. Mod managers treat them as separate mods and will not replace the original automatically.
+
+Remove it through your mod manager, or delete these files by hand:
+[list]
+[*]The [b]ZCOMSquadSix[/b] folder in [b]Binaries/Win64/ue4ss/Mods/[/b][/*]
+[*][b]pakchunk99-ZCOMSquadSix_P.pak[/b], [b]pakchunk99-ZCOMSquadSix_P.ucas[/b] and [b]pakchunk99-ZCOMSquadSix_P.utoc[/b] in [b]Content/Paks/~mods/[/b][/*]
+[/list]
+
+[heading]Installation[/heading]
+[b]Close the game before installing or updating.[/b]
+
+The download includes [b]Squad Six Reforged[/b] and [b]Squad Size Reforged - Core[/b]. Install both components from the release archive. The first is an upgrade stub that replaces the old Lua entry point; Core contains the gameplay files. A folder named ue4ss in the archive does not mean you need to install UE4SS.
+
+[b]Mod manager[/b]
+[list]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/29]Zero Mod Manager[/url]: choose [b]Install all components[/b] and Update/Replace existing entries.[/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/121]Zero Company Mod Command[/url]: install both components, replacing the existing entries.[/*]
+[*][b]Vortex[/b]: use the combined archive. V2 upgrade behavior has not been verified in Vortex.[/*]
+[/list]
+Upgrade matching was tested in Zero Mod Manager and Zero Company Mod Command. Use one manager for this mod to avoid duplicate deployments.
+
+[b]Manual installation[/b]
+Extract into your game's [b]SWZeroCompany[/b] folder, containing [b]Binaries[/b] and [b]Content[/b]. Merge folders and replace existing files. The installed locations are:
+[code]SWZeroCompany/Binaries/Win64/ue4ss/Mods/SquadSixReforged/
+SWZeroCompany/Content/Paks/~mods/SquadSixReforged_Core/[/code]
+Keep all three Core files ([b].pak, .ucas and .utoc[/b]) together.
+
+[b]Upgrading from v1[/b]
+Replace both components. The new [b]Scripts/main.lua[/b] does nothing and prevents the previous Lua runtime from running. After a manual overlay, other old Lua modules may remain, but the stub does not load them. Remove the old mod's Mixamoo settings page if it remains visible. Keep UE4SS installed if other mods need it.
+
+If you used the development trial, remove its separate [b]SquadSixGF_P.pak/.ucas/.utoc[/b] files before installing the release. Restart the game fully after every update.
+
+[b]Uninstalling[/b]
+Finish or abandon any mission in progress before removing the mod; keep it installed while continuing a mission saved with six. Close the game, then remove both components through your manager. For a manual uninstall, delete the two folders above.
+
+[heading]Known Issues[/heading]
+[list]
+[*]Cover placement uses suitable free, walkable cover facing the encounter. If none is found, an operator may deploy on open ground; the mod does not create cover.[/*]
+[*]Mission-start overlap correction and off-navmesh rescue are included. Rescue waits for three stationary checks, requires at least half the squad on navigation, and tries each operator once. These are not the full v1 deployment watchdog. The old [b]squadsixrescue[/b] command is not available in v2.[/*]
+[*]Other squad-size mods can compete with Reforged's limits and lineup changes. Keep their squad extensions disabled.[/*]
+[/list]
+
+[heading]Troubleshooting[/heading]
+Report problems in the [b]Bugs[/b] tab here on Nexus or on [url=https://github.com/chatterchats/SquadSixReforged]GitHub[/url]. Please include:
+[list]
+[*]Mission name and encounter, and whether the problem happened at deployment or later[/*]
+[*]Game build and Squad Six Reforged version[/*]
+[*]Other installed mods and the mod manager used[/*]
+[*]A screenshot of the problem, and any installation error text[/*]
+[/list]
+If upgrading from v1, check that both components were replaced and that only one copy of the Core containers is deployed. V2 does not produce the old Lua diagnostic entries; UE4SS logs are not required for this mod.
+
+[heading]Source Code[/heading]
+The source code and technical documentation are available on [url=https://github.com/chatterchats/SquadSixReforged]GitHub[/url].
+
+[heading]Credits[/heading]
+[list]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/44][b]arctco[/b][/url] — created the original Squad Six, including the expanded squad selection, lineup and mission support. Their manual testing and hand-picked mission list are the foundation of Reforged. Reforged continues that work with their permission after they discontinued it.[/*]
+[*][b]MortisVenunum[/b], [b]Tesel[/b] and [b]FoxFlight[/b] — reported the Squad Six bugs that shaped which missions stay at four.[/*]
+[/list]
+
+[heading]Check Out My Other Mods[/heading]
+[list]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/315]Off Duty[/url] — Operators get tired from back-to-back missions and recover while off duty, so the rest of your company gets a turn.[/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/154]Fast Resonance[/url] — Speeds up the Coil's ability presentations, with one speed setting and a switch for each ability.[/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/335]Skip Space Travel[/url] — Skips the ship-travel cutscenes before and after every mission.[/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/176]Character Share[/url] — Share custom characters and Astromechs using copy-and-paste codes in the Character Databank.[/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/209]Enhanced Databank[/url] — Sort your custom characters and Astromechs into folders you can create, rename and delete.[/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/314]Colors+[/url] — Choose colors beyond the preset swatches, with a live preview in the character creator, barracks and armory.[/*]
+[/list]
+
+[heading]Shout-outs[/heading]
+[list]
+[*][url=https://forums.nexusmods.com/profile/1661783-gugarion/]Gugarion[/url] and the [url=https://discord.gg/qpBkjjKSRp][b]ZCom Modding Discord[/b][/url] — thanks for the testing, advice and help figuring out how this game works.[/*]
+[*]The [url=https://github.com/UE4SS-RE/RE-UE4SS][b]UE4SS-RE team[/b][/url] — for the tools used to develop and test the original Lua runtime and investigate the game.[/*]
+[*][url=https://www.nexusmods.com/profile/Vercadi]Vercadi[/url] — for maintaining the [url=https://www.nexusmods.com/starwarszerocompany/mods/9]UE4SS build for Star Wars Zero Company[/url].[/*]
+[/list]

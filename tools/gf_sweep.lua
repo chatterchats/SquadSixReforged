@@ -62,7 +62,8 @@ parts[#parts + 1] = '"triggered":' .. str(triggered)
 if brain then
     local fields = {}
     for _, f in ipairs({ "AreasSeen", "AreasExpanded", "PointsAdded", "CoveredPoints", "SpotsKept", "SpotsSnapped",
-                         "SpotsMoved", "FixedApplied", "ProfilesApplied", "DirectionsUsed", "DeployPasses" }) do
+                         "SpotsMoved", "FixedApplied", "ProfilesApplied", "DirectionsUsed", "DeployPasses",
+                         "RescuePasses", "RescueStopped", "RescueOnFloor", "SpawnAttempts", "SpawnRescued" }) do
         local ok, value = pcall(function() return brain[f] end)
         fields[#fields + 1] = str(f) .. ":" .. (ok and tostring(value) or "null")
     end

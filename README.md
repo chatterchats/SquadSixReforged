@@ -2,13 +2,13 @@
 
 [Get Squad Six Reforged on Nexus Mods](https://www.nexusmods.com/starwarszerocompany/mods/340)
 
-**2.0.0** raises the deployable squad size in Star Wars: Zero Company to six using a Game Feature plugin. **UE4SS is no longer required.** It includes six squad slots, a six-model lineup with matching nameplates, the holotable's operator range, cover-aware deployment and hand-picked layouts for tricky encounters. Bespin remains solo; the opening tutorial keeps its authored squad. Not Your Turf, Dantooine 025 and Kaller 030 now allow six.
+**2.0.1** raises the deployable squad size in Star Wars: Zero Company to six using a Game Feature plugin. **UE4SS is no longer required.** It includes six squad slots, a six-model lineup with matching nameplates, the holotable's operator range, cover-aware deployment and hand-picked layouts for tricky encounters. Bespin remains solo; the opening tutorial keeps its authored squad. Not Your Turf, Dantooine 025 and Kaller 030 now allow six.
 
 This continues **Squad Six by arctco**, with credit for the original mod, manual testing and hand-picked mission list. See [CREDITS.md](CREDITS.md).
 
 ## Install and upgrade
 
-Install `SquadSixReforged-2.0.0.zip` with your mod manager, choosing **Update/Replace** for both existing components:
+Install `SquadSixReforged-2.0.1.zip` with your mod manager, choosing **Update/Replace** for both existing components:
 
 - **Squad Six Reforged**: a harmless `Scripts/main.lua` stub and the original runtime manifests. Install this component when upgrading so the previous Lua runtime stops running. It is not a UE4SS dependency for gameplay.
 - **Squad Size Reforged - Core**: the v2 pak, ucas and utoc files. Keep all three together.
@@ -23,13 +23,13 @@ Build **25898267** is now allowed by the manifests, fixing the older strict-buil
 
 ## Behavior and limitations
 
-The mod prefers free, walkable cover facing the encounter, then uses open ground when no suitable pocket is found. It does not create cover. Distant areas wait until the squad approaches before their destinations are prepared, allowing later encounter cover to stream in. A short mission-start pass separates overlapping operators where the game permits it.
+The mod prefers free, walkable cover facing the encounter, then uses open ground when no suitable pocket is found. It does not create cover. Distant areas wait until the squad approaches before their destinations are prepared, allowing later encounter cover to stream in. A short mission-start pass separates overlapping operators where the game permits it. Version 2.0.1 also restores off-navmesh spawn rescue: after three stationary checks, a stranded operator can move beside a nearby walkable squadmate. It requires at least half the squad on navigation, tries each operator once, and stops at first combat preparation or after five minutes.
 
 V2 does not ship the old MXM settings interface or the `squadsixrescue` command. Its deployment repair is not a full port of the v1 watchdog. Keep other squad-size extensions disabled to avoid competing changes.
 
 ## Building
 
-`python3 tools/package.py` builds the current release ZIP from checked-in cooked files under `release/2.0.0/`. The packager checks their hashes and the source inputs; it does not need Unreal Editor to assemble a release. `tools/package_v2.py` also offers experimental clean/main-only/text-only layouts for upgrade investigations; these are not the default release.
+`python3 tools/package.py` builds the current release ZIP from checked-in cooked files under `release/2.0.1/`. The packager checks their hashes and the source inputs; it does not need Unreal Editor to assemble a release. `tools/package_v2.py` also offers experimental clean/main-only/text-only layouts for upgrade investigations; these are not the default release.
 
 To author and cook, use `tools/build_gf.sh` with the SWZC Merged Kit. The build uses the frozen `data/placement.json` and `data/missions.tsv`; archived v1 Lua is not a build dependency. Internal asset paths remain `/SquadSixGF/` to preserve the tested references. The editor-only ZComAuthoring plugin is never shipped.
 

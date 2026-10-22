@@ -9,12 +9,17 @@ from pathlib import Path
 from package_v2 import ROOT, CORE, RUNTIME, STUB, build
 
 version = json.loads((ROOT / 'release.json').read_text())['version']
+assert json.loads((ROOT / 'unreal/SquadSixGF/SquadSixGF.uplugin').read_text())['VersionName'] == version
+record = json.loads((ROOT / 'release' / version / 'build.json').read_text())
+assert record['version'] == version
+assert {str(p.relative_to(ROOT)) for p in (ROOT / 'unreal/specs').glob('gf*.py')} <= set(record['inputs']), 'Untracked cooked source input'
 first = build(version, True)
 digest = hashlib.sha256(first.read_bytes()).hexdigest()
 build(version, True)
 assert hashlib.sha256(first.read_bytes()).hexdigest() == digest, 'Archive is not reproducible'
 with zipfile.ZipFile(first) as z:
     assert z.testzip() is None
+    assert f'Squad Six Reforged v{version}' in z.read(f'{CORE}/README-UPGRADE.txt').decode()
     runtime = {n for n in z.namelist() if n.startswith(RUNTIME + '/')}
     assert runtime == {f'{RUNTIME}/Scripts/main.lua', f'{RUNTIME}/modinfo.json', f'{RUNTIME}/zcom-mod.json'}
     assert z.read(f'{RUNTIME}/Scripts/main.lua') == STUB

@@ -24,6 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))  # run with python3 -I,
 import gf_holotable  # noqa: E402
 import gf_maps  # noqa: E402
 import gf_unstack  # noqa: E402
+import gf_spawn  # noqa: E402
 import gf_lineup  # noqa: E402
 from gf_graph import GS, KAL, KML, KSL, TARGET, Graph  # noqa: E402
 
@@ -83,11 +84,14 @@ def event_graph():
     g.call("deploy_timer", f"{KSL}:K2_SetTimer", {"FunctionName": "Deploy", "Time": "0.25", "bLooping": "true"})
     g.call("lineup_timer", f"{KSL}:K2_SetTimer", {"FunctionName": "Lineup", "Time": "0.1", "bLooping": "true"})
     g.call("unstack_timer", f"{KSL}:K2_SetTimer", {"FunctionName": "Unstack", "Time": "0.5", "bLooping": "true"})
-    g.chain("begin", "sweep_timer", "deploy_timer", "lineup_timer", "unstack_timer")
+    g.call("spawn_timer", f"{KSL}:K2_SetTimer", {"FunctionName": "SpawnRescue", "Time": "2.0", "bLooping": "true"})
+    g.chain("begin", "sweep_timer", "deploy_timer", "lineup_timer", "unstack_timer", "spawn_timer")
+    g.wire(("me.self", "spawn_timer.Object"))
     g.wire(("me.self", "sweep_timer.Object"), ("me.self", "deploy_timer.Object"), ("me.self", "lineup_timer.Object"),
            ("me.self", "unstack_timer.Object"))
     gf_lineup.event(g)
     gf_unstack.event(g)
+    gf_spawn.event(g)
 
     # Sweep: mission squad limits.
     g.node("sweep", "custom_event", name="Sweep")
@@ -1101,14 +1105,15 @@ def brain():
             *gf_holotable.variables(),
             *gf_maps.variables(),
             *gf_unstack.variables(),
+            *gf_spawn.variables(),
         ],
         # Functions first: the event graph calls ExpandArea, which calls the others.
         "functions": [area_nearby(), area_wait(), probe_cover(), nav_ready(), min_distance(), usable(), move_destination(), try_base(), consider_pocket(), query_and_consider(), line_search(),
                       try_cover(), try_improve(), improve_one(), improve_points(), add_one_point(), add_points(), group(), expand_area(),
                       *gf_lineup.functions(), *gf_holotable.functions(),
-                      *gf_maps.functions(), *gf_unstack.functions()],
+                      *gf_maps.functions(), *gf_unstack.functions(), *gf_spawn.functions()],
         "graph": event_graph(),
-        "defaults": {"CoverGrid": "(" + ",".join(f"(X={x},Y={y},Z=0)" for x,y in COVER_GRID) + ")", "Offsets": f"({offsets})", "ImproveOffsets": f"({improve})", **gf_maps.defaults(),
+        "defaults": {"CoverGrid": "(" + ",".join(f"(X={x},Y={y},Z=0)" for x,y in COVER_GRID) + ")", "Offsets": f"({offsets})", "ImproveOffsets": f"({improve})", **gf_maps.defaults(), **gf_spawn.defaults(),
                      "RaiseNames": "(" + ",".join(f'"{n}"' for n in raised_missions()) + ")"},
     }
 

@@ -46,8 +46,8 @@ def info(m):
     return {k: m[v] for k, v in [('title', 'name'), ('version', 'version'), ('author', 'author'), ('description', 'description')]}
 
 
-def instructions(compat):
-    return '''Squad Six Reforged v2.0.0
+def instructions(compat, version):
+    return f'''Squad Six Reforged v{version}
 
 Gameplay is pak-only and does not require UE4SS. The internal plugin path remains
 SquadSixGF; that is intentional and does not affect the player-facing name. Keep all three container files.
@@ -112,7 +112,7 @@ def build(version, compat, text_only=False, main_only=False):
     m = manifest(version)
     files[f'{CORE}/zcom-mod.json'] = encoded(m)
     files[f'{CORE}/modinfo.json'] = encoded(info(m))
-    files[f'{CORE}/README-UPGRADE.txt'] = instructions(compat).encode()
+    files[f'{CORE}/README-UPGRADE.txt'] = instructions(compat, version).encode()
     files[f'{CORE}/CREDITS.md'] = (ROOT / 'CREDITS.md').read_bytes()
     if compat:
         # Keep the original runtime identity for manager upgrade matching, with only

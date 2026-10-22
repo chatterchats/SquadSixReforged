@@ -497,3 +497,79 @@ Added a bounded 7x7 tile grid with 120-unit queries alongside the original broad
 Added AreaNearby: unprocessed areas wait until a squad member is within 10000 units (3D) of a destination before NavReady starts its per-area cover wait. Rebuilt, installed, launched via Lutris and ZC Sandbox. At mission start, encounter 1 has six destinations with both additions from cover; encounter 2 retains its four authored destinations and is not marked done. This verifies deferral, not that the chosen approach distance guarantees full cover availability. User approach/deployment test remains required. Game left at mission start for that test.
 
 User follow-up: played through to Belly of the Beast encounter 2 with the approach-gated build and confirmed everyone was in cover. This validates actual deployment for that encounter, including the operator previously left on the open-ground fallback. Broader regression testing of approach-gated preparation on other maps remains outstanding.
+
+
+## Pak-only spawn rescue — development checks, 2026-10-22
+
+A player reported glitched selection models and Hawks stranded behind vegetation
+in Deep Cover on 2.0.0; rolling back to 1.4.3 resolved the mission issue. Historical
+Deep Cover tests above recorded three off-navmesh spawn rescues in v1. The v2
+runtime had only overlap correction, so `gf_spawn.py` ports the missing startup
+watch. This is a suspected cause, not an in-game-confirmed fix.
+
+The watch runs every two seconds, caching the separate current-world tactical game state, only
+for squads larger than four. It tracks actors by identity, requires three still
+intervals and at least half the squad on navmesh, and tries one rescue per actor.
+It searches 150/250-unit offsets beside the nearest walkable squadmate within
+2000 units, checks floor height and occupancy, preserves capsule lift, and cancels
+old movement after accepted teleports. First combat preparation, an already
+activated/triggered area, or 150 passes permanently stops and clears the timer.
+
+Validation: full brain authoring and DLC cook succeeded. Run
+`bash tools/test_spawn_rescue.sh` for 19 compiled Blueprint fixture checks covering
+successful multi-operator rescue, movement, origin, distance, once-only attempts,
+identity history, stock squads, navigation quorum, timeout, deployment stop and a separate game-state owner.
+Fixtures replace the navigation query with a deterministic region and the kit's
+reconstructed squad-member getter with supplied members. They exercise real
+Blueprint control flow and actor teleportation, but do not validate shipping-game
+navmesh streaming, cinematic behavior or controller path cancellation. The latter
+executes only for Pawn/controller actors; fixture props have no controllers.
+
+Counters `RescuePasses`, `RescueStopped`, `RescueOnFloor`, `SpawnAttempts` and
+`SpawnRescued` are exposed through the optional `tools/gf_sweep.lua` diagnostic.
+No UE4SS is needed by the rescue itself. Deep Cover spawn/deployment and a long
+intro such as Retake Luunata remain live test targets. Selection-model glitches
+are not addressed by this change. Published 2.0.0 containers remain unchanged.
+
+
+### Shipping-game retest and owner-lookup correction — 2026-10-22
+
+The initial `rescue.1` build never ran its watch in the shipping game: the Game
+Feature brain belongs to the main BitReactorGameState, while TacticalGameState is
+an independent actor. Its owner cast failed. Deep Cover still looked correct to
+the user in that run, with seven operators on navigation, but `SpawnRescued=0`;
+existing fixed placement and overlap correction handled it. This was not evidence
+that the new rescue worked.
+
+`rescue.2` resolves TacticalGameState through a current-world actor-class query,
+then caches it. The compiled fixture now attaches the brain to a separate actor;
+all 19 checks passed, followed by fresh authoring/cooking. Published 2.0.0 remains
+unchanged. The first development ZIP is superseded.
+
+The game was launched through Lutris in an isolated setup with only the test
+containers, ZC Sandbox and the diagnostic console. Original mods, pak deployments
+and SaveGames/ZComDen data were backed up. Each mission started from the same
+throwaway Sandbox baseline with six selected operators at normal speed. Probes
+checked local nav projection and non-partial navigation paths to squadmates.
+
+| Mission | Startup rescue count | Settled result |
+|---|---:|---|
+| Deep Cover | 2 | All seven, including Rex, on connected navigation after first deployment; no overlapping pairs within 75 units; rescue timer stopped. |
+| Retake Luunata | 1 | All six on connected navigation through the intro and first deployment; no overlapping pairs; rescue timer stopped. |
+| The Infinite Coil | 0 | All six on connected navigation at startup and first deployment; no overlapping pairs; rescue timer stopped. |
+| Brentaal 035 | 0 | All six on connected navigation at startup and first deployment; no overlapping pairs; rescue timer stopped. |
+| Coil Strikes Back | 0 | All six on connected navigation at startup; terminal-to-combat transition stalled, so first deployment is not passed. |
+
+Coil Strikes Back's terminal objective reached Succeeded with 1/1 interactions,
+and its delay objective succeeded. The following PlayConversation objective stayed
+Active and combat preparation remained untriggered. The user confirmed activating
+the terminal did nothing. A fresh process with Squad Six's containers removed
+used the stock four-person squad; the user reported the same symptom. This control
+rules out Squad Six being required for the stall, but does not establish whether
+the cause is the Sandbox campaign setup, mission dialogue prerequisites, or a base
+game issue. No encounter/objective bypass was counted as a passing test.
+
+These are startup/first-deployment checks, not full mission playthroughs or
+squad-select visual regression tests. Local raw evidence and the tested-container
+hashes are in `dist/live-rescue-2026-10-22/`; failed diagnostic reads are retained
+and excluded from passing results.

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-10-25
+
+### Fixed
+- **The opening tutorial could strand Trick.** v2 still added deployment spots up to six
+  in The Serolonis Job, though its squad stays at four, and the game sent Trick to one of
+  them. The move the tutorial asks for then cost three action points, leaving none for his
+  scripted shot at the droid. The tutorial's deployment areas are now left exactly as the
+  game authored them, as in v1.
+
+### Validation
+- The Serolonis Job's opening fight played through on the shipping game: Trick reached
+  his spot with an action point left and the tutorial went on.
+
 ## [2.0.1] - 2026-10-22
 
 ### Fixed

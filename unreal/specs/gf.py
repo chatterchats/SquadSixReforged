@@ -72,7 +72,7 @@ IMPROVE_RANGE = 200.0   # RESCUE.cover_improve_range
 IMPROVE_RADII = (100.0, 200.0)  # RESCUE.cover_improve_offsets, each in eight directions
 SEPARATION = 100.0      # MIN_DESTINATION_SEPARATION_SQ's root: two destinations at least this far apart
 MIN_FORWARD = 300.0     # RESCUE.cover_min_forward: a volume centre nearer the group gives no direction
-SCRIPTED_MAP = "SerolonisJob"  # COVER.scripted_maps: the tutorial's scripted overwatch needs its own spots
+SCRIPTED_MAP = "SerolonisJob"  # the tutorial scripts its fights around the game's own spots; ExpandArea leaves them
 COVER_WAIT_PASSES = 40  # Deploy passes (0.25 s) an area waits for the game's cover data before using open ground      # a pocket further than this from every point is someone else's cover
 
 
@@ -187,7 +187,10 @@ def expand_area():
     read-only). The encounter's direction is the area's from directions.lua, else from the authored points' centroid to
     the linked tactical volume. Then, first match wins: a fixed layout replaces the destinations outright; a profile
     adds its rescues and then cover points, without improving the game's own; any other area has its own improved
-    (not on the scripted tutorial, and only with a direction) and points added around them.
+    (only with a direction) and points added around them. The scripted tutorial's areas are left as the game authored
+    them. Its squad stays at four, and with points added for six the game sent Trick to a spot three action points
+    away, leaving none for the shot it scripts (reported 2026-10-25; v1 had this bug in 1.0.4). Up to 2.0.1 only
+    improve_game_spots was kept off it.
     """
     g = Graph()
     g.node("getpd", "get", var=f"{AREA}:PlayerDestinations")
@@ -195,6 +198,11 @@ def expand_area():
     g.node("getdests", "get", var="Dests")
     g.node("len", "array_call", function=f"{KAL}:Array_Length")
     g.call("hasany", f"{KML}:Greater_IntInt", {"B": 0})
+    # Not on the scripted tutorial: neither improve_game_spots nor added points.
+    g.call("path", f"{KSL}:GetPathName")
+    g.call("scripted", "/Script/Engine.KismetStringLibrary:Contains", {"Substring": SCRIPTED_MAP})
+    g.call("notscripted", f"{KML}:Not_PreBool")
+    g.call("touchable", f"{KML}:BooleanAND")
     g.node("anydest", "branch")
     g.node("first", "array_call", function=f"{KAL}:Array_Get", defaults={"Index": 0})
     g.node("settemplate", "set", var="Template")
@@ -215,11 +223,7 @@ def expand_area():
     g.node("setmissing", "set", var="Missing")
     g.call("forward", f"{KML}:Normal2D")
     g.node("setforward", "set", var="Forward")
-    # improve_game_spots: not on the scripted tutorial, and only with a direction to face.
-    g.call("path", f"{KSL}:GetPathName")
-    g.call("scripted", "/Script/Engine.KismetStringLibrary:Contains", {"Substring": SCRIPTED_MAP})
-    g.call("notscripted", f"{KML}:Not_PreBool")
-    g.call("improvable", f"{KML}:BooleanAND")
+    # improve_game_spots: only with a direction to face.
     g.call("lookup", "self:LookupDirection")
     g.node("getmissing", "get", var="Missing")
     g.call("hasdirection", f"{KML}:Less_DoubleDouble", {"B": 0.5})
@@ -273,7 +277,7 @@ def expand_area():
     g.chain("doimprove.else", "add2", "writeback2", "setexp2")
     g.wire(("entry.Area", "getpd.self"), ("getpd.PlayerDestinations", "setdests.Dests"),
            ("getdests.Dests", "len.TargetArray"), ("len.ReturnValue", "hasany.A"),
-           ("hasany.ReturnValue", "anydest.Condition"),
+           ("hasany.ReturnValue", "touchable.A"), ("touchable.ReturnValue", "anydest.Condition"),
            ("getdests.Dests", "first.TargetArray"), ("first.Item", "settemplate.Template"),
            ("first.Item", "getteam.self"), ("getteam.OwningTeam", "setteam.Team"),
            ("entry.Area", "volume.self"), ("volume.ReturnValue", "hasvolume.Object"),
@@ -284,9 +288,8 @@ def expand_area():
            ("missing.ReturnValue", "setmissing.Missing"),
            ("towards.ReturnValue", "forward.A"), ("forward.ReturnValue", "setforward.Forward"),
            ("entry.Area", "path.Object"), ("path.ReturnValue", "scripted.SearchIn"),
-           ("scripted.ReturnValue", "notscripted.A"), ("notscripted.ReturnValue", "improvable.A"),
-           ("getmissing.Missing", "hasdirection.A"), ("hasdirection.ReturnValue", "improvable.B"),
-           ("improvable.ReturnValue", "doimprove.Condition"), ("entry.Area", "lookup.Area"),
+           ("scripted.ReturnValue", "notscripted.A"), ("notscripted.ReturnValue", "touchable.B"),
+           ("getmissing.Missing", "hasdirection.A"), ("hasdirection.ReturnValue", "doimprove.Condition"), ("entry.Area", "lookup.Area"),
            ("getfixeddests.FixedDests", "fixed.Points"), ("getfixedof.FixedDestOf", "fixed.Of"),
            ("getfixedcount.FixedCount", "fixed.Count"), ("fixed.Index", "isfixed.A"),
            ("isfixed.ReturnValue", "dofixed.Condition"), ("fixed.Index", "applyfixed.Layout"),

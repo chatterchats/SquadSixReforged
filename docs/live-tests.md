@@ -573,3 +573,13 @@ These are startup/first-deployment checks, not full mission playthroughs or
 squad-select visual regression tests. Local raw evidence and the tested-container
 hashes are in `dist/live-rescue-2026-10-22/`; failed diagnostic reads are retained
 and excluded from passing results.
+
+## The Serolonis Job's tutorial, v2 (2026-10-25)
+
+Reported: in 2.0.1 the opening fight sent Trick to a spot where the move the tutorial asks
+for cost three action points, leaving none for his scripted shot at the droid, so the
+tutorial couldn't go on. `ExpandArea` kept `improve_game_spots` off the tutorial but still
+added points up to six; v1 fixed the same thing in 1.0.4. The fix leaves the tutorial's
+areas untouched. Installed on the main install (fix build, plugin descriptor still 2.0.1)
+and played by the user through the tutorial on the shipping game: it worked. The 2.0.2
+containers differ from that build only in the `.pak`'s plugin descriptor version.

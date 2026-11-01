@@ -2,7 +2,8 @@
 """Generate unreal/specs/gf/*.json, the Game Feature trial's ZComAuthoring specs (tools/build_gf.sh runs this first).
 
 BP_SquadSixBrain is the component the plugin's AddComponents action puts on every BitReactorGameState. Three timers:
-- Sweep (2 s): the missions Squad Six ships at six (data/missions.tsv) raised to six.
+- Sweep (2 s): the missions Squad Six ships at six (data/missions.tsv) raised to six, with their minimum lowered to the
+  required cast plus one (LowerMinimum).
 - Deploy (0.25 s): every CombatPreparationArea not seen before (once its navmesh and the cover data are in) first has
   its own destinations improved as Reforged's improve_game_spots does (snapped onto the centre of the cover they stand
   in, or moved to facing cover nearby), then gets player destinations up to six. A new point is, as in Reforged's COVER.choose, the game's nearest cover pocket around a tile or two off an
@@ -12,7 +13,7 @@ BP_SquadSixBrain is the component the plugin's AddComponents action puts on ever
   from everyone and nearest the centroid. The game's own BP_CombatPreparationArea walks operators five and six on.
 - Unstack (0.5 s, a mission's first 30 s): operators spawned on top of each other moved a tile apart (gf_unstack.py).
 - Lineup (0.1 s): the squad screen's lineup at six (gf_lineup.py) and the holotable's "4 - 6" (gf_holotable.py).
-Counters (Sweeps, Seen, Raised, AreasSeen, AreasExpanded, PointsAdded, CoveredPoints, SpotsKept, SpotsSnapped, SpotsMoved) are for reading back from outside: shipping
+Counters (Sweeps, Seen, Raised, Lowered, AreasSeen, AreasExpanded, PointsAdded, CoveredPoints, SpotsKept, SpotsSnapped, SpotsMoved) are for reading back from outside: shipping
 builds have no log.
 """
 import json
@@ -120,6 +121,7 @@ def event_graph():
     g.node("getraised", "get", var="Raised")
     g.call("addraised", f"{KML}:Add_IntInt", {"B": 1})
     g.node("setraised", "set", var="Raised")
+    g.call("lower", "self:LowerMinimum")
     g.node("getsweeps", "get", var="Sweeps")
     g.call("addsweeps", f"{KML}:Add_IntInt", {"B": 1})
     g.node("setsweeps", "set", var="Sweeps")
@@ -127,7 +129,8 @@ def event_graph():
     g.chain("loop.LoopBody", "mission")
     g.chain("mission", "guarded")
     g.chain("guarded.else", "keep", "raise")
-    g.chain("raise", "setmax", "setraised")
+    g.chain("raise", "setmax", "setraised", "lower")
+    g.chain("raise.else", "lower")
     g.chain("loop.Completed", "setsweeps")
     cast = "mission.AsBit Reactor Mission Data"
     g.wire(("registry.ReturnValue", "byclass.self"), ("byclass.OutAssetData", "setfound.Found"),
@@ -138,6 +141,7 @@ def event_graph():
            ("listed.ReturnValue", "unlisted.A"), ("unlisted.ReturnValue", "guarded.Condition"), ("getkept.Kept", "keep.TargetArray"), (cast, "keep.NewItem"),
            (cast, "getmax.self"), ("getmax.MaxSquadSize", "below.A"), ("below.ReturnValue", "raise.Condition"),
            (cast, "setmax.Object"), ("getraised.Raised", "addraised.A"), ("addraised.ReturnValue", "setraised.Raised"),
+           (cast, "lower.Mission"),
            ("getsweeps.Sweeps", "addsweeps.A"), ("addsweeps.ReturnValue", "setsweeps.Sweeps"))
 
     # Deploy: each preparation area once.
@@ -178,6 +182,37 @@ def event_graph():
            ("getpasses.DeployPasses", "addpasses.A"), ("addpasses.ReturnValue", "setpasses.DeployPasses"),
            (acast, "near.Area"), ("near.Nearby", "isnear.Condition"))
     return g.spec()
+
+
+def lower_minimum():
+    """LowerMinimum(Mission): MinSquadSize down to the mission's required cast plus one, never up.
+
+    CharacterRequirements is the cast the game auto-assigns, so the player always gets to pick at least one operator:
+    none required is a minimum of one, Hawks two, Hawks and a companion three. Never up: a Hawks-only mission already at
+    one stays at one. It's read from the mission rather than tabled so a game patch can't leave it stale. Missions Sweep
+    doesn't list (the tutorial, Bespin) never get here.
+    """
+    g = Graph()
+    g.node("getcast", "get", var=f"{MISSION}:CharacterRequirements")
+    g.node("cast", "array_call", function=f"{KAL}:Array_Length")
+    g.call("plusone", f"{KML}:Add_IntInt", {"B": 1})
+    g.node("getmin", "get", var=f"{MISSION}:MinSquadSize")
+    g.call("above", f"{KML}:Greater_IntInt")
+    g.node("lower", "branch")
+    # Read-only in the kit, like MaxSquadSize; see Sweep.
+    g.call("setmin", f"{KSL}:SetIntPropertyByName", {"PropertyName": "MinSquadSize"})
+    g.node("getlowered", "get", var="Lowered")
+    g.call("addlowered", f"{KML}:Add_IntInt", {"B": 1})
+    g.node("setlowered", "set", var="Lowered")
+    g.chain("entry", "lower")
+    g.chain("lower", "setmin", "setlowered")
+    g.wire(("entry.Mission", "getcast.self"), ("getcast.CharacterRequirements", "cast.TargetArray"),
+           ("cast.ReturnValue", "plusone.A"), ("entry.Mission", "getmin.self"), ("getmin.MinSquadSize", "above.A"),
+           ("plusone.ReturnValue", "above.B"), ("above.ReturnValue", "lower.Condition"),
+           ("entry.Mission", "setmin.Object"), ("plusone.ReturnValue", "setmin.Value"),
+           ("getlowered.Lowered", "addlowered.A"), ("addlowered.ReturnValue", "setlowered.Lowered"))
+    return {"name": "LowerMinimum", "inputs": [{"name": "Mission", "type": f"object:{MISSION}"}], "outputs": [],
+            **g.spec()}
 
 
 def expand_area():
@@ -1068,6 +1103,7 @@ def brain():
             {"name": "Sweeps", "type": "int", "default": "0"},
             {"name": "Seen", "type": "int", "default": "0"},
             {"name": "Raised", "type": "int", "default": "0"},
+            {"name": "Lowered", "type": "int", "default": "0"},
             {"name": "Found", "type": "struct:/Script/CoreUObject.AssetData[]"},
             {"name": "Kept", "type": f"object:{MISSION}[]"},
             {"name": "RaiseNames", "type": "string[]"},
@@ -1111,7 +1147,7 @@ def brain():
             *gf_spawn.variables(),
         ],
         # Functions first: the event graph calls ExpandArea, which calls the others.
-        "functions": [area_nearby(), area_wait(), probe_cover(), nav_ready(), min_distance(), usable(), move_destination(), try_base(), consider_pocket(), query_and_consider(), line_search(),
+        "functions": [lower_minimum(), area_nearby(), area_wait(), probe_cover(), nav_ready(), min_distance(), usable(), move_destination(), try_base(), consider_pocket(), query_and_consider(), line_search(),
                       try_cover(), try_improve(), improve_one(), improve_points(), add_one_point(), add_points(), group(), expand_area(),
                       *gf_lineup.functions(), *gf_holotable.functions(),
                       *gf_maps.functions(), *gf_unstack.functions(), *gf_spawn.functions()],

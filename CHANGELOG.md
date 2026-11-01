@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.3] - 2026-11-01
+
+### Changed
+- **Smaller squads.** A mission's minimum squad is now its required cast plus one: one operator
+  with no required cast, two with Hawks, three with Hawks and a companion. A minimum is only ever
+  lowered. The opening tutorial and Bespin stay as the game authored them.
+
+### Validation
+- The minimum rule passed compiled Blueprint tests in the editor. It has not been played on the
+  shipping game: squad select and missions at the smaller sizes are untested.
+
 ## [2.0.2] - 2026-10-25
 
 ### Fixed

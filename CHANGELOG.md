@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- **The UE4SS placeholder.** The download is now only the Core pak component. If you installed
+  2.0.0 to 2.0.3, the leftover `Squad Six Reforged` component does nothing and can be removed. If
+  you are coming straight from v1, remove its UE4SS runtime before playing: this download doesn't
+  replace it, and mod managers were seen leaving it installed.
+
 ## [2.0.3] - 2026-11-01
 
 ### Changed

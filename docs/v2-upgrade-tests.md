@@ -91,3 +91,12 @@ name are exactly "Squad Size Reforged - Core". Runtime remains "Squad Six
 Reforged". IDs and deployment paths are unchanged. This spelling differs from
 the original v1 Core title ("Squad Six Reforged - Core"), so Mod Command's
 reported title-based replacement behavior still needs checking for this name.
+
+## Dropping the placeholder after 2.0.3
+
+Per user decision (2026-11-01), 2.0.3 is the last release with the runtime stub
+(`LAST_STUB_RELEASE` in `tools/package_v2.py`). Higher versions package only Core,
+and `tools/validate_v2_release.py` fails until `README.md` and the Nexus description
+stop describing the stub. Direct v1 upgrades lose their protection: the clean-upgrade
+result above means managers can leave v1's Lua runtime active, so the docs must tell
+those players to remove it. Pak-only upgrades have not been tested in a manager.

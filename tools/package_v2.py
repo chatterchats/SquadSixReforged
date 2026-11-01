@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Build the v1-runtime-retirement upgrade package from the cooked v2 plugin.
 
-Compatibility is the default for 2.0.0: a single Scripts/main.lua stub replaces
-v1 (confirmed in Zero Mod Manager); clean upgrades left the runtime installed. Use --clean for a diagnostic clean ZIP or
---both to produce both variants.
+Up to LAST_STUB_RELEASE the release is Compatibility: a single Scripts/main.lua stub replaces
+v1 (confirmed in Zero Mod Manager); clean upgrades left the runtime installed. Later versions ship pak-only.
+Use --clean for a diagnostic clean ZIP or --both to produce both variants.
 
 Keeps v1 Core filenames for mod-manager replacement detection. Internal /SquadSixGF/
 asset paths remain stable to preserve the tested references.
@@ -20,6 +20,13 @@ CORE = 'Content/Paks/~mods/SquadSixReforged_Core'
 RUNTIME = 'Binaries/Win64/ue4ss/Mods/SquadSixReforged'
 OLD_CONTAINER = 'pakchunk99-SquadSixReforged_P'
 STUB = b'-- Squad Six Reforged v2 upgrade compatibility: retired v1 module.\n-- Gameplay now runs in the Game Feature pak; no hooks or timers are registered here.\nreturn {}\n'
+# The last release with the UE4SS placeholder. Versions above it ship only the Core component, and 2.0.3 and earlier
+# still rebuild byte for byte.
+LAST_STUB_RELEASE = (2, 0, 3)
+
+
+def ships_stub(version):
+    return tuple(int(n) for n in version.split('-')[0].split('.')) <= LAST_STUB_RELEASE
 
 
 def encoded(obj):
@@ -46,7 +53,33 @@ def info(m):
     return {k: m[v] for k, v in [('title', 'name'), ('version', 'version'), ('author', 'author'), ('description', 'description')]}
 
 
+def pak_only_instructions(version):
+    return f'''Squad Six Reforged v{version}
+
+Gameplay is pak-only and does not require UE4SS. The internal plugin path remains
+SquadSixGF; that is intentional and does not affect the player-facing name. Keep all three container files.
+
+INSTALLING OR UPDATING
+1. Close the game.
+2. Remove any manually installed SquadSixGF_P.pak/.ucas/.utoc trial files from
+   Content/Paks/~mods/. Do not load both copies.
+3. Import this ZIP, use the manager's Replace/Update option and deploy it.
+   For a manual install, extract into SWZeroCompany/ and replace the old Core containers.
+4. Check that the old Core entry was replaced, not left alongside another pak.
+5. Restart the game and check squad select, holotable range and deployment.
+
+THE OLD UE4SS COMPONENT
+Versions up to {'.'.join(map(str, LAST_STUB_RELEASE))} also installed Binaries/Win64/ue4ss/Mods/SquadSixReforged/.
+- From 2.0.0 to {'.'.join(map(str, LAST_STUB_RELEASE))} it is a placeholder that does nothing. You can remove it.
+- From v1 it is the old Lua runtime, and this ZIP does not remove or disable it. Remove it
+  through your manager, or delete that folder, before playing.
+Do not change UE4SS itself, mods.txt, other mods or player settings.
+'''
+
+
 def instructions(compat, version):
+    if not compat:
+        return pak_only_instructions(version)
     return f'''Squad Six Reforged v{version}
 
 Gameplay is pak-only and does not require UE4SS. The internal plugin path remains
@@ -59,12 +92,10 @@ UPGRADING FROM v1
 3. Import this ZIP, use the manager's Replace/Update option and deploy it.
 4. Check that the old Core entry was replaced, not left alongside another pak.
 5. Check the runtime folder at Binaries/Win64/ue4ss/Mods/SquadSixReforged/.
-''' + ('''   For this compatibility ZIP, the runtime contains a harmless Scripts/main.lua
+   For this compatibility ZIP, the runtime contains a harmless Scripts/main.lua
    stub plus zcom-mod.json and modinfo.json preserving its upgrade identity. Install BOTH components when offered. ZMM was confirmed to
    remove the old modules on replacement. Other managers may leave unused files.
-''' if compat else '''   For this clean ZIP, that old runtime must be removed/disabled by the manager
-   or manually before playing. This archive cannot request deletion by itself.
-''') + '''6. Restart the game and check squad select, holotable range and deployment.
+6. Restart the game and check squad select, holotable range and deployment.
 7. When uninstalling, use the manager that deployed the files.
 
 MANUAL INSTALL
@@ -146,7 +177,8 @@ def build(version, compat, text_only=False, main_only=False):
         ).encode()
         assert [n for n in files if n.startswith(RUNTIME + '/')] == [f'{RUNTIME}/Scripts/main.lua']
     variant = 'MainOnly-Experiment' if main_only else 'TextOnly-Experiment' if text_only else 'Compatibility' if compat else 'Clean'
-    name = f'SquadSixReforged-{version}.zip' if compat and '-' not in version else f'SquadSixReforged-{version}-{variant}.zip'
+    is_release = compat == ships_stub(version) and not (text_only or main_only) and '-' not in version
+    name = f'SquadSixReforged-{version}.zip' if is_release else f'SquadSixReforged-{version}-{variant}.zip'
     target = ROOT / 'dist' / name
     target.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(target, 'w', zipfile.ZIP_DEFLATED) as z:
@@ -181,4 +213,4 @@ if __name__ == '__main__':
     if args.clean or args.both:
         build(args.version, False)
     if not args.clean and not args.text_only and not args.main_only:
-        build(args.version, True)
+        build(args.version, args.both or ships_stub(args.version))

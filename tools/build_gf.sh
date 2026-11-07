@@ -22,8 +22,8 @@
 set -eu
 cd "$(dirname "$0")/.."
 repo=$(pwd)
-root=${SWZC_ROOT:-/run/media/chats/0c7bd812-03b4-405c-9602-31282b68fd64}
-kit=${SWZC_KIT:-"$root/SWZC Merged Kit"}
+root=${SWZC_ROOT:-/run/media/chats/0c7bd812-03b4-405c-9602-31282b68fd64/Tools}
+kit=${SWZC_KIT:-"/run/media/chats/0c7bd812-03b4-405c-9602-31282b68fd64/Projects/ZeroCompany/SDK/SWZC Merged Kit"}
 engine="$root/UnrealEngine/Engine"
 project="$kit/SWZeroCompany.uproject"
 platform=Linux

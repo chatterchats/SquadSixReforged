@@ -31,7 +31,7 @@ name=SquadSixGF
 logs="$repo/dist/gf-logs"
 out="$repo/dist/gf"
 # The game's plugin manifest, extracted from pakchunk0-Windows.pak of the build being targeted (1.2 here).
-manifest=${SQUADSIXGF_MANIFEST:-/run/media/chats/e0057d4a-fe46-43eb-a837-db51979c500f/ZCRE/v1.2/data/pak_files/SWZeroCompany/Plugins/SWZeroCompany.upluginmanifest}
+manifest=${SQUADSIXGF_MANIFEST:-/run/media/chats/0c7bd812-03b4-405c-9602-31282b68fd64/Projects/ZeroCompany/RE/v1.2/data/pak_files/SWZeroCompany/Plugins/SWZeroCompany.upluginmanifest}
 author_only=false install=false layout=own
 while [ $# -gt 0 ]; do
     case "$1" in

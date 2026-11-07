@@ -76,7 +76,7 @@ def probe(trigger=False):
     raise RuntimeError("probe failed: " + (r.stdout + r.stderr).strip()[-300:])
 
 
-CRASHES = Path("/run/media/chats/e0057d4a-fe46-43eb-a837-db51979c500f/Games/STAR WARS Zero Company (2026)/prefix/"
+CRASHES = Path("/run/media/chats/e0057d4a-fe46-43eb-a837-db51979c500f/Games/Prefixes/proton/Zero Company/"
                "drive_c/users/steamuser/AppData/Local/SWZeroCompany/Saved/Crashes")
 
 

@@ -1,9 +1,16 @@
-[center][size=6]Squad Six Reforged 2.0.3[/size]
+[center][size=6]Squad Six Reforged 2.0.4[/size]
 [size=4]Six operators. No UE4SS required.[/size][/center]
 
 Raises squads to six using the game's Game Feature system, with a six-model lineup, readable nameplates, a holotable operator range and cover-aware deployment. Continues arctco's original Squad Six with credit for their work, testing and hand-picked missions.
 
-[quote][b]What's new in 2.0.3[/b]
+[quote][b]What's new in 2.0.4[/b]
+[list]
+[*][b]Squad select fixed.[/b] The lineup no longer shrinks every time you remove and add an operator. The models stand over their own nameplates when the squad isn't full, a removed fifth or sixth operator disappears together with their weapons, and the operator you hover in the picker shows at the row's size.[/*]
+[*][b]One component.[/b] The download is now only [b]Squad Size Reforged - Core[/b]. The old UE4SS placeholder is no longer included; see [b]Upgrading[/b] below.[/*]
+[*]Known: clicking an empty slot past the first free one and picking very quickly can leave that operator's model missing until the next change on the screen.[/*]
+[/list]
+
+[b]2.0.3[/b]
 [list]
 [*][b]Smaller squads.[/b] You can now bring fewer operators: a mission's minimum is its required cast plus one. That's one operator with no required cast, two with Hawks, three with Hawks and a companion. The opening tutorial and Bespin stay as the game authored them.[/*]
 [*]Not yet played at the smaller sizes on the shipping game, so please report anything that breaks.[/*]
@@ -28,13 +35,13 @@ Raises squads to six using the game's Game Feature system, with a six-model line
 [*]Fixed the mod-manager build block for build 25898267 by updating the compatibility manifests.[/*]
 [/list]
 
-[b]Upgrading from v1[/b]
-Install both components and choose Update/Replace:
+[b]Upgrading[/b]
+Choose Update/Replace for [b]Squad Size Reforged - Core[/b]. Up to 2.0.3 the download also had a [b]Squad Six Reforged[/b] component in [b]Binaries/Win64/ue4ss/Mods/SquadSixReforged/[/b]:
 [list]
-[*][b]Squad Six Reforged[/b] replaces the old runtime entry point with a harmless stub. Keep this upgrade component even though gameplay no longer needs UE4SS.[/*]
-[*][b]Squad Size Reforged - Core[/b] contains the v2 pak files.[/*]
+[*]From 2.0.0 to 2.0.3 it is a placeholder that does nothing. You can remove it.[/*]
+[*]Coming straight from v1, it is the old Lua runtime, and this download does not remove or disable it. Remove it through your mod manager, or delete that folder, before playing.[/*]
 [/list]
-Zero Mod Manager and Mod Command upgrade matching was tested. Vortex retains the combined archive layout but has not been verified for v2. For manual installation, extract into SWZeroCompany and replace existing files. Do not remove UE4SS if other mods need it.[/quote]
+Do not remove UE4SS if other mods need it.[/quote]
 
 
 This is a continuation of [url=https://www.nexusmods.com/starwarszerocompany/mods/44][b]Squad Six[/b][/url] by [b]arctco[/b], shared with their permission. Their original squad expansion, testing and hand-picked mission list are the foundation of Reforged. Version 2 rebuilds the runtime using the game's Game Feature system.
@@ -72,11 +79,11 @@ In hero missions, the characters the mission assigns (Hawks and the hero, or Haw
 [*]A crisis mission and several skirmishes[/*]
 [/list]
 
-[b]Version 2 checks[/b] include the six-model lineup at 1280×720 and 1920×1080, holotable text, deployment and later-encounter cover placement. All six were confirmed in cover in Belly of the Beast's second encounter. Automated mission-start checks do not establish that every encounter can be completed.
+[b]Version 2 checks[/b] include the six-model lineup at 1280×720 and 1920×1080 (in 2.0.4, removing and adding operators at every squad size in squad select), holotable text, deployment and later-encounter cover placement. All six were confirmed in cover in Belly of the Beast's second encounter. Automated mission-start checks do not establish that every encounter can be completed.
 
 The manifests now allow [b]build 25898267[/b], fixing the mod-manager installation block. That metadata fix alone does not establish a full gameplay test on that build. Please report problems using the details below.
 
-[b]2.0.1 startup and first-deployment checks[/b] passed in Deep Cover, Retake Luunata, The Infinite Coil and Brentaal 035. Coil Strikes Back had connected navigation at startup, but its terminal conversation stalled both with six and with the mod removed at four. Its combat activation is not counted as passed. These were focused checks, not complete playthroughs. The reported squad-select model glitches remain unresolved.
+[b]2.0.1 startup and first-deployment checks[/b] passed in Deep Cover, Retake Luunata, The Infinite Coil and Brentaal 035. Coil Strikes Back had connected navigation at startup, but its terminal conversation stalled both with six and with the mod removed at four. Its combat activation is not counted as passed. These were focused checks, not complete playthroughs.
 
 [heading]Requirements[/heading]
 [list]
@@ -101,29 +108,28 @@ Remove it through your mod manager, or delete these files by hand:
 [heading]Installation[/heading]
 [b]Close the game before installing or updating.[/b]
 
-The download includes [b]Squad Six Reforged[/b] and [b]Squad Size Reforged - Core[/b]. Install both components from the release archive. The first is an upgrade stub that replaces the old Lua entry point; Core contains the gameplay files. A folder named ue4ss in the archive does not mean you need to install UE4SS.
+The download is one component, [b]Squad Size Reforged - Core[/b], which contains the gameplay files.
 
 [b]Mod manager[/b]
 [list]
-[*][url=https://www.nexusmods.com/starwarszerocompany/mods/29]Zero Mod Manager[/url]: choose [b]Install all components[/b] and Update/Replace existing entries.[/*]
-[*][url=https://www.nexusmods.com/starwarszerocompany/mods/121]Zero Company Mod Command[/url]: install both components, replacing the existing entries.[/*]
-[*][b]Vortex[/b]: use the combined archive. V2 upgrade behavior has not been verified in Vortex.[/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/29]Zero Mod Manager[/url]: install the component and Update/Replace the existing Core entry.[/*]
+[*][url=https://www.nexusmods.com/starwarszerocompany/mods/121]Zero Company Mod Command[/url]: install it, replacing the existing Core entry.[/*]
+[*][b]Vortex[/b]: V2 upgrade behavior has not been verified in Vortex.[/*]
 [/list]
-Upgrade matching was tested in Zero Mod Manager and Zero Company Mod Command. Use one manager for this mod to avoid duplicate deployments.
+Upgrade matching was tested in Zero Mod Manager and Zero Company Mod Command up to 2.0.3; the Core-only 2.0.4 upgrade has not been tested in a manager. Use one manager for this mod to avoid duplicate deployments.
 
 [b]Manual installation[/b]
-Extract into your game's [b]SWZeroCompany[/b] folder, containing [b]Binaries[/b] and [b]Content[/b]. Merge folders and replace existing files. The installed locations are:
-[code]SWZeroCompany/Binaries/Win64/ue4ss/Mods/SquadSixReforged/
-SWZeroCompany/Content/Paks/~mods/SquadSixReforged_Core/[/code]
+Extract into your game's [b]SWZeroCompany[/b] folder, containing [b]Binaries[/b] and [b]Content[/b]. Merge folders and replace existing files. The installed location is:
+[code]SWZeroCompany/Content/Paks/~mods/SquadSixReforged_Core/[/code]
 Keep all three Core files ([b].pak, .ucas and .utoc[/b]) together.
 
 [b]Upgrading from v1[/b]
-Replace both components. The new [b]Scripts/main.lua[/b] does nothing and prevents the previous Lua runtime from running. After a manual overlay, other old Lua modules may remain, but the stub does not load them. Remove the old mod's Mixamoo settings page if it remains visible. Keep UE4SS installed if other mods need it.
+This download does not remove or disable v1's Lua runtime in [b]Binaries/Win64/ue4ss/Mods/SquadSixReforged/[/b]. Remove it through your manager, or delete that folder, before playing. Remove the old mod's Mixamoo settings page if it remains visible. Keep UE4SS installed if other mods need it.
 
 If you used the development trial, remove its separate [b]SquadSixGF_P.pak/.ucas/.utoc[/b] files before installing the release. Restart the game fully after every update.
 
 [b]Uninstalling[/b]
-Finish or abandon any mission in progress before removing the mod; keep it installed while continuing a mission saved with six. Close the game, then remove both components through your manager. For a manual uninstall, delete the two folders above.
+Finish or abandon any mission in progress before removing the mod; keep it installed while continuing a mission saved with six. Close the game, then remove the mod through your manager. For a manual uninstall, delete the folder above, and [b]Binaries/Win64/ue4ss/Mods/SquadSixReforged/[/b] if an older version left it.
 
 [heading]Known Issues[/heading]
 [list]
@@ -140,7 +146,7 @@ Report problems in the [b]Bugs[/b] tab here on Nexus or on [url=https://github.c
 [*]Other installed mods and the mod manager used[/*]
 [*]A screenshot of the problem, and any installation error text[/*]
 [/list]
-If upgrading from v1, check that both components were replaced and that only one copy of the Core containers is deployed. V2 does not produce the old Lua diagnostic entries; UE4SS logs are not required for this mod.
+If upgrading, check that the Core component was replaced and that only one copy of the Core containers is deployed; if coming from v1, that its Lua runtime was removed. V2 does not produce the old Lua diagnostic entries; UE4SS logs are not required for this mod.
 
 [heading]Source Code[/heading]
 The source code and technical documentation are available on [url=https://github.com/chatterchats/SquadSixReforged]GitHub[/url].

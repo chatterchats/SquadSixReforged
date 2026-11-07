@@ -1,7 +1,7 @@
 {
     "FileVersion": 3,
-    "Version": 20003,
-    "VersionName": "2.0.3",
+    "Version": 20004,
+    "VersionName": "2.0.4",
     "FriendlyName": "Squad Six Reforged",
     "Description": "Six-operator squads, cover-aware deployment and squad presentation. No UE4SS required.",
     "Category": "Game Features",

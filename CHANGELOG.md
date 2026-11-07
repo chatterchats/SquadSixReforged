@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.4] - 2026-11-06
+
 ### Fixed
 - **Squad select models shrank on every swap.** With five or six in the squad, removing an
   operator and adding another made the whole lineup smaller each time, until the models all but

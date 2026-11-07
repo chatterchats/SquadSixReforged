@@ -14,13 +14,25 @@ classes are loaded at runtime by path and members of game Blueprints are reached
   Reforged's EntrySpacing -100 on the CharacterSlots row, which can't be reached without the screen's class
   (GetWidgetFromName isn't Blueprint-callable, and the entries have no UMG parent).
 - Squad: the screen's BrunoMissionViewModel ("Default") lists the slots, required then flexible, in the lineup's order;
-  Used is one past the last with an AssignedCharacterVM (matched the lineup exactly in game, 2026-10-18).
-- Fit: the four authored positions are captured once per manager. With more than four in the squad the models are laid
-  along the authored row, centred on it, ROW_STEP_RATIO of its step apart (so each stands over its squeezed
-  nameplate; Reforged's 3 / (used - 1) left them 15% short) and scaled by 3 / (used - 1); no camera changes (the
+  Used is one past the last with an AssignedCharacterVM (matched the lineup exactly in game, 2026-10-18); Filled says
+  which slots have one, so an emptied fifth with the sixth still filled is a hole (in game, 2026-11-06).
+- Row: Shown is how many nameplates the screen has up, at least Used. The game puts up one per slot of the mission,
+  EMPTY ones included (six at every squad size in a six-slot mission, in game 2026-11-06); laying the models out by Used
+  put five each half a slot right of its name (player report and in game, 2026-11-06).
+- Fit: the four authored positions are captured once per manager. With more than four plates the models are laid
+  along the authored row as a row of Shown, centred on it, ROW_STEP_RATIO of its step apart (so each stands over its squeezed
+  nameplate; Reforged's 3 / (used - 1) left them 15% short) and scaled by 3 / (Shown - 1); no camera changes (the
   character editor shares this stage). Each takes the rotation of the authored slot nearest its place. Per proxy, the scale the fit started from and the one it wrote are kept, so it never compounds and
-  a new character's scale is picked up; with four or fewer, a proxy still carrying the fit's scale gets its base back.
-  Overflow proxies past the squad are hidden (the game never hides a proxy whose slot emptied).
+  a new character's scale is picked up; with four or fewer plates, a proxy still carrying the fit's scale gets its base
+  back and, while it hangs in its diorama slot, the slot's own place (the game only snaps it there when it attaches).
+  Empty overflow slots' proxies (past Used, or a hole) are hidden (the game never hides a proxy whose slot emptied, so a removed sixth, or a
+  cancelled preview, stays standing over the EMPTY plate), but not while the picker is open and not until the squad has
+  held for SETTLE_PASSES: the picker previews a character by cloning it into the proxy and showing it before Used counts
+  it, and the game never shows that proxy again once its slot holds that character, so hiding it then hid a re-added
+  sixth for good (in game, 2026-11-06). A hidden proxy is also parked at the origin, where the game parks one whose
+  slot emptied: its weapons are actors of their own, attached, and stayed in the row when only the proxy was hidden.
+  While the picker is open the slot being filled (Used) is placed too, if the game is showing it, so the preview stands
+  in the row at the row's size rather than full size on the game's slot.
 """
 from gf_graph import Graph, KSL, KML, KAL, GS, TARGET
 
@@ -44,6 +56,13 @@ NAMEPLATE_SQUEEZE = -50.0  # each side: Reforged's EntrySpacing -100, per entry 
 ROW_STEP_RATIO = 0.6926
 MIN_SLOT_SEPARATION = 10.0  # MIN_SLOT_SEPARATION_SQ's root: an unplaced pool sits on top of itself
 ASSIGNMENT = "/Script/MDViewModel.MDViewModelAssignmentReference"
+IMC_SUBSYSTEM = "/Script/BitReactorGame.BitReactorIMCStateSubsystem"
+# The squad screen's input state while its character picker is up (UpdateState -> ChangeIMCState; read in game with the
+# picker open and closed, 2026-11-06). The picker previews the hovered character in the slot, cloned into its proxy,
+# before the slot counts that character.
+PICKER_STATE = "BR.UI.IMCState.Strategy.SquadSelect.Assign"
+# Passes (0.1 s each) the squad has to stay the same, picker closed, before overflow proxies past it are hidden.
+SETTLE_PASSES = 3
 
 
 def variables():
@@ -58,12 +77,18 @@ def variables():
         {"name": "Screen", "type": f"object:{USER_WIDGET}"},
         {"name": "ScreenIsOpen", "type": "bool"},
         {"name": "Used", "type": "int"},
+        {"name": "Shown", "type": "int"},
+        {"name": "LastUsed", "type": "int", "default": "0"},
+        {"name": "Settle", "type": "int", "default": "0"},
+        {"name": "PickerIsOpen", "type": "bool"},
+        {"name": "Filled", "type": "bool[]"},
         {"name": "RequiredCount", "type": "int"},
         {"name": "Captured", "type": "bool", "default": "false"},
         {"name": "AuthLocs", "type": "vector[]"},
         {"name": "AuthRots", "type": "rotator[]"},
         {"name": "OverflowScale", "type": "vector"},
         {"name": "RowBase", "type": "vector"},
+        {"name": "PlaceBase", "type": "vector"},
         {"name": "FitProxies", "type": f"object:{ACTOR}[]"},
         {"name": "FitBases", "type": "vector[]"},
         {"name": "FitApplied", "type": "vector[]"},
@@ -243,12 +268,12 @@ def screen_open():
 
 
 def pad_nameplates():
-    """PadNameplates: with five or six in the squad, every visible nameplate gets NAMEPLATE_SQUEEZE left and right
+    """PadNameplates: with five or six plates up, every visible nameplate gets NAMEPLATE_SQUEEZE left and right
     (Reforged's fit_squad_screen, per entry since the row itself can't be reached); with four or fewer, none, so they
     stay under the authored models. Set only where it differs. Reforged's vertical reset of the row is left out: per
     entry, +100 px pushed the names into the button bar (2026-10-18)."""
     g = Graph()
-    g.node("getused", "get", var="Used")
+    g.node("getshown", "get", var="Shown")
     g.call("wide", f"{KML}:Greater_IntInt", {"B": AUTHORED})
     g.call("want", f"{KML}:SelectFloat", {"A": NAMEPLATE_SQUEEZE, "B": 0})
     g.node("getentryclass", "get", var="EntryClass")
@@ -265,7 +290,7 @@ def pad_nameplates():
     g.chain("entry", "widgets", "loop.Exec")
     g.chain("loop.LoopBody", "dopad")
     g.chain("dopad", "setpad")
-    g.wire(("getused.Used", "wide.A"), ("wide.ReturnValue", "want.bPickA"),
+    g.wire(("getshown.Shown", "wide.A"), ("wide.ReturnValue", "want.bPickA"),
            ("getentryclass.EntryClass", "widgets.WidgetClass"), ("widgets.FoundWidgets", "loop.Array"),
            ("loop.Array Element", "visible.self"), ("loop.Array Element", "getpad.self"),
            ("getpad.Padding", "pad.Margin"), ("pad.Left", "differs.A"), ("want.ReturnValue", "differs.B"),
@@ -276,9 +301,18 @@ def pad_nameplates():
 
 
 def count_used():
-    """CountUsed: Used = one past the last squad slot with a character, required slots then flexible ones."""
+    """CountUsed: Used = one past the last squad slot with a character, required slots then flexible ones; Filled[i] =
+    slot i has one (false past the slots, up to the pool's TARGET)."""
     g = Graph()
     g.node("setzero", "set", var="Used", defaults={"Used": 0})
+    g.node("getfilled", "get", var="Filled")
+    g.node("clearfilled", "array_call", function=f"{KAL}:Array_Clear")
+    g.node("getfilled2", "get", var="Filled")
+    g.node("reqadd", "array_call", function=f"{KAL}:Array_Add")
+    g.node("getfilled3", "get", var="Filled")
+    g.node("flexadd", "array_call", function=f"{KAL}:Array_Add")
+    g.node("getfilled4", "get", var="Filled")
+    g.node("pad", "array_call", function=f"{KAL}:Array_Resize", defaults={"Size": TARGET})
     g.node("getscreen", "get", var="Screen")
     g.node("assignment", "make_struct", struct=ASSIGNMENT,
            defaults={"ViewModelClass": MISSION_VM, "ViewModelName": "Default"})
@@ -302,13 +336,14 @@ def count_used():
     g.call("flexat", f"{KML}:Add_IntInt")
     g.call("flexnext", f"{KML}:Add_IntInt", {"B": 1})
     g.node("setflexused", "set", var="Used")
-    g.chain("entry", "setzero", "getvm", "mission")
+    g.chain("entry", "setzero", "clearfilled", "getvm", "mission")
     g.chain("mission", "setreqcount", "reqloop.Exec")
-    g.chain("reqloop.LoopBody", "reqif")
+    g.chain("reqloop.LoopBody", "reqadd", "reqif")
     g.chain("reqif", "setreqused")
     g.chain("reqloop.Completed", "flexloop.Exec")
-    g.chain("flexloop.LoopBody", "flexif")
+    g.chain("flexloop.LoopBody", "flexadd", "flexif")
     g.chain("flexif", "setflexused")
+    g.chain("flexloop.Completed", "pad")
     cast = "mission.AsBruno Mission View Model"
     g.wire(("getscreen.Screen", "getvm.Object"), ("assignment.MDViewModelAssignmentReference", "getvm.Assignment"),
            ("getvm.ReturnValue", "mission.Object"),
@@ -320,8 +355,63 @@ def count_used():
            ("getflex.FlexibleSlotVMs", "flexloop.Array"), ("flexloop.Array Element", "flexchar.self"),
            ("flexchar.AssignedCharacterVM", "flexfilled.Object"), ("flexfilled.ReturnValue", "flexif.Condition"),
            ("getreqcount.RequiredCount", "flexat.A"), ("flexloop.Array Index", "flexat.B"),
-           ("flexat.ReturnValue", "flexnext.A"), ("flexnext.ReturnValue", "setflexused.Used"))
+           ("flexat.ReturnValue", "flexnext.A"), ("flexnext.ReturnValue", "setflexused.Used"),
+           ("getfilled.Filled", "clearfilled.TargetArray"),
+           ("getfilled2.Filled", "reqadd.TargetArray"), ("reqfilled.ReturnValue", "reqadd.NewItem"),
+           ("getfilled3.Filled", "flexadd.TargetArray"), ("flexfilled.ReturnValue", "flexadd.NewItem"),
+           ("getfilled4.Filled", "pad.TargetArray"))
     return {"name": "CountUsed", "inputs": [], "outputs": [], **g.spec()}
+
+
+def count_shown():
+    """CountShown: Shown = the visible nameplates (WBP_CharacterSlot), never fewer than Used. The game puts up one per
+    slot of the mission, EMPTY ones included, so this is the row the models have to line up with."""
+    g = Graph()
+    g.node("setzero", "set", var="Shown", defaults={"Shown": 0})
+    g.node("getentryclass", "get", var="EntryClass")
+    g.call("widgets", "/Script/UMG.WidgetBlueprintLibrary:GetAllWidgetsOfClass", {"TopLevelOnly": "false"})
+    g.node("loop", "macro", macro="ForEachLoop")
+    g.call("visible", "/Script/UMG.Widget:IsVisible")
+    g.node("isvisible", "branch")
+    g.node("getshown", "get", var="Shown")
+    g.call("next", f"{KML}:Add_IntInt", {"B": 1})
+    g.node("setnext", "set", var="Shown")
+    g.node("getshown2", "get", var="Shown")
+    g.node("getused", "get", var="Used")
+    g.call("atleast", f"{KML}:Max")
+    g.node("setatleast", "set", var="Shown")
+    g.chain("entry", "setzero", "widgets", "loop.Exec")
+    g.chain("loop.LoopBody", "isvisible")
+    g.chain("isvisible", "setnext")
+    g.chain("loop.Completed", "setatleast")
+    g.wire(("getentryclass.EntryClass", "widgets.WidgetClass"), ("widgets.FoundWidgets", "loop.Array"),
+           ("loop.Array Element", "visible.self"), ("visible.ReturnValue", "isvisible.Condition"),
+           ("getshown.Shown", "next.A"), ("next.ReturnValue", "setnext.Shown"),
+           ("getshown2.Shown", "atleast.A"), ("getused.Used", "atleast.B"), ("atleast.ReturnValue", "setatleast.Shown"))
+    return {"name": "CountShown", "inputs": [], "outputs": [], **g.spec()}
+
+
+def picker_open():
+    """PickerOpen -> Open: the squad screen's character picker is up (the top input state is PICKER_STATE)."""
+    g = Graph()
+    g.call("pc", f"{GS}:GetPlayerController", {"PlayerIndex": 0})
+    g.call("sub", "/Script/Engine.SubsystemBlueprintLibrary:GetLocalPlayerSubSystemFromPlayerController",
+           {"Class": IMC_SUBSYSTEM})
+    g.node("imc", "cast", **{"class": IMC_SUBSYSTEM})
+    g.call("top", f"{IMC_SUBSYSTEM}:GetTopIMCStateTag")
+    g.call("name", "/Script/GameplayTags.BlueprintGameplayTagLibrary:GetTagName")
+    g.call("same", f"{KML}:EqualEqual_NameName", {"B": PICKER_STATE})
+    g.node("setopen", "set", var="PickerIsOpen")
+    g.node("setclosed", "set", var="PickerIsOpen", defaults={"PickerIsOpen": "false"})
+    g.node("getopen", "get", var="PickerIsOpen")
+    g.chain("entry", "setclosed", "imc")
+    g.chain("imc", "top", "setopen", "result")
+    g.chain("imc.CastFailed", "result")
+    g.wire(("pc.ReturnValue", "sub.PlayerController"), ("sub.ReturnValue", "imc.Object"),
+           ("imc.AsBit Reactor IMCState Subsystem", "top.self"), ("top.ReturnValue", "name.GameplayTag"),
+           ("name.ReturnValue", "same.A"), ("same.ReturnValue", "setopen.PickerIsOpen"),
+           ("getopen.PickerIsOpen", "result.Open"))
+    return {"name": "PickerOpen", "inputs": [], "outputs": [{"name": "Open", "type": "bool"}], **g.spec()}
 
 
 def capture_layout():
@@ -375,8 +465,9 @@ def capture_layout():
 
 
 def place_proxy():
-    """PlaceProxy(Index): model Index on the row, ROW_STEP_RATIO of the authored step apart and centred on the authored
-    row, scaled by Fit from its tracked base; it takes the rotation of the authored slot nearest its place."""
+    """PlaceProxy(Index): model Index on a row of Shown, ROW_STEP_RATIO of the authored step apart and centred on the
+    authored row, scaled by Fit from its tracked base (kept in PlaceBase before the scale is written); it takes the rotation of
+    the authored slot nearest its place."""
     g = Graph()
     g.node("getlocs", "get", var="AuthLocs")
     g.node("a0", "array_call", function=f"{KAL}:Array_Get", defaults={"Index": 0})
@@ -385,7 +476,7 @@ def place_proxy():
     g.call("centre", f"{KML}:Multiply_VectorFloat", {"B": 0.5})
     g.call("span", f"{KML}:Subtract_VectorVector")
     g.call("step", f"{KML}:Multiply_VectorFloat", {"B": 1.0 / (AUTHORED - 1)})
-    g.node("getused", "get", var="Used")
+    g.node("getused", "get", var="Shown")
     g.call("usedf", f"{KML}:Conv_IntToDouble")
     g.call("last", f"{KML}:Subtract_DoubleDouble", {"B": 1})
     g.call("mid", f"{KML}:Multiply_DoubleDouble", {"B": 0.5})
@@ -404,6 +495,14 @@ def place_proxy():
     g.node("getproxies", "get", var="Proxies")
     g.node("proxy", "array_call", function=f"{KAL}:Array_Get")
     g.call("valid", f"{KSL}:IsValid")
+    # An empty slot (past the squad, or a hole) only while the game is showing its proxy (the picker's preview): a
+    # hidden proxy's weapons would come back into the row with it.
+    g.node("getfilled", "get", var="Filled")
+    g.node("insquad", "array_call", function=f"{KAL}:Array_Get")
+    g.node("gethidden", "get", var=f"{ACTOR}:bHidden")
+    g.call("shownnow", f"{KML}:Not_PreBool")
+    g.call("wanted", f"{KML}:BooleanOR")
+    g.call("go", f"{KML}:BooleanAND")
     g.node("isvalid", "branch")
     # Scale: the base the fit started from, unless the Blueprint has put a new one on the actor since.
     g.node("getfitp", "get", var="FitProxies")
@@ -421,6 +520,12 @@ def place_proxy():
     g.call("fresh", f"{KML}:SelectVector")
     g.call("oursauthored", f"{KML}:BooleanAND")
     g.call("chosen", f"{KML}:SelectVector")
+    # Kept before the scale is written. Pure nodes run again for every impure node that reads them, so anything after
+    # SetActorScale3D that read `chosen` would see the scale just written instead of the base, and record that as the
+    # base: 2.0.3 stored the fitted scale, fitted it again (six stood at 0.36 of their size, not 0.6) and shrank the
+    # row further on every change of squad size, until the models vanished.
+    g.node("setplacebase", "set", var="PlaceBase")
+    g.node("getplacebase", "get", var="PlaceBase")
     g.call("islast", f"{KML}:EqualEqual_IntInt", {"B": AUTHORED - 1})
     g.node("setrowbase", "branch")
     g.node("rowbase", "set", var="RowBase")
@@ -440,7 +545,7 @@ def place_proxy():
     g.node("getapplied3", "get", var="FitApplied")
     g.node("addapplied", "array_call", function=f"{KAL}:Array_Add")
     g.chain("entry", "isvalid")
-    g.chain("isvalid", "setrowbase")
+    g.chain("isvalid", "setplacebase", "setrowbase")
     g.chain("setrowbase", "rowbase", "scale")
     g.chain("setrowbase.else", "scale")
     g.chain("scale", "move", "keeprecord")
@@ -450,7 +555,7 @@ def place_proxy():
     g.wire(("getlocs.AuthLocs", "a0.TargetArray"), ("getlocs.AuthLocs", "a3.TargetArray"),
            ("a0.Item", "ends.A"), ("a3.Item", "ends.B"), ("ends.ReturnValue", "centre.A"),
            ("a3.Item", "span.A"), ("a0.Item", "span.B"), ("span.ReturnValue", "step.A"),
-           ("getused.Used", "usedf.InInt"), ("usedf.ReturnValue", "last.A"), ("last.ReturnValue", "mid.A"),
+           ("getused.Shown", "usedf.InInt"), ("usedf.ReturnValue", "last.A"), ("last.ReturnValue", "mid.A"),
            ("entry.Index", "indexf.InInt"), ("indexf.ReturnValue", "rel.A"), ("mid.ReturnValue", "rel.B"),
            ("rel.ReturnValue", "offset.A"), ("step.ReturnValue", "shift.A"),
            ("offset.ReturnValue", "shift.B"), ("centre.ReturnValue", "where.A"), ("shift.ReturnValue", "where.B"),
@@ -458,7 +563,11 @@ def place_proxy():
            ("round.ReturnValue", "nearest.Value"), ("getrots.AuthRots", "rot.TargetArray"),
            ("nearest.ReturnValue", "rot.Index"),
            ("getproxies.Proxies", "proxy.TargetArray"), ("entry.Index", "proxy.Index"),
-           ("proxy.Item", "valid.Object"), ("valid.ReturnValue", "isvalid.Condition"),
+           ("proxy.Item", "valid.Object"),
+           ("getfilled.Filled", "insquad.TargetArray"), ("entry.Index", "insquad.Index"),
+           ("proxy.Item", "gethidden.self"),
+           ("gethidden.bHidden", "shownnow.A"), ("insquad.Item", "wanted.A"), ("shownnow.ReturnValue", "wanted.B"),
+           ("valid.ReturnValue", "go.A"), ("wanted.ReturnValue", "go.B"), ("go.ReturnValue", "isvalid.Condition"),
            ("getfitp.FitProxies", "find.TargetArray"), ("proxy.Item", "find.ItemToFind"),
            ("find.ReturnValue", "known.A"), ("proxy.Item", "live.self"),
            ("getapplied.FitApplied", "applied.TargetArray"), ("find.ReturnValue", "applied.Index"),
@@ -473,25 +582,28 @@ def place_proxy():
            # chosen: an authored proxy still carrying our last write -> its recorded base, else fresh
            ("ours.ReturnValue", "oursauthored.A"), ("authoredidx.ReturnValue", "oursauthored.B"),
            ("base.Item", "chosen.A"), ("fresh.ReturnValue", "chosen.B"), ("oursauthored.ReturnValue", "chosen.bPickA"),
+           ("chosen.ReturnValue", "setplacebase.PlaceBase"),
            ("entry.Index", "islast.A"), ("islast.ReturnValue", "setrowbase.Condition"),
-           ("chosen.ReturnValue", "rowbase.RowBase"),
-           ("chosen.ReturnValue", "scaled.A"), ("getfit.Fit", "scaled.B"),
+           ("getplacebase.PlaceBase", "rowbase.RowBase"),
+           ("getplacebase.PlaceBase", "scaled.A"), ("getfit.Fit", "scaled.B"),
            ("proxy.Item", "scale.self"), ("scaled.ReturnValue", "scale.NewScale3D"),
            ("proxy.Item", "move.self"), ("where.ReturnValue", "move.NewLocation"), ("rot.Item", "move.NewRotation"),
            ("known.ReturnValue", "record.Condition"),
            ("authoredidx.ReturnValue", "keeprecord.Condition"),
            ("getbases2.FitBases", "setbase.TargetArray"), ("find.ReturnValue", "setbase.Index"),
-           ("chosen.ReturnValue", "setbase.Item"),
+           ("getplacebase.PlaceBase", "setbase.Item"),
            ("getapplied2.FitApplied", "setapplied.TargetArray"), ("find.ReturnValue", "setapplied.Index"),
            ("scaled.ReturnValue", "setapplied.Item"),
            ("getfitp2.FitProxies", "addproxy.TargetArray"), ("proxy.Item", "addproxy.NewItem"),
-           ("getbases3.FitBases", "addbase.TargetArray"), ("chosen.ReturnValue", "addbase.NewItem"),
+           ("getbases3.FitBases", "addbase.TargetArray"), ("getplacebase.PlaceBase", "addbase.NewItem"),
            ("getapplied3.FitApplied", "addapplied.TargetArray"), ("scaled.ReturnValue", "addapplied.NewItem"))
     return {"name": "PlaceProxy", "inputs": [{"name": "Index", "type": "int"}], "outputs": [], **g.spec()}
 
 
 def restore_scales():
-    """RestoreScales: with four or fewer in the squad, a proxy still carrying the fit's scale gets its base back."""
+    """RestoreScales: with four or fewer plates, a proxy still carrying the fit's scale gets its base back and, while it
+    hangs in a diorama slot, the slot's own place: the slot attaches it snapped (relative zero) and never moves it again,
+    so a model the fit had moved stayed on the squeezed row next to the wrong name (in game, 2026-11-06)."""
     g = Graph()
     g.node("getfitp", "get", var="FitProxies")
     g.node("loop", "macro", macro="ForEachLoop")
@@ -507,9 +619,15 @@ def restore_scales():
     g.call("scale", "/Script/Engine.Actor:SetActorScale3D")
     g.node("getapplied2", "get", var="FitApplied")
     g.node("forget", "array_call", function=f"{KAL}:Array_Set")
+    g.call("parent", f"{ACTOR}:GetAttachParentActor")
+    g.call("hasparent", f"{KSL}:IsValid")
+    g.node("attached", "branch")
+    g.call("relloc", f"{ACTOR}:K2_SetActorRelativeLocation", {"bTeleport": "true"})
+    g.call("relrot", f"{ACTOR}:K2_SetActorRelativeRotation", {"bTeleport": "true"})
     g.chain("entry", "loop.Exec")
     g.chain("loop.LoopBody", "ours")
-    g.chain("ours", "scale", "forget")
+    g.chain("ours", "scale", "forget", "attached")
+    g.chain("attached", "relloc", "relrot")
     g.wire(("getfitp.FitProxies", "loop.Array"), ("loop.Array Element", "valid.Object"),
            ("loop.Array Element", "live.self"), ("getapplied.FitApplied", "applied.TargetArray"),
            ("loop.Array Index", "applied.Index"), ("live.ReturnValue", "same.A"), ("applied.Item", "same.B"),
@@ -518,14 +636,20 @@ def restore_scales():
            ("loop.Array Element", "scale.self"), ("base.Item", "scale.NewScale3D"),
            # Applied is set to the base too, so the next pass sees the actor as ours at its base and leaves it.
            ("getapplied2.FitApplied", "forget.TargetArray"), ("loop.Array Index", "forget.Index"),
-           ("base.Item", "forget.Item"))
+           ("base.Item", "forget.Item"),
+           ("loop.Array Element", "parent.self"), ("parent.ReturnValue", "hasparent.Object"),
+           ("hasparent.ReturnValue", "attached.Condition"),
+           ("loop.Array Element", "relloc.self"), ("loop.Array Element", "relrot.self"))
     return {"name": "RestoreScales", "inputs": [], "outputs": [], **g.spec()}
 
 
 def fit_lineup():
-    """FitLineup: Used from the activity slots, the authored layout once, then the fitted row (or restored scales)."""
+    """FitLineup: Used from the activity slots and Shown from the nameplates, the authored layout once, then the fitted
+    row of Shown (or restored scales and places)."""
     g = Graph()
     g.call("count", "self:CountUsed")
+    g.call("shown", "self:CountShown")
+    g.node("getshown", "get", var="Shown")
     g.node("getcaptured", "get", var="Captured")
     g.node("hascapture", "branch")
     g.call("capture", "self:CaptureLayout")
@@ -538,45 +662,85 @@ def fit_lineup():
     g.call("gaps", f"{KML}:Subtract_DoubleDouble", {"B": 1})
     g.call("fit", f"{KML}:Divide_DoubleDouble", {"A": AUTHORED - 1})
     g.node("setfit", "set", var="Fit")
-    g.call("lastindex", f"{KML}:Subtract_IntInt", {"B": 1})
+    # Through Used - 1, or Used while the picker is open (its preview slot), within the pool.
+    g.call("previewing", f"{KML}:SelectInt", {"A": 0, "B": -1})
+    g.call("lastwanted", f"{KML}:Add_IntInt")
+    g.node("getproxies3", "get", var="Proxies")
+    g.node("len3", "array_call", function=f"{KAL}:Array_Length")
+    g.call("lastpool", f"{KML}:Subtract_IntInt", {"B": 1})
+    g.call("lastindex", f"{KML}:Min")
     g.node("loop", "macro", macro="ForLoop", defaults={"FirstIndex": 0})
     g.call("place", "self:PlaceProxy")
     g.node("getfits", "get", var="LineupFits")
     g.call("addfits", f"{KML}:Add_IntInt", {"B": 1})
     g.node("setfits", "set", var="LineupFits")
     g.call("restore", "self:RestoreScales")
-    # Overflow proxies past the squad: hidden.
-    g.call("firsthide", f"{KML}:Max", {"B": AUTHORED})
+    # Overflow proxies of empty slots: hidden and parked once the squad has settled with the picker closed (see the
+    # module docstring).
     g.node("getproxies2", "get", var="Proxies")
     g.node("len", "array_call", function=f"{KAL}:Array_Length")
     g.call("lasthide", f"{KML}:Subtract_IntInt", {"B": 1})
-    g.node("hideloop", "macro", macro="ForLoop")
+    g.call("picker", "self:PickerOpen")
+    g.node("getlast", "get", var="LastUsed")
+    g.call("changed", f"{KML}:NotEqual_IntInt")
+    g.call("unsettled", f"{KML}:BooleanOR")
+    g.node("restart", "branch")
+    g.node("setsettlezero", "set", var="Settle", defaults={"Settle": 0})
+    g.node("getsettle", "get", var="Settle")
+    g.call("addsettle", f"{KML}:Add_IntInt", {"B": 1})
+    g.node("setsettle", "set", var="Settle")
+    g.node("setlast", "set", var="LastUsed")
+    g.node("getsettle2", "get", var="Settle")
+    g.call("settled", f"{KML}:GreaterEqual_IntInt", {"B": SETTLE_PASSES})
+    g.node("dropped", "branch")
+    g.node("hideloop", "macro", macro="ForLoop", defaults={"FirstIndex": AUTHORED})
+    g.node("getfilled", "get", var="Filled")
+    g.node("slotfilled", "array_call", function=f"{KAL}:Array_Get")
+    g.call("empty", f"{KML}:Not_PreBool")
+    g.call("tohide", f"{KML}:BooleanAND")
     g.node("extra", "array_call", function=f"{KAL}:Array_Get")
     g.call("valid", f"{KSL}:IsValid")
     g.node("isvalid", "branch")
     g.call("hide", "/Script/Engine.Actor:SetActorHiddenInGame", {"bNewHidden": "true"})
-    g.chain("entry", "count", "hascapture")
+    g.call("park", f"{ACTOR}:K2_SetActorLocation", {"bTeleport": "true"})
+    g.chain("entry", "count", "shown", "picker", "hascapture")
     g.chain("hascapture.else", "capture", "dofit")
     g.chain("hascapture", "dofit")
     g.chain("dofit", "setfit", "loop.execute")
     g.chain("loop.LoopBody", "place")
-    g.chain("loop.Completed", "setfits", "hideloop.execute")
-    g.chain("dofit.else", "restore", "hideloop.execute")
+    g.chain("loop.Completed", "setfits", "restart")
+    g.chain("dofit.else", "restore", "restart")
+    g.chain("restart", "setsettlezero", "setlast")
+    g.chain("restart.else", "setsettle", "setlast")
+    g.chain("setlast", "dropped")
+    g.chain("dropped", "hideloop.execute")
     g.chain("hideloop.LoopBody", "isvalid")
-    g.chain("isvalid", "hide")
-    g.wire(("getcaptured.Captured", "hascapture.Condition"), ("getused.Used", "wide.A"),
+    g.chain("isvalid", "hide", "park")
+    g.wire(("getcaptured.Captured", "hascapture.Condition"), ("getshown.Shown", "wide.A"),
            ("getcaptured2.Captured", "ready.A"), ("wide.ReturnValue", "ready.B"), ("ready.ReturnValue", "dofit.Condition"),
-           ("getused.Used", "usedf.InInt"), ("usedf.ReturnValue", "gaps.A"), ("gaps.ReturnValue", "fit.B"),
-           ("fit.ReturnValue", "setfit.Fit"), ("getused.Used", "lastindex.A"), ("lastindex.ReturnValue", "loop.LastIndex"),
+           ("getshown.Shown", "usedf.InInt"), ("usedf.ReturnValue", "gaps.A"), ("gaps.ReturnValue", "fit.B"),
+           ("fit.ReturnValue", "setfit.Fit"), ("picker.Open", "previewing.bPickA"), ("getused.Used", "lastwanted.A"),
+           ("previewing.ReturnValue", "lastwanted.B"), ("getproxies3.Proxies", "len3.TargetArray"),
+           ("len3.ReturnValue", "lastpool.A"), ("lastwanted.ReturnValue", "lastindex.A"),
+           ("lastpool.ReturnValue", "lastindex.B"), ("lastindex.ReturnValue", "loop.LastIndex"),
            ("loop.Index", "place.Index"), ("getfits.LineupFits", "addfits.A"), ("addfits.ReturnValue", "setfits.LineupFits"),
-           ("getused.Used", "firsthide.A"), ("firsthide.ReturnValue", "hideloop.FirstIndex"),
            ("getproxies2.Proxies", "len.TargetArray"), ("len.ReturnValue", "lasthide.A"),
+           ("getused.Used", "changed.A"), ("getlast.LastUsed", "changed.B"),
+           ("picker.Open", "unsettled.A"), ("changed.ReturnValue", "unsettled.B"),
+           ("unsettled.ReturnValue", "restart.Condition"),
+           ("getsettle.Settle", "addsettle.A"), ("addsettle.ReturnValue", "setsettle.Settle"),
+           ("getused.Used", "setlast.LastUsed"),
+           ("getsettle2.Settle", "settled.A"), ("settled.ReturnValue", "dropped.Condition"),
            ("lasthide.ReturnValue", "hideloop.LastIndex"), ("getproxies2.Proxies", "extra.TargetArray"),
-           ("hideloop.Index", "extra.Index"), ("extra.Item", "valid.Object"), ("valid.ReturnValue", "isvalid.Condition"),
-           ("extra.Item", "hide.self"))
+           ("hideloop.Index", "extra.Index"), ("extra.Item", "valid.Object"),
+           ("getfilled.Filled", "slotfilled.TargetArray"), ("hideloop.Index", "slotfilled.Index"),
+           ("slotfilled.Item", "empty.A"), ("valid.ReturnValue", "tohide.A"), ("empty.ReturnValue", "tohide.B"),
+           ("tohide.ReturnValue", "isvalid.Condition"),
+           ("extra.Item", "hide.self"), ("extra.Item", "park.self"))
     return {"name": "FitLineup", "inputs": [], "outputs": [], **g.spec()}
 
 
 def functions():
-    return [load_classes(), find_manager(), ensure_pool(), screen_open(), pad_nameplates(), count_used(), capture_layout(),
+    return [load_classes(), find_manager(), ensure_pool(), screen_open(), pad_nameplates(), count_used(), count_shown(),
+            picker_open(), capture_layout(),
             place_proxy(), restore_scales(), fit_lineup()]

@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Squad select models shrank on every swap.** With five or six in the squad, removing an
+  operator and adding another made the whole lineup smaller each time, until the models all but
+  vanished (reported with a video on 2.0.3). The fit recorded each model's base size from the
+  scale it had just written, so every change of squad size shrank it again. Six now stand at 3/5
+  of their size and five at 3/4, as intended. In 2.0.3 they sat at 9/25 and 9/16 even
+  before any swap, so the models are larger than they were.
+- **Squad select models stood half a slot off their names when the squad wasn't full.** The game
+  shows a nameplate for every slot of the mission, EMPTY ones included, but the models were laid
+  out for the filled slots only. They now line up with the nameplates on screen.
+- **Models could stay on the squeezed row on a lineup of four nameplates or fewer.** They now go
+  back to the game's own slots.
+- **A sixth operator added back could stay invisible.** The character picker previews the
+  hovered operator in the slot before the squad counts them, and the mod hid that preview; once
+  picked, the game never showed it again (switching to another operator and back brought it
+  back). Previews are now left alone while the picker is open, and a cancelled preview or a
+  removed fifth or sixth is still hidden once the squad settles.
+- **Weapons stayed on the stage after a fifth or sixth operator was removed.** The weapons are
+  attached actors of their own and stayed visible when only the model was hidden. A hidden model
+  is now moved off the stage the way the game moves its own, weapons included.
+- **Removing the fifth operator with a sixth still in the squad left the fifth model standing.**
+  Only slots after the last filled one were treated as empty. Each slot is now checked on its own.
+- **The operator being previewed in the picker stood at full size.** The slot being filled now
+  takes its place in the row at the row's size while the picker shows it.
+
+### Known issues
+- **Clicking an empty slot past the first free one very quickly can leave a model missing.** The
+  game previews into the slot that was clicked but places the pick in the first free slot, and
+  doesn't redraw in between. Unmodded, the model would stand in the wrong place; with this mod,
+  where the slot is a fifth or sixth, it is hidden. Any later change on the screen brings it back.
+
+### Validation
+- The lineup fit passed compiled Blueprint tests in the editor (`tools/test_lineup_fit.sh`),
+  including repeated remove/add swaps, rows with EMPTY plates, picker previews and holes in the
+  squad.
+- Played on the shipping game in a six-slot mission's squad select: removing and adding at every
+  squad size, cancelled and confirmed previews, the fifth removed with the sixth kept, and down to
+  one and back. Sizes stayed fixed, models lined up with their names, and no weapons were left
+  behind. Missions with four or fewer slots were not checked.
+
 ### Removed
 - **The UE4SS placeholder.** The download is now only the Core pak component. If you installed
   2.0.0 to 2.0.3, the leftover `Squad Six Reforged` component does nothing and can be removed. If

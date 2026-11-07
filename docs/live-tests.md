@@ -583,3 +583,33 @@ added points up to six; v1 fixed the same thing in 1.0.4. The fix leaves the tut
 areas untouched. Installed on the main install (fix build, plugin descriptor still 2.0.1)
 and played by the user through the tutorial on the shipping game: it worked. The 2.0.2
 containers differ from that build only in the `.pak`'s plugin descriptor version.
+
+## Squad select lineup, v2 (2026-11-06)
+
+Reported on 2.0.3 with a video: with six in the squad, every remove/add shrank the whole lineup
+until the models all but vanished. The cause is in the Brain, not the game: `PlaceProxy` recorded
+each proxy's base from `GetActorScale3D` after `SetActorScale3D`, because Blueprint pure nodes
+run again for each impure node that reads them (confirmed in the 2.0.3 bytecode). Six stood at
+9/25 of their size before any swap and every change of squad size shrank the base again.
+
+Played by the user on the main install (Den Designer's pak moved aside: it crashed at load with
+"Bad name index" in `BP_DenEditorState`), "Early Retirement", six slots. The lineup was read
+with a PlagueNightConsole probe of the Brain and its proxies, about twice a second, so the user
+kept the mouse. Each problem below was found in one round and fixed in the next:
+
+- Six at 0.30 world scale (3/5 of the slot's 0.5) through every swap; no compounding.
+- The game shows a nameplate per slot of the mission, EMPTY ones included: `Shown` was 6 at every
+  squad size. Five laid out by `Used` stood half a slot right of their names.
+- The picker previews the hovered character into the proxy of the slot it opened for and shows
+  it, before the squad VM counts it; the top IMC state is `BR.UI.IMCState.Strategy.SquadSelect.Assign`
+  while it is open (`Select` otherwise). Hiding past `Used` every pass hid that preview, and once
+  picked the game never showed it again. Hiding only on a drop in `Used` left a cancelled preview
+  standing over EMPTY.
+- Weapons are attached actors and stayed visible when only the proxy was hidden; parking the
+  proxy at the origin (where the game parks one whose slot emptied) took them along.
+- `Used` is one past the last filled slot, so a fifth removed with the sixth kept was never
+  hidden; the per-slot `Filled` list fixed it.
+
+Known, not fixed: clicking an empty slot past the first free one and picking very quickly. The
+game previews into the clicked slot, assigns the pick to the first free slot, and doesn't redraw
+in between; the hidden preview leaves that operator missing until the next change.

@@ -1,0 +1,23 @@
+{
+  "version": "2.0.5",
+  "platform": "Linux (shader-free Blueprint/data cook, not played in the Windows game)",
+  "inputs": {
+    "data/missions.tsv": "214428beb29e0a135529a9bb42010134cfd17b639bdc0cb65a83a96163a37bb6",
+    "data/placement.json": "3cacb3b8d9e9376b89dc4bc0e3c032eb48b5e761d082625de220e265e695046d",
+    "tools/build_gf.sh": "ccf488e784cc9ca73859d9dac8646eb29774a074c4a4522f896ce210f87a839a",
+    "unreal/SquadSixGF/SquadSixGF.uplugin": "3218afd88e610e9addbf364381c9efbe19ca44e04e3e9c0761554c594517a1c5",
+    "unreal/scripts/build_gf.py": "2bd061ace2be9da6b58dcce4535473d8be8b8214ac4929b7807ce3e6232b8ecb",
+    "unreal/specs/gf.py": "8e52fe266c3535415e180848783eb668d05a7a8205b87b922fcf2f8c2179061a",
+    "unreal/specs/gf_graph.py": "b714fc4ee62e21426c69d51b3a115bc939df1879420c752bd83d52a77227e362",
+    "unreal/specs/gf_holotable.py": "eef0aa1fde0a12f2bb7102be3e0c86a3248bb6bcade778be3bad58cb02a29e04",
+    "unreal/specs/gf_lineup.py": "a2c587bf45eb8137bbbc09a67a90256c3e5e00c106e4f0888d46bd9555403b62",
+    "unreal/specs/gf_maps.py": "353eb425290ad9d0a39c64cd0ffa25f23fd130bf9491fbb23e1cb7eae41e1e31",
+    "unreal/specs/gf_spawn.py": "d459112cf54ca814aec48ff634e30e953b33792b9bff4a9e84d212bbb592e7a6",
+    "unreal/specs/gf_unstack.py": "05d1f498b709b1db5f6152767b3864f065e5cc4667c0f35326c018c6de367da3"
+  },
+  "paks": {
+    "SquadSixGF_P.pak": "eaac32d8624c4cf0e5dbeeda10cd8cdab0ff4def196a75f49f25b3bf3660c7d8",
+    "SquadSixGF_P.ucas": "a5ec122f9a1fae01ed804a641ffbd2abda40e0b81ff48f3c4bed73677ec138a5",
+    "SquadSixGF_P.utoc": "ed9243d9cc992a0530badc03fe70c89f5377c79cc1779acd8e90a7f2b0e35de1"
+  }
+}

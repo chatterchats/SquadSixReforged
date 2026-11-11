@@ -18,7 +18,7 @@ For a manual install, close the game and extract the archive into `SWZeroCompany
 
 If you used the development trial, remove the separate `SquadSixGF_P.pak/.ucas/.utoc` files before installing the release. Do not deploy the same mod through two managers at once.
 
-Build **25898267** is now allowed by the manifests, fixing the older strict-build installation block. The earlier gameplay tests were on build 25134257; the metadata update alone is not a new gameplay validation on 25898267.
+The manifests list builds **25898267** (1.2) and **26445778** (the 1.2 hotfix) as tested. From 2.0.5 they are no longer strict, so mod managers don't block installing on other builds.
 
 ## Behavior and limitations
 

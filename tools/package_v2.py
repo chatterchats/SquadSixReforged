@@ -23,10 +23,23 @@ STUB = b'-- Squad Six Reforged v2 upgrade compatibility: retired v1 module.\n-- 
 # The last release with the UE4SS placeholder. Versions above it ship only the Core component, and 2.0.3 and earlier
 # still rebuild byte for byte.
 LAST_STUB_RELEASE = (2, 0, 3)
+# The last release whose manifests are strict to 25134257 and 25898267. Later ones list 1.2 (25898267) and the 1.2
+# hotfix (26445778) without strict, and 2.0.4 and earlier still rebuild byte for byte.
+LAST_STRICT_RELEASE = (2, 0, 4)
+
+
+def release_tuple(version):
+    return tuple(int(n) for n in version.split('-')[0].split('.'))
 
 
 def ships_stub(version):
-    return tuple(int(n) for n in version.split('-')[0].split('.')) <= LAST_STUB_RELEASE
+    return release_tuple(version) <= LAST_STUB_RELEASE
+
+
+def game_compat(version):
+    if release_tuple(version) <= LAST_STRICT_RELEASE:
+        return {'appId': 2075800, 'testedBuilds': ['25134257', '25898267'], 'strict': True}
+    return {'appId': 2075800, 'testedBuilds': ['25898267', '26445778']}
 
 
 def encoded(obj):
@@ -42,7 +55,7 @@ def manifest(version, runtime=False):
         'author': 'Chats; original Squad Six by arctco',
         'description': ('Harmless replacement for the v1 Lua runtime. Gameplay is in the v2 pak.' if runtime
                         else 'Six-operator squads using a Game Feature plugin. UE4SS is not required.'),
-        'game': {'appId': 2075800, 'testedBuilds': ['25134257', '25898267'], 'strict': True},
+        'game': game_compat(version),
         'type': ['ue4ss'] if runtime else ['iostore'],
         'requires': {'ue4ss': False},
         'nexus': {'modId': 340},

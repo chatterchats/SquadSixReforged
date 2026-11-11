@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.5] - 2026-11-11
+
+### Changed
+- **Tested builds are now 25898267 (1.2) and 26445778 (the 1.2 hotfix).** The manifests no longer
+  list 25134257, and they are no longer strict, so mod managers stop refusing to install on other
+  game builds.
+- The Core containers were re-cooked for 2.0.5. Only the plugin version changed; gameplay is the
+  same as 2.0.4.
+
 ## [2.0.4] - 2026-11-06
 
 ### Fixed

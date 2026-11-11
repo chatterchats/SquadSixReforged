@@ -2,6 +2,11 @@ name: Release to Nexus Mods
 
 on:
   workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: "Skip the Lua tests (they need apt for LuaJIT); run tools/run-tests.sh locally first. The release validator still runs."
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -58,13 +63,17 @@ jobs:
               output.write(f"changelog<<{delimiter}\n{changelog}\n{delimiter}\n")
           PY
 
-      - name: Run tests
+      - name: Run Lua tests
+        if: ${{ !inputs.skip_tests }}
         shell: bash
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq luajit
           tools/run-tests.sh
-          python3 tools/validate_v2_release.py
+
+      - name: Validate release
+        shell: bash
+        run: python3 tools/validate_v2_release.py
 
       - name: Resolve Nexus IDs
         id: nexus

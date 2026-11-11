@@ -6,7 +6,7 @@
 -- models stay hidden. The watch scans for the screen's slot box at most once, and not at all once
 -- the box's construction notification has handed it over: every scan walks every object.
 --   luajit tests/lineup_test.lua <Scripts dir>
-local scripts = assert(arg[1], "usage: lineup_test.lua <Scripts dir>")
+local scripts = arg[1] or "dev/v1/SquadSixReforged/Scripts" -- usage: lineup_test.lua <Scripts dir>
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
 local mock = dofile(here .. "ue4ss_mock.lua")
 

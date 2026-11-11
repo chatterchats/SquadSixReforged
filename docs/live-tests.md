@@ -324,7 +324,7 @@ shows the setting was really off, because `COVER.improve` returns without loggin
 ## Hero missions at six (7043c6b + test build, 2026-10-13)
 
 The test build lets seven hero missions take six (`COMPANION_AT_SIX_MISSION_NAMES` in limits.lua,
-and the Core pak; see data/missions.tsv). The first install raised them at runtime only, and Best
+and the Core pak; see tools/data/missions.tsv). The first install raised them at runtime only, and Best
 Served Cold's squad select still offered four: it copies the limit when the galaxy map is built,
 before the runtime's re-sweep. With the missions in the Core pak, startup logs
 `data_container=loaded fallback_writes=0`. From the user's sandbox campaign on Instance 2.
@@ -352,7 +352,7 @@ is").
 Origin of Infection, three runs:
 1. `math.atan2` in the new direction log line: UE4SS runs Lua 5.4, which has none, so the
    placement pass stopped (`destinations=4/4`); six walked onto four spots, Hawks into a piece of
-   cover and Kabb in the open. Fixed; tools/run-tests.sh now also runs the tests without what
+   cover and Kabb in the open. Fixed; tools/run-tests.sh (now `make test`) also runs the tests without what
    Lua 5.4 lacks (tests/lua54.lua).
 2. Directions from spawner positions: 215 degrees. A reinforcement spawner (Enemy1.4) stands in the
    lane; the six live Coil enemies stood at about 86 (the volume said 91). 14 of 16 cover pockets

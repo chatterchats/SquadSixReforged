@@ -2,7 +2,7 @@
 """Generate unreal/specs/gf/*.json, the Game Feature trial's ZComAuthoring specs (tools/build_gf.sh runs this first).
 
 BP_SquadSixBrain is the component the plugin's AddComponents action puts on every BitReactorGameState. Three timers:
-- Sweep (2 s): the missions Squad Six ships at six (data/missions.tsv) raised to six, with their minimum lowered to the
+- Sweep (2 s): the missions Squad Six ships at six (tools/data/missions.tsv) raised to six, with their minimum lowered to the
   required cast plus one (LowerMinimum).
 - Deploy (0.25 s): every CombatPreparationArea not seen before (once its navmesh and the cover data are in) first has
   its own destinations improved as Reforged's improve_game_spots does (snapped onto the centre of the cover they stand
@@ -34,10 +34,10 @@ REPO = Path(__file__).resolve().parents[2]
 
 
 def raised_missions():
-    """The missions Squad Six ships at six that the game doesn't (data/missions.tsv, Reforged's own table): Deep Cover
+    """The missions Squad Six ships at six that the game doesn't (tools/data/missions.tsv, Reforged's own table): Deep Cover
     from 3, the rest from 4. The solo Bespin, the three-operator missions and the Serolonis Job tutorial aren't listed."""
     names = []
-    for line in (REPO / "data/missions.tsv").read_text().splitlines():
+    for line in (REPO / "tools/data/missions.tsv").read_text().splitlines():
         if line.startswith("#") or line.startswith("mission\t") or not line.strip():
             continue
         path, game, squad = line.split("\t")[:3]

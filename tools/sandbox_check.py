@@ -47,8 +47,8 @@ WIN64 = GAME_DIR / "SWZeroCompany" / "Binaries" / "Win64"
 PAKS = GAME_DIR / "SWZeroCompany" / "Content" / "Paks" / "~mods"
 CRASHES = Path("prefix/drive_c/users/steamuser/AppData/Local/SWZeroCompany/Saved/Crashes")
 
-RUNTIME_SOURCE = ROOT / "src" / "SquadSixReforged"
-CORE_SOURCE = ROOT / "src" / "SquadSixReforged_Core"
+RUNTIME_SOURCE = ROOT / "dev" / "v1" / "SquadSixReforged"
+CORE_SOURCE = ROOT / "dev" / "v1" / "SquadSixReforged_Core"
 CORE_FOLDER = "SquadSixReforged_Core"  # under ~mods, as the release ZIP installs it
 PROBE_SOURCE = ROOT / "dev" / "SquadSixReforgedProbe"
 # Development-only settings page entries (the debug markers), added to the installed page.
@@ -169,7 +169,7 @@ def git_identity():
     def git(*args):
         return subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True, text=True).stdout.strip()
     commit = git("rev-parse", "--short", "HEAD") or "unknown"
-    dirty = bool(git("status", "--porcelain", "--", "src", "dev"))
+    dirty = bool(git("status", "--porcelain", "--", "dev"))
     return commit + ("+uncommitted" if dirty else "")
 
 

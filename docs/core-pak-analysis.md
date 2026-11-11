@@ -2,7 +2,7 @@
 
 This describes arctco's 1.1.4 container. The container this repository builds differs only as
 listed in the changelog (HM_Jae_020 and MM_01_010_SerolonisJob out; SK_Serolonis_020, SK_Vandor_015,
-MM_02_010_CoilReunion and the main-story placeholder in), as set in `data/missions.tsv`.
+MM_02_010_CoilReunion and the main-story placeholder in), as set in `tools/data/missions.tsv`.
 
 Inspected 2026-10-11 with retoc 0.1.5 against the installed game (the Windows build in
 `Games/STAR WARS Zero Company (2026)`). Re-run with `tools/inspect_core.py` after any game patch.
@@ -24,7 +24,7 @@ arctco's patched byte in all 105.
 
 arctco built the pak with retoc: to-legacy, patch, to-zen. That round trip reproduces the game's
 mission packages byte for byte, and `tools/build_core.py` produces all 106 of 1.1.4's packages
-byte for byte from the mission table in `data/missions.tsv`.
+byte for byte from the mission table in `tools/data/missions.tsv`.
 
 ## Mission definitions
 
@@ -78,7 +78,7 @@ too); the export data is the game's apart from the literal. 1.1.4 shipped that w
 
 ## Rebuilding
 
-`tools/build_core.py` rebuilds the pak from the installed game: it reads `data/missions.tsv`, finds
+`tools/build_core.py` rebuilds the pak from the installed game: it reads `tools/data/missions.tsv`, finds
 each `MaxSquadSize` by parsing the package, patches the legacy `.uexp`, packs with
 `retoc to-zen --version UE5_6`, and verifies the result before writing `src/ZCOMSquadSix_Core`. It refuses to
 build if the game's missions or their limits no longer match the table, so a game patch has to be

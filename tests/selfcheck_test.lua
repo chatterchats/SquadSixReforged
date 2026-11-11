@@ -1,7 +1,7 @@
 -- The self-check against a game update that broke names: the slot index field got a new GUID
 -- suffix, a Blueprint relocation function was renamed, and reflection fails on one class.
 --   luajit tests/selfcheck_test.lua <Scripts dir>
-local scripts = assert(arg[1], "usage: selfcheck_test.lua <Scripts dir>")
+local scripts = arg[1] or "dev/v1/SquadSixReforged/Scripts" -- usage: selfcheck_test.lua <Scripts dir>
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
 local mock = dofile(here .. "ue4ss_mock.lua")
 

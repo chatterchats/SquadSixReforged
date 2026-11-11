@@ -25,7 +25,7 @@ SEPARATION = 100.0
 
 def _data():
     # Frozen v2 data: rebuilding the plugin no longer depends on the archived v1 runtime.
-    return json.loads((REPO / "data/placement.json").read_text())
+    return json.loads((REPO / "tools/data/placement.json").read_text())
 
 
 DATA = _data()

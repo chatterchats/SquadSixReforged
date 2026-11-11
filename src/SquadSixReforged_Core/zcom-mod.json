@@ -1,24 +1,22 @@
 {
   "schemaVersion": 1,
   "id": "community.squad-six-reforged.core",
-  "name": "Squad Six Reforged - Core",
-  "version": "1.4.3",
-  "author": "arctco, continued by Chats",
-  "description": "Raises the deployable squad size from four to six on the supported missions.",
+  "name": "Squad Size Reforged - Core",
+  "version": "2.0.5",
+  "author": "Chats; original Squad Six by arctco",
+  "description": "Six-operator squads using a Game Feature plugin. UE4SS is not required.",
   "game": {
     "appId": 2075800,
     "testedBuilds": [
-      "25134257",
-      "24874058",
-      "25898267"
-    ],
-    "strict": true
+      "25898267",
+      "26445778"
+    ]
   },
   "type": [
     "iostore"
   ],
   "requires": {
-    "ue4ss": true
+    "ue4ss": false
   },
   "nexus": {
     "modId": 340

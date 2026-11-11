@@ -4,7 +4,7 @@
 -- accepted by the engine but lands somewhere else: both operators must end up back where they
 -- started, not one rolled back and the other left wherever the engine put it.
 --   luajit tests/rescue_test.lua <Scripts dir>
-local scripts = assert(arg[1], "usage: rescue_test.lua <Scripts dir>")
+local scripts = arg[1] or "dev/v1/SquadSixReforged/Scripts" -- usage: rescue_test.lua <Scripts dir>
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
 local mock = dofile(here .. "ue4ss_mock.lua")
 

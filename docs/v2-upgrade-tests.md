@@ -1,6 +1,11 @@
 # v2 upgrade-manager tests
 
 Build with `python3 tools/package_v2.py` after a successful `tools/build_gf.sh`.
+
+> Since the move to the ModTemplate standard (after 2.0.5), releases are built by `make package` from
+> `src/SquadSixReforged_Core/`. `package_v2.py`, its upgrade-experiment variants and
+> `validate_v2_release.py` are in the `v2.0.5` tag; `tools/gf_build.py check` carries on the
+> validator's stale-input and retired-placeholder checks.
 Compatibility is now the default. Use `--clean` for the diagnostic clean archive
 or `--both` to rebuild both variants.
 Outputs are `dist/SquadSixReforged-2.0.0-test.1-Clean.zip` and

@@ -528,7 +528,7 @@ degrees, towards the middle of the map, while all seven enemies stood at about
 moved had their cover facing away from them.
 
 The direction now comes from `directions.lua` where it lists the area (by
-`<level package>:<area>`, as `data/mapscan.json` names areas), and from the
+`<level package>:<area>`, as `tools/data/mapscan.json` names areas), and from the
 volume where it doesn't. `tools/encounter_directions.py` writes it from the
 levels. Every enemy is spawned by an actor spawner (no level places enemies
 directly), and a spawner that places a fight's opening enemies lists where they

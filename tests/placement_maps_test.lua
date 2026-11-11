@@ -1,4 +1,4 @@
--- placement.lua against every deployment area in the game (data/mapscan.json, from
+-- placement.lua against every deployment area in the game (tools/data/mapscan.json, from
 -- tools/map_scan.py).
 --
 -- Geometry, for every playable lane:
@@ -25,7 +25,7 @@
 --   luajit tests/placement_maps_test.lua <Scripts dir> [--print | --write-golden]
 -- With --print, writes one line per area instead of asserting. With --write-golden, rewrites
 -- tests/data/derived_points.txt from the current code (review the diff before committing it).
-local scripts = assert(arg[1], "usage: placement_maps_test.lua <Scripts dir> [--print | --write-golden]")
+local scripts = arg[1] or "dev/v1/SquadSixReforged/Scripts" -- usage: placement_maps_test.lua <Scripts dir> [--print | --write-golden]
 local print_only = arg[2] == "--print"
 local write_golden = arg[2] == "--write-golden"
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
@@ -65,7 +65,7 @@ mock.run_until(1000)
 mock.run_loops(3)
 local P = package.loaded.placement.internals
 
-local file = assert(io.open(here .. "../data/mapscan.json"))
+local file = assert(io.open(here .. "../tools/data/mapscan.json"))
 local scan = json.decode(file:read("*a"))
 file:close()
 

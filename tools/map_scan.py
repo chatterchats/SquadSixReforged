@@ -5,7 +5,7 @@
 Every BP_CombatPreparationArea in every map package under /Game/Game/Maps is read straight from
 the cooked level: its PlayerDestinations (the TacticalPoints the map author marked for player
 deployment) and where each one stands (its root component's RelativeLocation). The result is
-written to data/mapscan.json, the input placement.lua's rules were derived from (arctco's own scan
+written to tools/data/mapscan.json, the input placement.lua's rules were derived from (arctco's own scan
 was never published).
 
 The scan then checks what placement.lua assumes about the maps:
@@ -33,10 +33,10 @@ import zen  # noqa: E402
 from retoc import Retoc, link_base_game  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "data" / "mapscan.json"
+OUTPUT = ROOT / "tools" / "data" / "mapscan.json"
 MAP_SCHEMA = ROOT / "tools" / "data" / "map_schema.json"
 MISSION_SCHEMA = ROOT / "tools" / "data" / "schema.json"
-PLACEMENT = ROOT / "src" / "SquadSixReforged" / "Scripts" / "placement.lua"
+PLACEMENT = ROOT / "dev" / "v1" / "SquadSixReforged" / "Scripts" / "placement.lua"
 MAPS_ROOT = "/Game/Game/Maps/"
 MISSION_ROOT = "/Game/Game/GameData/MissionData/"
 AREA_CLASS = "BP_CombatPreparationArea_C"

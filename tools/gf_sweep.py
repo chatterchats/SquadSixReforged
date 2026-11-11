@@ -14,7 +14,7 @@ in), and the walk onto the destinations is the game's own, the same for points f
 so the checks are on what this mod decides:
 - spawn: an operator at the world origin, or two on one tile (the game's own spawn of five and six, which the
   destinations can't fix);
-- each area (against the authored destinations in data/mapscan.json): fewer than six destinations where no fixed
+- each area (against the authored destinations in tools/data/mapscan.json): fewer than six destinations where no fixed
   layout applied, two on one tile, or a destination the mod placed too far from the authored ones or on another
   floor.
 One JSON line per mission goes to results.jsonl (missions already there are skipped, so the sweep resumes), and a
@@ -47,7 +47,7 @@ AUTHORED = 5.0     # a destination this close to an authored one is that one
 FAR = 450.0        # a placed destination further than this from every authored one has left the lane
 FLOOR = 250.0      # a placed destination this far above or below the authored one nearest it is on another floor
 SCAN = {(a["package"].rsplit("/", 1)[-1], a["area"]): [d["location"] for d in a["destinations"]]
-        for a in json.loads((REPO / "data/mapscan.json").read_text())["areas"]}
+        for a in json.loads((REPO / "tools/data/mapscan.json").read_text())["areas"]}
 
 
 def say(text):
@@ -108,9 +108,9 @@ def restart():
 
 
 def all_missions():
-    """Every mission definition, from data/missions.tsv (the sandbox's `missions` replies are cut at ~900 characters)."""
+    """Every mission definition, from tools/data/missions.tsv (the sandbox's `missions` replies are cut at ~900 characters)."""
     names = []
-    for line in (REPO / "data/missions.tsv").read_text().splitlines():
+    for line in (REPO / "tools/data/missions.tsv").read_text().splitlines():
         if line.startswith("#") or line.startswith("mission\t") or not line.strip():
             continue
         names.append(line.split("\t", 1)[0].rsplit("/", 1)[-1])

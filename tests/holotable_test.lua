@@ -5,7 +5,7 @@
 -- maximum. The current-activity view model is found by one object scan; once the panel's Changed
 -- event has handed over the mission view model, no scan is needed at all.
 --   luajit tests/holotable_test.lua <Scripts dir>
-local scripts = assert(arg[1], "usage: holotable_test.lua <Scripts dir>")
+local scripts = arg[1] or "dev/v1/SquadSixReforged/Scripts" -- usage: holotable_test.lua <Scripts dir>
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
 local mock = dofile(here .. "ue4ss_mock.lua")
 

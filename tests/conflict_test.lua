@@ -2,7 +2,7 @@
 -- ue4ss/Mods tree: arctco's Squad Six, and ZC Unlocked with its squad extension on, unset (its
 -- default is on), and off (squad=0), with and without squad_limit_text=0.
 --   luajit tests/conflict_test.lua <Scripts dir>
-local scripts = assert(arg[1], "usage: conflict_test.lua <Scripts dir>")
+local scripts = arg[1] or "dev/v1/SquadSixReforged/Scripts" -- usage: conflict_test.lua <Scripts dir>
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
 
 local root = os.tmpname()

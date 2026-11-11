@@ -3,7 +3,7 @@
 --   luajit tests/bootstrap_test.lua <Scripts dir> [--print]
 -- With --print, writes the full transcript (log lines and registrations) to stdout instead of
 -- asserting, so two builds of the runtime can be compared line for line.
-local scripts = assert(arg[1], "usage: bootstrap_test.lua <Scripts dir> [--print]")
+local scripts = arg[1] or "dev/v1/SquadSixReforged/Scripts" -- usage: bootstrap_test.lua <Scripts dir> [--print]
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
 local mock = dofile(here .. "ue4ss_mock.lua")
 local m = mock.mission

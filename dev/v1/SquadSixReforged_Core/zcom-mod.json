@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "community.squad-six-reforged.core",
+  "name": "Squad Six Reforged - Core",
+  "version": "1.4.3",
+  "author": "arctco, continued by Chats",
+  "description": "Raises the deployable squad size from four to six on the supported missions.",
+  "game": {
+    "appId": 2075800,
+    "testedBuilds": [
+      "25134257",
+      "24874058",
+      "25898267"
+    ],
+    "strict": true
+  },
+  "type": [
+    "iostore"
+  ],
+  "requires": {
+    "ue4ss": true
+  },
+  "nexus": {
+    "modId": 340
+  }
+}

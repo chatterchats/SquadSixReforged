@@ -1,5 +1,16 @@
 {
+  "name": "SquadSixReforged",
+  "title": "Squad Six Reforged",
   "version": "2.0.5",
-  "name": "Squad Six Reforged",
-  "nexusModId": 340
+  "nexusModId": 340,
+  "zipLayout": "game",
+  "shipped": [
+    {"folder": "SquadSixReforged_Core", "kind": "pak", "notices": true}
+  ],
+  "versionSpots": [
+    {"file": "src/SquadSixReforged_Core/README-UPGRADE.txt", "pattern": "^Squad Six Reforged v(\\S+)$"},
+    {"file": "unreal/SquadSixGF/SquadSixGF.uplugin", "pattern": "\"VersionName\"\\s*:\\s*\"([^\"]*)\""},
+    {"file": "unreal/SquadSixGF/SquadSixGF.uplugin", "pattern": "\"Version\"\\s*:\\s*(\\d+)", "format": "packed"}
+  ],
+  "licence": "none: arctco's original Squad Six came without a licence; see CREDITS.md"
 }

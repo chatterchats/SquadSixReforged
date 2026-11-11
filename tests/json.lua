@@ -1,4 +1,4 @@
--- A minimal JSON decoder for the test data (data/mapscan.json): objects, arrays, strings without
+-- A minimal JSON decoder for the test data (tools/data/mapscan.json): objects, arrays, strings without
 -- escapes beyond \" and \\, numbers, true, false and null.
 local json = {}
 

@@ -1,35 +1,67 @@
 # Squad Six Reforged
 
-[Get Squad Six Reforged on Nexus Mods](https://www.nexusmods.com/starwarszerocompany/mods/340)
+[Nexus Mods (340)](https://www.nexusmods.com/starwarszerocompany/mods/340) ·
+[GitHub releases](https://github.com/chatterchats/SquadSixReforged/releases)
 
-**2.0.4** raises the deployable squad size in Star Wars: Zero Company to six using a Game Feature plugin. **UE4SS is no longer required.** It includes six squad slots, a six-model lineup with matching nameplates, the holotable's operator range, cover-aware deployment and hand-picked layouts for tricky encounters. A mission's minimum squad is its required cast plus one, so you can also bring fewer; the smaller sizes have not been played on the shipping game. Bespin remains solo; the opening tutorial keeps its authored squad and deployment spots. Not Your Turf, Dantooine 025 and Kaller 030 now allow six.
+Raises the deployable squad size in Star Wars: Zero Company to six, as a Game Feature plugin: no
+UE4SS needed. Six squad slots, a six-model lineup with matching nameplates, the holotable's
+operator range, cover-aware deployment and hand-picked layouts for tricky encounters. A mission's
+minimum squad is its required cast plus one. Bespin stays solo; the opening tutorial keeps its
+authored squad. Player-facing text, with install and upgrade steps, is in [`docs/nexus/`](docs/nexus/).
 
-This continues **Squad Six by arctco**, with credit for the original mod, manual testing and hand-picked mission list. See [CREDITS.md](CREDITS.md).
+This continues **Squad Six by arctco**, with credit for the original mod, manual testing and the
+hand-picked mission list. arctco's work came without a licence, so there is no LICENSE file; see
+[CREDITS.md](CREDITS.md).
 
-## Install and upgrade
+## Commands
 
-Install `SquadSixReforged-2.0.4.zip` with your mod manager, choosing **Update/Replace** for **Squad Size Reforged - Core**: the v2 pak, ucas and utoc files. Keep all three together. From 2.0.4 the download is only this component.
+`make help` lists everything.
 
-Up to 2.0.3 the download also installed a **Squad Six Reforged** component in `Binaries/Win64/ue4ss/Mods/SquadSixReforged/`. If you installed 2.0.0 to 2.0.3, that leftover is a placeholder that does nothing and can be removed. If you are coming straight from v1, it is the old Lua runtime: this download doesn't remove or disable it, so remove it through your manager, or delete that folder, before playing. Remove the old mod's MXM settings page if it remains visible. Do not remove UE4SS itself if other mods use it.
+| Target | Does |
+| --- | --- |
+| `make test` | the Lua tests, under LuaJIT and again with only Lua 5.4's features (`tests/lua54.lua`) |
+| `make build-gf` | cook the Game Feature with the SWZC Merged Kit (`tools/build_gf.sh`), then copy the paks into `src/` and record the cook in `unreal/build.json` |
+| `make package` | `dist/SquadSixReforged-X.Y.Z.zip`; refuses paks that are stale against `unreal/build.json` |
+| `make install` / `make uninstall` | link `src/SquadSixReforged_Core` into the main install's `Content/Paks/~mods` |
+| `make bump V=X.Y.Z` | the version in `release.json`, both manifests, `README-UPGRADE.txt` and the `.uplugin` (`Version` and `VersionName`) |
+| `make release` | check, test, tag, push; CI publishes to GitHub and Nexus |
 
-Upgrade matching was tested with Zero Mod Manager and Zero Company Mod Command up to 2.0.3; the Core-only upgrade has not been tested in a manager. Vortex was not verified for v2.
+A version bump changes the `.uplugin`, which is a cook input, so every release needs a
+`make build-gf` after `make bump`: `make package` says so until it's done.
 
-For a manual install, close the game and extract the archive into `SWZeroCompany/`, replacing the old Core files. The pak lives in `Content/Paks/~mods/SquadSixReforged_Core/`. No UE4SS installation is needed for a new user.
+## Layout
 
-If you used the development trial, remove the separate `SquadSixGF_P.pak/.ucas/.utoc` files before installing the release. Do not deploy the same mod through two managers at once.
+The standard layout (`../ModTemplate/STANDARD.md`). Specific to this repo:
 
-The manifests list builds **25898267** (1.2) and **26445778** (the 1.2 hotfix) as tested. From 2.0.5 they are no longer strict, so mod managers don't block installing on other builds.
+- `src/SquadSixReforged_Core/` is exactly what ships, at `Content/Paks/~mods/SquadSixReforged_Core/`:
+  the cooked paks under v1's container name `pakchunk99-SquadSixReforged_P` (mod managers match
+  upgrades on it), the two manifests and `README-UPGRADE.txt`. CREDITS.md is added when packaging.
+  The paks are committed because cooking needs the Linux Unreal kit, which CI doesn't have.
+- `unreal/SquadSixGF/` is the plugin project (internal paths stay `/SquadSixGF/` to keep tested
+  references); `unreal/specs/` generates its Blueprint graphs; `unreal/scripts/` drives the kit.
+  `unreal/build.json` hashes every cook input and pak.
+- `tools/data/` holds the frozen inputs: `missions.tsv` (which missions go to six), `placement.json`
+  (hand-picked layouts), `mapscan.json` (every deployment area), and the JSON schemas.
+- `dev/v1/` is the retired v1 UE4SS runtime and its Core paks, kept for reference. The Lua tests
+  and the v1 tools (`build_core.py`, `inspect_core.py`, `sandbox_check.py`,
+  `encounter_directions.py`) work on it. `dev/SquadSixReforgedProbe` and
+  `dev/SquadSixReforgedTestLimits` are in-game development probes.
+- `tests/unreal/` holds kit-side tests run by `tools/test_*.sh`, not by `make test`.
 
-## Behavior and limitations
+## How it works
 
-The mod prefers free, walkable cover facing the encounter, then uses open ground when no suitable pocket is found. It does not create cover. Distant areas wait until the squad approaches before their destinations are prepared, allowing later encounter cover to stream in. A short mission-start pass separates overlapping operators where the game permits it. Version 2.0.1 also restores off-navmesh spawn rescue: after three stationary checks, a stranded operator can move beside a nearby walkable squadmate. It requires at least half the squad on navigation, tries each operator once, and stops at first combat preparation or after five minutes.
+Behaviour, limits and the history of each fix are in [CHANGELOG.md](CHANGELOG.md),
+[docs/live-tests.md](docs/live-tests.md), [docs/runtime-notes.md](docs/runtime-notes.md) and
+[docs/placement-coverage.md](docs/placement-coverage.md). Upgrade testing across mod managers is
+in [docs/v2-upgrade-tests.md](docs/v2-upgrade-tests.md); arctco's original release is described in
+[docs/upstream.md](docs/upstream.md).
 
-V2 does not ship the old MXM settings interface or the `squadsixrescue` command. Its deployment repair is not a full port of the v1 watchdog. Keep other squad-size extensions disabled to avoid competing changes.
+## Testing in game
 
-## Building
+After `make build-gf` and `make install`, restart the game and check squad select (six slots),
+the holotable's operator range, and deployment on a mission with several encounters. Use a game
+copy or a throwaway save: Squad Six changes the squad size of every campaign it loads in. Keep
+other squad-size mods (such as Squad Expansion) out of the install.
 
-`python3 tools/package.py` builds the current release ZIP from checked-in cooked files under `release/2.0.4/`. The packager checks their hashes and the source inputs; it does not need Unreal Editor to assemble a release. `tools/package_v2.py` also offers experimental clean/main-only/text-only layouts for upgrade investigations; these are not the default release.
-
-To author and cook, use `tools/build_gf.sh` with the SWZC Merged Kit. The build uses the frozen `data/placement.json` and `data/missions.tsv`; archived v1 Lua is not a build dependency. Internal asset paths remain `/SquadSixGF/` to preserve the tested references. The editor-only ZComAuthoring plugin is never shipped.
-
-`src/`, the Lua tests and `tools/package_v1.py` retain the historical v1 implementation for reference. `unreal/specs/` contains the v2 Blueprint graph generators. See [CHANGELOG.md](CHANGELOG.md), [live tests](docs/live-tests.md) and [upgrade tests](docs/v2-upgrade-tests.md).
+Known gap: `tools/gf_sweep.py` loads `ZComDenDesigner/tools/dd.py`, which no longer exists, so the
+all-missions sweep can't run until that helper is restored.

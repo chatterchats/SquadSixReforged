@@ -11,7 +11,7 @@
 --   3. At mission start, an operator standing still in the hole is moved beside a squadmate,
 --      but not while the whole squad is off the navmesh (an intro), and not in a stock squad.
 --   luajit tests/live_fixes_test.lua <Scripts dir>
-local scripts = assert(arg[1], "usage: live_fixes_test.lua <Scripts dir>")
+local scripts = arg[1] or "dev/v1/SquadSixReforged/Scripts" -- usage: live_fixes_test.lua <Scripts dir>
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
 local mock = dofile(here .. "ue4ss_mock.lua")
 

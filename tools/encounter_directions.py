@@ -12,7 +12,7 @@ spawned nobody at the start in either fight checked live: it is a reinforcement,
 of Infection (HM_TelRea_010) stands inside the deployment lane, so spawner positions alone gave a
 direction 130 degrees off. The designers also label spawners, for example BP_ActorSpawner_Enemy1.3
 where 1 is the wave. Labels are editor data the game doesn't load, so the direction is worked out
-here and written to src/SquadSixReforged/Scripts/directions.lua.
+here and written to dev/v1/SquadSixReforged/Scripts/directions.lua.
 
 For each deployment area: the destinations of the spawners labelled as enemies (not neutral,
 crisis, rescue or named story characters), of the lowest wave, whose destinations' centre is
@@ -38,7 +38,7 @@ import map_scan  # noqa: E402
 from retoc import Retoc, link_base_game  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "src" / "SquadSixReforged" / "Scripts" / "directions.lua"
+OUTPUT = ROOT / "dev" / "v1" / "SquadSixReforged" / "Scripts" / "directions.lua"
 SCHEMA = ROOT / "tools" / "data" / "direction_schema.json"
 AREA_CLASS = "BP_CombatPreparationArea_C"
 SPAWNER_CLASS = "BP_ActorSpawner_C"

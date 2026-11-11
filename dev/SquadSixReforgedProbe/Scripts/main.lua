@@ -109,7 +109,7 @@ end
 
 local function vector(point) return {X = point.X, Y = point.Y, Z = point.Z} end
 
--- "SK_Lothal_035_Gameplay:BP_CombatPreparationArea_C_0", as data/mapscan.json names areas.
+-- "SK_Lothal_035_Gameplay:BP_CombatPreparationArea_C_0", as tools/data/mapscan.json names areas.
 local function area_key(area)
     local name = full_name(area)
     local package = name:match("%s(/[^%.]+)%.") or name

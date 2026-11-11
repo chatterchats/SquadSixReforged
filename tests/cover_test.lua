@@ -28,7 +28,7 @@
 --      pocket set from the cover and its walls recoloured by category (green usable, yellow
 --      crowded, red outside), none for cover facing away; all removed after a minute.
 --   luajit tests/cover_test.lua <Scripts dir>
-local scripts = assert(arg[1], "usage: cover_test.lua <Scripts dir>")
+local scripts = arg[1] or "dev/v1/SquadSixReforged/Scripts" -- usage: cover_test.lua <Scripts dir>
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
 local mock = dofile(here .. "ue4ss_mock.lua")
 

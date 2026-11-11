@@ -1,0 +1,43 @@
+# SHARED FILE: owned by ModTemplate and copied in by `make sync`; never edit it in a mod repo.
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SKIP_LUA_TESTS: ${{ vars.SKIP_LUA_TESTS == 'true' && '1' || '' }}
+    steps:
+      - uses: actions/checkout@v6
+
+      # apt first; when Ubuntu's mirrors are down, build LuaJIT from GitHub instead.
+      - name: Install LuaJIT
+        if: hashFiles('tests/*_test.lua') != '' && env.SKIP_LUA_TESTS != '1'
+        run: |
+          if timeout 120 sh -c 'sudo apt-get update -qq -o Acquire::Retries=2 && sudo apt-get install -y -qq luajit'; then
+            exit 0
+          fi
+          echo "::warning::apt failed; building LuaJIT from source"
+          git clone -q --depth 1 --branch v2.1 https://github.com/LuaJIT/LuaJIT.git "$RUNNER_TEMP/luajit"
+          make -s -C "$RUNNER_TEMP/luajit" -j"$(nproc)"
+          sudo make -s -C "$RUNNER_TEMP/luajit" install
+          command -v luajit || sudo ln -sf "$(ls /usr/local/bin/luajit-2.1* | head -1)" /usr/local/bin/luajit
+          luajit -v
+
+      - name: Conformance check
+        run: python3 tools/modtool.py check --ci
+
+      - name: Tests
+        run: make test
+
+      - name: Package
+        run: make package

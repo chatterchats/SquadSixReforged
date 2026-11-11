@@ -1,11 +1,11 @@
 """Build the Core pak (pakchunk99-SquadSixReforged_P) from the installed game's own packages.
 
   python3 tools/build_core.py --retoc /path/to/retoc --paks ".../SWZeroCompany/Content/Paks"
-  python3 tools/build_core.py ... --check     build to a temporary folder and compare with src/SquadSixReforged_Core
+  python3 tools/build_core.py ... --check     build to a temporary folder and compare with dev/v1/SquadSixReforged_Core
 
 No editor and no cook: every package in the pak is the game's cooked package with one value
 changed, exactly as in arctco's releases.
-  - Mission definitions: MaxSquadSize set to the `squad` column of data/missions.tsv. Only rows
+  - Mission definitions: MaxSquadSize set to the `squad` column of tools/data/missions.tsv. Only rows
     where it differs from `game` are packed. The value is located by parsing the package's
     unversioned properties (zen.py), never by searching for bytes.
   - AC_HologramManager: the lineup loop's last index, the package's only EX_IntConst 3, becomes 5.
@@ -15,7 +15,7 @@ mission packages byte for byte, so the built packages differ from the game's onl
 Every build is verified before it's written: each package is compared with the same package
 packed unpatched (only the 4 patched bytes may differ), the unpatched missions must equal the
 game's byte for byte, and each mission is re-parsed to confirm its squad limit. The result and the inputs it was built from are recorded in
-data/core-build.sha256, which tools/package.py checks.
+tools/data/core-build.sha256, which the v1 packager (tools/package_v1.py, removed after v2.0.5) checked.
 """
 from pathlib import Path
 import argparse
@@ -31,10 +31,10 @@ import zen  # noqa: E402
 from retoc import Retoc, legacy_path, link_base_game  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-MISSIONS = ROOT / "data" / "missions.tsv"
+MISSIONS = ROOT / "tools" / "data" / "missions.tsv"
 SCHEMA = ROOT / "tools" / "data" / "schema.json"
-RECORD = ROOT / "data" / "core-build.sha256"
-OUTPUT = ROOT / "src" / "SquadSixReforged_Core"
+RECORD = ROOT / "tools" / "data" / "core-build.sha256"
+OUTPUT = ROOT / "dev" / "v1" / "SquadSixReforged_Core"
 STEM = "pakchunk99-SquadSixReforged_P"
 PAK_FILES = [f"{STEM}.{extension}" for extension in ("pak", "ucas", "utoc")]
 MISSION_ROOT = "/Game/Game/GameData/MissionData/"
@@ -45,7 +45,7 @@ HOLOGRAM = "/Game/Game/UI/AC_HologramManager"
 INT_CONST = 0x1D  # EX_IntConst, followed by an int32
 LINEUP_LAST_INDEX = (3, 5)
 # Inputs whose change means the pak must be rebuilt.
-RECORDED_INPUTS = ["data/missions.tsv", "tools/build_core.py", "tools/zen.py", "tools/retoc.py",
+RECORDED_INPUTS = ["tools/data/missions.tsv", "tools/build_core.py", "tools/zen.py", "tools/retoc.py",
                    "tools/data/schema.json"]
 
 
@@ -77,7 +77,7 @@ def plan(retoc, base, schema, rows):
     unlisted = sorted(set(missions) - set(rows))
     missing = sorted(set(rows) - set(missions))
     if unlisted or missing:
-        raise SystemExit("data/missions.tsv doesn't match the game's missions:\n"
+        raise SystemExit("tools/data/missions.tsv doesn't match the game's missions:\n"
                          + "".join(f"  new in the game, add a row: {p[len(MISSION_ROOT):]}\n" for p in unlisted)
                          + "".join(f"  no longer in the game: {p[len(MISSION_ROOT):]}\n" for p in missing))
     patches, changed = {}, []
@@ -191,15 +191,15 @@ def compare(retoc, built, committed):
                     != retoc.get(committed / f"{STEM}.utoc", theirs[path]))
     only_ours, only_theirs = sorted(set(ours) - set(theirs)), sorted(set(theirs) - set(ours))
     identical = all((built / name).read_bytes() == (committed / name).read_bytes() for name in PAK_FILES)
-    print(f"src/SquadSixReforged_Core: {len(set(ours) & set(theirs)) - len(differ)} packages identical, "
-          f"{len(differ)} different, {len(only_ours)} only in this build, {len(only_theirs)} only in src/SquadSixReforged_Core"
+    print(f"dev/v1/SquadSixReforged_Core: {len(set(ours) & set(theirs)) - len(differ)} packages identical, "
+          f"{len(differ)} different, {len(only_ours)} only in this build, {len(only_theirs)} only in dev/v1/SquadSixReforged_Core"
           + ("; container files identical" if identical else "; container files differ in layout"))
     for path in differ:
         print(f"  different: {path}")
     for path in only_ours:
         print(f"  only in this build: {path}")
     for path in only_theirs:
-        print(f"  only in src/SquadSixReforged_Core: {path}")
+        print(f"  only in dev/v1/SquadSixReforged_Core: {path}")
     return not (differ or only_ours or only_theirs)
 
 
@@ -207,7 +207,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--retoc", required=True)
     parser.add_argument("--paks", required=True, type=Path, help="the game's SWZeroCompany/Content/Paks")
-    parser.add_argument("--check", action="store_true", help="compare with src/SquadSixReforged_Core instead of writing it")
+    parser.add_argument("--check", action="store_true", help="compare with dev/v1/SquadSixReforged_Core instead of writing it")
     args = parser.parse_args()
     retoc = Retoc(args.retoc)
     schema = zen.Schema(json.loads(SCHEMA.read_text())["schemas"])
@@ -229,7 +229,7 @@ def main():
     lines = [f"{sha256(OUTPUT / name)}  {name}" for name in PAK_FILES]
     lines += [f"{sha256(ROOT / name)}  {name}" for name in RECORDED_INPUTS]
     RECORD.write_text("\n".join(lines) + "\n")
-    print(f"Wrote src/SquadSixReforged_Core/{STEM}.* and {RECORD.relative_to(ROOT)}")
+    print(f"Wrote dev/v1/SquadSixReforged_Core/{STEM}.* and {RECORD.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@
 -- two destinations later, then enemies to the lane's -X with the tactical volume's centre to +Y.
 -- The probe runs while missions load, so it also mustn't search all objects often.
 --   luajit tests/probe_test.lua <Scripts dir>
-local scripts = assert(arg[1], "usage: probe_test.lua <Scripts dir>")
+local scripts = arg[1] or "dev/v1/SquadSixReforged/Scripts" -- usage: probe_test.lua <Scripts dir>
 local here = string.match(arg[0], "^(.*[/\\])") or "./"
 local mock = dofile(here .. "ue4ss_mock.lua")
 
@@ -14,7 +14,7 @@ SquadSixProbeOutputDir = output .. "-"
 mock.install({})
 local generic_find = StaticFindObject
 
--- Lothal 035 (data/mapscan.json): four destinations close to a line.
+-- Lothal 035 (tools/data/mapscan.json): four destinations close to a line.
 local destinations = {}
 for index, p in ipairs({{449.0, 935.0, 7.3}, {892.7, 635.3, 52.3}, {431.9, 1164.7, 149.6}, {1368.0, 240.0, 7.3}}) do
     destinations[index] = mock.actor("TacticalPoint TacticalPoint_" .. index, {X = p[1], Y = p[2], Z = p[3]})

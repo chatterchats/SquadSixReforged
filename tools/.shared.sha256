@@ -1,6 +1,6 @@
-# Shared files from ModTemplate 9f17d5c. Written by `make sync`; do not edit.
-284f4170a4927598b6fb9530815635ebe7de7f6f3f9a327489847e0b748c4669  .github/workflows/ci.yml
-90e8fc955e744d1a9d0f43889578ae14798dee37f39dfd8b1972c471ca0b0d3e  .github/workflows/release.yml
+# Shared files from ModTemplate 25dd98d. Written by `make sync`; do not edit.
+34179235dcc13115060cec1fdf012a52146a0bb1a964a68947729b61b8a96939  .github/workflows/ci.yml
+c622970830120e2399fc1863adb4477bca6ee296cae70fef23fb5320d1162118  .github/workflows/release.yml
 2d99c44d8fb650fd8f074ea5a239356478fd41fd037dd39f614a8c2ddc96bf8f  docs/agent-rules.md
 746e79f3be96caeb1f39a9d41fb48590e3549a15a38a59d2f773b623dc49f402  tools/mod.mk
-6a57ba06904a571e7ea82b82bf945d6f8551c06d978d68ffbc627b962f595491  tools/modtool.py
+be8344af61b5733fbcf21357bde084b78e3720b7ebc553d26a4c789bc90281ea  tools/modtool.py

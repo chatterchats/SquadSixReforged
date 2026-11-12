@@ -19,10 +19,22 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      # apt first; when Ubuntu's mirrors are down, build LuaJIT from GitHub instead.
-      - name: Install LuaJIT
+      # The Lua the tests run under (release.json "lua": luajit or 5.4). apt first; when Ubuntu's
+      # mirrors are down, build it from source instead.
+      - name: Install Lua
         if: hashFiles('tests/*_test.lua') != '' && env.SKIP_LUA_TESTS != '1'
         run: |
+          lua=$(python3 -c 'import json; print(json.load(open("release.json")).get("lua", "luajit"))')
+          if [ "$lua" = 5.4 ]; then
+            if timeout 120 sh -c 'sudo apt-get update -qq -o Acquire::Retries=2 && sudo apt-get install -y -qq lua5.4'; then
+              lua5.4 -v; exit 0
+            fi
+            echo "::warning::apt failed; building Lua 5.4 from source"
+            git clone -q --depth 1 --branch v5.4.7 https://github.com/lua/lua.git "$RUNNER_TEMP/lua"
+            make -s -C "$RUNNER_TEMP/lua" -j"$(nproc)" MYCFLAGS="-std=c99 -DLUA_USE_LINUX" MYLIBS="-ldl" CC=gcc
+            sudo install -m 755 "$RUNNER_TEMP/lua/lua" /usr/local/bin/lua5.4
+            lua5.4 -v; exit 0
+          fi
           if timeout 120 sh -c 'sudo apt-get update -qq -o Acquire::Retries=2 && sudo apt-get install -y -qq luajit'; then
             exit 0
           fi
